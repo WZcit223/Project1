@@ -26,8 +26,14 @@ Every plugin:
 6. Has contract tests: registration, parameter validation, determinism, output schema.
 7. Bumps `version` on any behaviour change that alters outputs for the same inputs.
 
-`core.Registry[T]` API: `register(plugin)`, `get(id, version=None)` (latest if omitted),
-`list()`, `__contains__`. Duplicate `(id, version)` → `DuplicatePluginError`.
+`core.Registry[T]` (implemented in `industrial_ai.core.registry`):
+`Registry(kind, key)` where `key(plugin) → (id, version)` tells the registry which attributes hold the
+id and version (e.g. `generator_id`, `generator_version`); `register(plugin)`,
+`get(id, version=None)` (highest semver if omitted), `list()` and `keys()` (ordered by id, then
+version), `len()`, iteration, `"id" in registry` / `("id", "1.0.0") in registry`.
+Errors: duplicate `(id, version)` → `DuplicatePluginError`; unknown id/version →
+`PluginNotFoundError`; version not `MAJOR.MINOR.PATCH` → `InvalidVersionError`
+(all subclasses of `IndustrialAIError`).
 
 ## 3. Scenario packs and discovery
 

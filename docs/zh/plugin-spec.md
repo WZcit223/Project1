@@ -28,8 +28,10 @@
 6. 具备契约测试（contract test）：注册、参数校验、确定性、输出 schema。
 7. 任何导致相同输入产生不同输出的行为变更，都须提升 `version`。
 
-`core.Registry[T]` API：`register(plugin)`、`get(id, version=None)`（省略时取最新版本）、
-`list()`、`__contains__`。重复的 `(id, version)` → `DuplicatePluginError`。
+`core.Registry[T]`（实现于 `industrial_ai.core.registry`）：
+`Registry(kind, key)`，其中 `key(plugin) → (id, version)` 告诉注册表插件的 id 与版本存放在哪些属性中（例如 `generator_id`、`generator_version`）；`register(plugin)`、
+`get(id, version=None)`（省略时取语义化版本最高者）、`list()` 与 `keys()`（按 id、再按版本排序）、`len()`、迭代、`"id" in registry` / `("id", "1.0.0") in registry`。
+错误：重复的 `(id, version)` → `DuplicatePluginError`；未知的 id/版本 → `PluginNotFoundError`；版本不是 `MAJOR.MINOR.PATCH` → `InvalidVersionError`（均为 `IndustrialAIError` 的子类）。
 
 ## 3. 场景包与发现机制
 

@@ -11,3 +11,19 @@ class IndustrialAIError(Exception):
 
 class ConfigurationError(IndustrialAIError):
     """Invalid or missing configuration."""
+
+
+class InvalidVersionError(IndustrialAIError, ValueError):
+    """A version string is not a valid ``MAJOR.MINOR.PATCH`` semantic version."""
+
+
+class RegistryError(IndustrialAIError):
+    """Base class for plugin registry errors."""
+
+
+class DuplicatePluginError(RegistryError):
+    """A plugin with the same ``(id, version)`` is already registered."""
+
+
+class PluginNotFoundError(RegistryError, LookupError):
+    """No plugin is registered under the requested id (and version)."""
