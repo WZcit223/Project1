@@ -4,11 +4,11 @@ from fastapi.testclient import TestClient
 
 import industrial_ai
 from industrial_ai.api.app import create_app
-from industrial_ai.core.config import Settings
+from industrial_ai.core.config import Environment, Settings
 
 
 def make_client() -> TestClient:
-    return TestClient(create_app(Settings(env="test")))
+    return TestClient(create_app(Settings(env=Environment.TEST)))
 
 
 def test_health_returns_ok_and_version() -> None:
@@ -24,5 +24,5 @@ def test_openapi_schema_is_served_under_api() -> None:
 
 
 def test_app_keeps_injected_settings() -> None:
-    settings = Settings(env="test", api_port=9100)
+    settings = Settings(env=Environment.TEST, api_port=9100)
     assert create_app(settings).state.settings is settings

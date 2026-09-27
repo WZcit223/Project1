@@ -41,7 +41,7 @@ known-first-party = ["industrial_ai", "industrial_ai_warehouse"]
 [tool.mypy]
 python_version = "3.11"
 strict = true
-packages = ["industrial_ai", "industrial_ai_warehouse"]
+files = ["src", "scenarios/warehouse/src", "tests"]
 mypy_path = ["src", "scenarios/warehouse/src"]
 
 [tool.pytest.ini_options]
