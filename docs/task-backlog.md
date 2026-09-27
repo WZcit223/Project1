@@ -23,7 +23,7 @@ Branch name suggestion in brackets.
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ✅ approved 2026-09-27 |
 | M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ✅ approved 2026-09-27 |
 | M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ✅ approved 2026-09-27 (with follow-ups TASK-STR-004) |
-| M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ⬜ |
+| M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | 🟡 awaiting owner review |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ⬜ |
 | M13 UI | 13 | G11 UI executes Golden Path | M12 | ⬜ |
@@ -161,7 +161,7 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
   reproducible results and explicit temporal information boundaries.* It is **not** a demonstration that
   any strategy is economically or operationally superior in the real world.
 
-### TASK-STR-004 — Gate 8 follow-ups  [`phase10`]
+### TASK-STR-004 — Gate 8 follow-ups  [`phase10`] ✅
 - Keep `OperationsConfig.order_cost_range` unchanged (the cost structure exposes ordering-cost dominance).
 - Separate cost components and volume metrics (ordering / holding / lost-sales cost, total cost, average
   on-hand units and value, purchase orders, units ordered, fill rate, stockout days, unfulfilled demand).
@@ -177,8 +177,8 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 10 — Scenario engine
 
-### TASK-SCN-001 — ScenarioSpec, registry, YAML loading, parameter model  [`feature/scenario-engine`]
-### TASK-SCN-002 — Four warehouse scenarios + Level-3 scenario tests
+### TASK-SCN-001 — ScenarioSpec, registry, YAML loading, parameter model  [`phase10`] ✅
+### TASK-SCN-002 — Four warehouse scenarios + Level-3 scenario tests  [`phase10`] ✅
 
 ## Phase 11 — Golden Path
 
