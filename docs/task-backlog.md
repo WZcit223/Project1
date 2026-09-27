@@ -21,7 +21,7 @@ Branch name suggestion in brackets.
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ✅ approved 2026-09-27 |
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ✅ approved 2026-09-27 |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ✅ approved 2026-09-27 |
-| M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | 🟡 awaiting owner review |
+| M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ✅ approved 2026-09-27 |
 | M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ⬜ |
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ⬜ |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |

@@ -5,6 +5,21 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 7 / M8 approved
+
+### Branch
+`phase8`
+
+### Changes
+- Owner approved Gate 7 (inventory simulation works) and the seven Phase 8 decisions (strategy protocol
+  delivered early, CRN pre-sampling, unshipped share lost, duration 0 = whole horizon, capacity reported
+  only, lost-sales value at mean price, initial on_order after mean lead time). M8 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 9 (replenishment strategies) on branch `phase9` created from `phase8`.
+
+---
+
 ## 2026-09-27 — Phase 8: Inventory simulation + metrics (TASK-INV-001, TASK-INV-002)
 
 ### Branch
