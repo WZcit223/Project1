@@ -1,8 +1,9 @@
 """Scenario specification (docs/scenario-spec.md §2) — minimal generic form.
 
 A scenario is explicit, versioned configuration of the environment; it contains no code
-(Scenario ≠ Algorithm). Parameter *validation* against a pack's parameter model, the scenario
-registry and YAML loading arrive with the scenario engine (Phase 10).
+(Scenario ≠ Algorithm). Parameters are validated against the pack's parameter model when the spec
+is registered (:mod:`industrial_ai.scenario.registry`); files are read by
+:mod:`industrial_ai.scenario.loading`.
 """
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator

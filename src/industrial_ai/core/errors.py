@@ -71,3 +71,11 @@ class SimulationError(IndustrialAIError):
 
 class SimulationInputError(SimulationError, ValueError):
     """The dataset, parameters or upstream results do not satisfy the plugin's requirements."""
+
+
+class ScenarioError(IndustrialAIError):
+    """Base class for scenario specification errors."""
+
+
+class ScenarioValidationError(ScenarioError, ValueError):
+    """A scenario file or specification is malformed, or its parameters fail the pack's model."""
