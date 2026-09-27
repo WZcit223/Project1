@@ -5,6 +5,66 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 1: Framework skeleton (TASK-CORE-001 … 006)
+
+### Branch
+`phase1` — based on `phase0` @ `0f04972`
+
+### Objective
+Make the project start and its tests run (Gate 1): workspace layout, architecture enforcement,
+configuration, logging, plugin registry, API skeleton and CI. No domain logic.
+
+### Changes
+- **CORE-001** uv workspace: `scenarios/warehouse` is the separate package `industrial-ai-warehouse`
+  (ADR-004), installed via the root dev group only; framework layer packages created
+  (`core`, `foundation`, `scenario`, `synthetic`, `simulation`, `application`, `api`).
+- **CORE-002** `tests/unit/test_architecture.py` statically enforces R1 (no scenario-pack imports in
+  the framework) and R2 (per-layer dependency table, now documented in architecture.md §2, EN + ZH).
+  Verified to fail on an injected violation.
+- **CORE-003** `core.config.Settings` (pydantic-settings, `IAI_*`, `.env`), `load_settings()`,
+  `core.logging.configure_logging()` / `get_logger()`, `core.errors`.
+- **CORE-004** `core.registry.Registry[T]` keyed by `(id, semver)`, `core.versioning`; plugin-spec
+  (EN + ZH) documents the implemented API.
+- **CORE-005** FastAPI `create_app()`, `GET /health`, OpenAPI at `/api/openapi.json`,
+  `uv run python -m industrial_ai.api`.
+- **CORE-006** GitHub Actions CI: `uv sync --locked`, ruff format/lint, mypy, pytest.
+
+### Dependencies added
+Runtime: pydantic, pydantic-settings, fastapi, uvicorn. Dev: httpx2 (Starlette TestClient; `httpx`
+is deprecated there).
+
+### Decisions / assumptions
+- Phase 1 tasks were small, so they were implemented directly on `phase1` as atomic commits rather
+  than separate `feature/*` branches.
+- The generic `scenario` layer sits between foundation and synthetic/simulation in the dependency
+  table (synthetic generators and simulation plugins both receive a `ScenarioSpec`).
+- `api` may import only `core` and `application` (strict reading of ADR-001).
+- `Registry` takes a key function so each plugin protocol keeps its own id/version attribute names.
+
+### Files / Modules
+`pyproject.toml`, `uv.lock`, `.env.example`, `README.md`, `.github/workflows/ci.yml`,
+`src/industrial_ai/{core,foundation,scenario,synthetic,simulation,application,api}/`,
+`scenarios/warehouse/`, `tests/unit/`, `tests/integration/`, `docs/architecture.md`,
+`docs/plugin-spec.md`, `docs/task-backlog.md` (+ ZH mirrors).
+
+### Tests / checks
+ruff format + lint, mypy strict (both packages), pytest: 56 passed (unit + integration).
+Manual: API started with uvicorn, `GET /health` → `{"status":"ok","version":"0.1.0.dev0"}`.
+CI: GitHub Actions run #1 on `phase1` @ 3a1b8e4 — success (https://github.com/WZcit223/Project1/actions/runs/36307244146).
+
+### Commits
+7fcb8a9 build(workspace), e7372eb test(architecture), cddf953 feat(core) config/logging,
+afc25ed feat(core) registry, 462ee68 feat(api), 3a1b8e4 ci, + docs(log) for this entry.
+
+### Known issues
+- `foundation`, `scenario`, `synthetic`, `simulation`, `application` are still empty packages (by design).
+- No database yet; `IAI_DATABASE_URL` is used from Phase 2.
+
+### Next
+Owner review of Gate 1 → Phase 2 (Dataset foundation, TASK-DATA-001 …) on branch `phase2` from `phase1`.
+
+---
+
 ## 2026-09-27 — Gate 0 approved
 
 ### Branch

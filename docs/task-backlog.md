@@ -14,7 +14,7 @@ Branch name suggestion in brackets.
 | Milestone | Phase | Gate | Depends on | Status |
 |---|---|---|---|---|
 | M0 Architecture spec | 0 | G0 Architecture documented & approved | — | ✅ approved 2026-09-27 |
-| M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ⬜ |
+| M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ 2026-09-27 (awaiting owner review) |
 | M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ⬜ |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ⬜ |
 | M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ⬜ |
@@ -39,36 +39,36 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 1 — Skeleton
 
-### TASK-CORE-001 — Workspace & package skeleton  [`feature/project-skeleton`]
+### TASK-CORE-001 — Workspace & package skeleton  [`phase1`] ✅
 - Objective: create uv workspace with `scenarios/warehouse` member package `industrial-ai-warehouse`; create empty sub-packages per [architecture.md §3](architecture.md#3-package--module-structure).
 - Outputs: `pyproject.toml` (workspace), `scenarios/warehouse/pyproject.toml`, `__init__.py` files, `scripts/`, `ui/` placeholders.
 - Acceptance: `uv sync` installs both packages; `import industrial_ai_warehouse` works.
 - Tests: import smoke test for both packages.
 - Non-goals: any logic.
 
-### TASK-CORE-002 — Architecture enforcement test  [`feature/project-skeleton`]
+### TASK-CORE-002 — Architecture enforcement test  [`phase1`] ✅
 - Objective: test that `industrial_ai` never imports `industrial_ai_warehouse` and that layers only import downward (R1, R2).
 - Interfaces: test walks AST imports of `src/industrial_ai/**`.
 - Acceptance: test passes; a deliberately bad import (in a temp file inside the test) fails it.
 - Non-goals: third-party import-linter dependency.
 
-### TASK-CORE-003 — Configuration & logging  [`feature/core-config`]
+### TASK-CORE-003 — Configuration & logging  [`phase1`] ✅
 - Objective: `core.config.Settings` (pydantic-settings, `IAI_*` env vars, matches `.env.example`); `core.logging.configure()`.
 - Acceptance: settings load from env and defaults; log lines include level/logger/message.
 - Tests: env override, invalid value error.
 - Non-goals: remote logging, secrets management.
 
-### TASK-CORE-004 — Generic registry & errors  [`feature/core-registry`]
+### TASK-CORE-004 — Generic registry & errors  [`phase1`] ✅
 - Objective: `core.Registry[T]` keyed by `(id, version)` with latest-version lookup; `core.errors` hierarchy; semver parsing helper.
 - Acceptance: register/get/list/contains; duplicates rejected; `get(id)` returns highest semver.
 - Tests: unit tests for all behaviours.
 
-### TASK-CORE-005 — FastAPI app & health  [`feature/api-skeleton`]
+### TASK-CORE-005 — FastAPI app & health  [`phase1`] ✅
 - Objective: `industrial_ai.api.app:create_app()`, `GET /health` → `{"status":"ok","version":…}`; `scripts/run_api.py` / `uv run` command.
 - Acceptance: TestClient returns 200 with correct body.  **Gate 1.**
 - Non-goals: other endpoints.
 
-### TASK-CORE-006 — CI workflow  [`ci/github-actions`]
+### TASK-CORE-006 — CI workflow  [`phase1`] ✅
 - Objective: GitHub Actions: `uv sync --locked`, ruff format check, ruff lint, mypy, pytest on push/PR.
 - Acceptance: workflow green on the PR.
 

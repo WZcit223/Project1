@@ -16,7 +16,7 @@
 | 里程碑 | 阶段 | 关卡（Gate） | 依赖 | 状态 |
 |---|---|---|---|---|
 | M0 架构规范 | 0 | G0 架构已文档化并获批准 | — | ✅ 已批准 2026-09-27 |
-| M1 框架骨架 | 1 | G1 项目可启动、测试可运行 | M0 | ⬜ |
+| M1 框架骨架 | 1 | G1 项目可启动、测试可运行 | M0 | ✅ 2026-09-27（待负责人评审） |
 | M2 数据集基础 | 2 | G2 数据集可加载并验证 | M1 | ⬜ |
 | M3 M5 适配器 | 3 | G3 M5 → 规范模型（canonical） | M2 | ⬜ |
 | M4 合成数据引擎 | 4 | G4 可复现的合成数据 | M2 | ⬜ |
@@ -41,36 +41,36 @@
 
 ## Phase 1 — 骨架
 
-### TASK-CORE-001 — 工作区与包骨架  [`feature/project-skeleton`]
+### TASK-CORE-001 — 工作区与包骨架  [`phase1`] ✅
 - 目标：创建 uv 工作区（workspace），包含 `scenarios/warehouse` 成员包 `industrial-ai-warehouse`；按照 [architecture.md §3](architecture.md) 创建空的子包。
 - 输出：`pyproject.toml`（workspace）、`scenarios/warehouse/pyproject.toml`、`__init__.py` 文件、`scripts/`、`ui/` 占位。
 - 验收：`uv sync` 安装两个包；`import industrial_ai_warehouse` 可用。
 - 测试：两个包的导入冒烟测试。
 - 非目标：任何逻辑。
 
-### TASK-CORE-002 — 架构约束测试  [`feature/project-skeleton`]
+### TASK-CORE-002 — 架构约束测试  [`phase1`] ✅
 - 目标：测试 `industrial_ai` 从不导入 `industrial_ai_warehouse`，且各层只能向下导入（R1、R2）。
 - 接口：测试遍历 `src/industrial_ai/**` 的 AST 导入。
 - 验收：测试通过；故意构造的错误导入（在测试内的临时文件中）会使其失败。
 - 非目标：第三方 import-linter 依赖。
 
-### TASK-CORE-003 — 配置与日志  [`feature/core-config`]
+### TASK-CORE-003 — 配置与日志  [`phase1`] ✅
 - 目标：`core.config.Settings`（pydantic-settings，`IAI_*` 环境变量，与 `.env.example` 一致）；`core.logging.configure()`。
 - 验收：设置可从环境变量和默认值加载；日志行包含 level/logger/message。
 - 测试：环境变量覆盖、非法值报错。
 - 非目标：远程日志、密钥管理。
 
-### TASK-CORE-004 — 通用注册表与错误  [`feature/core-registry`]
+### TASK-CORE-004 — 通用注册表与错误  [`phase1`] ✅
 - 目标：以 `(id, version)` 为键、支持最新版本查找的 `core.Registry[T]`；`core.errors` 异常层级；semver 解析辅助函数。
 - 验收：register/get/list/contains；拒绝重复；`get(id)` 返回最高 semver。
 - 测试：覆盖所有行为的单元测试。
 
-### TASK-CORE-005 — FastAPI 应用与健康检查  [`feature/api-skeleton`]
+### TASK-CORE-005 — FastAPI 应用与健康检查  [`phase1`] ✅
 - 目标：`industrial_ai.api.app:create_app()`，`GET /health` → `{"status":"ok","version":…}`；`scripts/run_api.py` / `uv run` 命令。
 - 验收：TestClient 返回 200 且响应体正确。  **Gate 1。**
 - 非目标：其他端点。
 
-### TASK-CORE-006 — CI 工作流  [`ci/github-actions`]
+### TASK-CORE-006 — CI 工作流  [`phase1`] ✅
 - 目标：GitHub Actions：在 push/PR 时执行 `uv sync --locked`、ruff 格式检查、ruff lint、mypy、pytest。
 - 验收：PR 上工作流为绿色。
 
