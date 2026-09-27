@@ -5,7 +5,7 @@
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
-§1–3 中的接口已在 `industrial_ai.simulation` 中**实现**（Phase 6）；§4 中的插件将在 Phase 7–9 中陆续提供。
+§1–3 中的接口已在 `industrial_ai.simulation` 中**实现**（Phase 6）；§4 中的预测插件已实现（Phase 7）；库存仿真与策略将在 Phase 8–9 中陆续提供。
 
 ## 1. 插件接口
 
@@ -74,17 +74,27 @@ comparison.metrics_table()                   # variants × metric ids (pandas Da
 
 | 插件 | 类型 (Kind) | 位置 | 说明 |
 |---|---|---|---|
-| `moving_average` v1 | forecast | core `simulation/forecasting` | 窗口参数；基线 (baseline) |
-| `seasonal_naive` v1 | forecast | core | 周度季节性朴素法 (weekly seasonal naive)（默认基线） |
-| `lightgbm` v1 | forecast | core | 跨序列的全局模型；滞后/滚动/日历/价格特征；在仿真期间之前的历史数据上训练一次；每隔 `reforecast_interval_days`（默认 7）进行滚动预测，预测长度为 `forecast_horizon_days`（默认 28），使用截至 *t* 为止观测到的需求 |
+| `seasonal_naive` 1.0.0 ✅ | forecast | core `simulation/forecasting` | 取同一星期几（`season_length_days` 7）最近 `seasons`（4）个值的均值 —— 默认基线 (baseline) |
+| `moving_average` 1.0.0 ✅ | forecast | core | 最近 `window_days`（28）天的平直均值 (flat mean) |
+| `lightgbm` 1.0.0 ✅ | forecast | core | 一个全局 Poisson 模型，在仿真期间开始之前的数据上训练一次（原生 API、单线程、确定性、种子取自本次运行）；直接多步预测 (direct multi-step prediction)；特征：预测期第几天 (horizon day)、星期几、月份、最近一个值、7/28/365 天均值、最近 4 个同星期几值的均值。v1 中不含价格或事件特征 |
 | `inventory_simulation` v1 | simulation | warehouse pack | 按日离散时间模型，见 [scenario-spec.md §5](scenario-spec.md) |
 | 补货策略 (replenishment strategies) | strategy（供库存仿真使用） | warehouse pack | `reorder_point`、`safety_stock`、`dynamic`；见 [plugin-spec.md §4](plugin-spec.md) |
 
 指令中的名称 `DemandForecastPlugin`、`InventorySimulationPlugin`、`ReplenishmentStrategyPlugin`
 分别对应预测插件、`inventory_simulation` 以及策略插件。
 
-预测插件在仿真期间上报告准确度指标：MAE、RMSE、WAPE；M5 WRMSSE 仅可作为参考指标
-加入。目标是打通可运行的 Data → Forecast → Simulation 流水线，而非追求预测准确度。
+**滚动起点预测 (rolling-origin forecasting)（所有预测插件）。** 通用参数：`entity_columns`、
+`time_column`（`date`）、`value_column`（`quantity`）、`input_table`（数据包 (bundle) 中的表）、`reforecast_interval_days`
+（7）、`forecast_horizon_days`（28）。预测起点 (origin) 为仿真期间的开始日，以及此后每隔 7 天直至仿真期间结束的各日；
+每个起点向前预测 28 天，且**只使用日期早于该起点的观测值**（已测试：从某个起点开始修改数据，绝不会改变该起点的预测结果）。
+输入为观测到的序列（历史数据，加上随时间推移逐步被观测到的仿真期间需求）；缺失的日度单元格以 0 填充并予以报告。
+输出 `sim.forecast`：`origin_date, date, <entity columns>, forecast (≥ 0), actual (nullable)`。
+
+预测插件在具有实际值 (actual) 的行上报告准确度指标：`mae`、`rmse`、`wape` = Σ|e| / Σ actual、`bias` =
+Σe / Σ actual（当 Σ actual = 0 时为 `None`），以及 `forecast_rows_evaluated`；M5 WRMSSE 日后可能加入，但仅作为
+参考指标。目标是打通可运行的 Data → Forecast → Simulation 流水线，而非追求预测准确度。
+在真实 M5 子集上（50 条序列，26 个周度起点，2015 年 11 月 – 2016 年 5 月）：WAPE 季节性朴素法 (seasonal naive) 0.44、
+移动平均 (moving average) 0.46、LightGBM 0.41（仅为描述性结果）。
 
 ## 5. 预留插件类型（未实现）
 
