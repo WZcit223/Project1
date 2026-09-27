@@ -84,6 +84,21 @@
 
 校验从不修改数据，也不会因数据有误而抛出异常。`skipped` 的检查不会使报告失败，但始终会被列出，因此不会有任何检查被悄悄视为通过。
 
+### 1.6 数据目录（`industrial_ai.foundation.catalog.DatasetCatalog`）
+
+SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bundle 保存一行记录，其中 Schema、元数据与溯源以 JSON 存储；数据本身为 Parquet 文件，位于
+`<IAI_DATA_DIR>/processed/artifacts/datasets/<dataset_id>/<version>/data.parquet`。
+
+| 操作 | 行为 |
+|---|---|
+| `register(dataset)` | 写入 Parquet，并在提交前**重新读取、校验内容哈希**；重复的 `(dataset_id, version)` → `DatasetAlreadyRegisteredError` |
+| `get(dataset_id, version=None)` | 重建 `Dataset`，并重新校验哈希，因此被修改过的数据文件会引发 `DatasetError`；`version=None` 表示最近注册的版本 |
+| `list(source_type=None)` | 按注册顺序返回 `DatasetSummary` |
+| `preview(dataset_id, version=None, limit=50)` | 概要、逐列统计（数据类型、空值数、最小/最大值、均值）以及前若干行（JSON 安全的字典） |
+| `register_bundle(bundle)` / `get_bundle(...)` | 保存成员表的引用；已注册且内容相同的表会被复用，内容冲突的表会被拒绝 |
+
+数据集版本为自由格式字符串（例如 `"1"`、`"2026-09-27"`）；插件与 Schema 版本为语义化版本。
+
 ## 2. 规范零售需求模型（Warehouse 包，`schema_version 1.0`）
 
 框架本身从不接触 M5 列名；这些表由 M5 适配器 (adapter) 生成。

@@ -31,3 +31,15 @@ class PluginNotFoundError(RegistryError, LookupError):
 
 class DatasetError(IndustrialAIError):
     """A dataset is malformed or inconsistent with its schema, metadata or provenance."""
+
+
+class CatalogError(IndustrialAIError):
+    """Base class for dataset catalog errors."""
+
+
+class DatasetAlreadyRegisteredError(CatalogError):
+    """A different dataset is already registered under the same ``(dataset_id, version)``."""
+
+
+class DatasetNotFoundError(CatalogError, LookupError):
+    """No dataset (or bundle) is registered under the requested id and version."""

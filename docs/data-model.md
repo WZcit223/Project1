@@ -89,6 +89,22 @@ return a `ValidationReport` (`subject`, `results`, computed `passed`). Each `Che
 Validation never modifies data and never raises for bad data. `skipped` checks do not fail a report
 but are always listed, so nothing is silently treated as passed.
 
+### 1.6 Catalog (`industrial_ai.foundation.catalog.DatasetCatalog`)
+
+SQLite (via SQLModel; `IAI_DATABASE_URL`) holds one row per dataset and per bundle with the schema,
+metadata and provenance as JSON; the data is a Parquet file under
+`<IAI_DATA_DIR>/processed/artifacts/datasets/<dataset_id>/<version>/data.parquet`.
+
+| Operation | Behaviour |
+|---|---|
+| `register(dataset)` | Writes Parquet, **re-reads it and checks the content hash** before committing; duplicate `(dataset_id, version)` → `DatasetAlreadyRegisteredError` |
+| `get(dataset_id, version=None)` | Rebuilds the `Dataset`; the hash is re-verified, so a modified artifact raises `DatasetError`; `version=None` = most recently registered |
+| `list(source_type=None)` | `DatasetSummary` rows in registration order |
+| `preview(dataset_id, version=None, limit=50)` | Summary, per-column stats (dtype, nulls, min/max, mean) and the first rows as JSON-safe dicts |
+| `register_bundle(bundle)` / `get_bundle(...)` | Stores member-table references; identical already-registered tables are reused, conflicting ones rejected |
+
+Dataset versions are free-form strings (e.g. `"1"`, `"2026-09-27"`); plugin and schema versions are semver.
+
 ## 2. Canonical retail-demand model (Warehouse pack, `schema_version 1.0`)
 
 The framework never sees M5 column names; the M5 adapter produces these tables.
