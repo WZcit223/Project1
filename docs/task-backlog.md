@@ -16,7 +16,7 @@ Branch name suggestion in brackets.
 | M0 Architecture spec | 0 | G0 Architecture documented & approved | — | ✅ approved 2026-09-27 |
 | M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ approved 2026-09-27 |
 | M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ✅ approved 2026-09-27 |
-| M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ⬜ |
+| M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ✅ 2026-09-27 (awaiting owner review) |
 | M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ⬜ |
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ⬜ |
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ⬜ |
@@ -98,18 +98,18 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 3 — M5 adapter (warehouse pack)
 
-### TASK-M5-001 — Canonical retail schemas  [`feature/m5-adapter`]
+### TASK-M5-001 — Canonical retail schemas  [`phase3`] ✅
 - Objective: `retail.*` schemas per [data-model.md §2](data-model.md#2-canonical-retail-demand-model-warehouse-pack-schema_version-10) in the pack.
 
-### TASK-M5-002 — M5-shaped synthetic fixture  [`feature/m5-adapter`]
+### TASK-M5-002 — M5-shaped synthetic fixture  [`phase3`] ✅
 - Objective: `scripts/make_m5_fixture.py` writes a small synthetic dataset in raw M5 file layout to `tests/fixtures/m5_like/` (seeded, labelled synthetic).
 - Acceptance: re-running produces byte-identical files.
 
-### TASK-M5-003 — M5 adapter  [`feature/m5-adapter`]
+### TASK-M5-003 — M5 adapter  [`phase3`] ✅
 - Objective: raw M5 (or subset) → canonical `DatasetBundle` with attribution metadata; wide→long unpivot; weekday re-encoding; events to rows.
 - Tests: on fixture: row counts, FK validity, weekday mapping, no negative quantities.  **Gate 3.**
 
-### TASK-M5-004 — Subset extraction script  [`feature/m5-subset-script`]
+### TASK-M5-004 — Subset extraction script  [`phase3`] ✅
 - Objective: `scripts/make_m5_subset.py --stores CA_1 --dept FOODS_3 --top-n 50` for users to run locally on full Kaggle files; writes `data/raw/m5_subset/` + `SOURCE.json`.
 - Acceptance: works on the fixture; streams the large sales file without loading everything into memory.
 - Non-goals: downloading from Kaggle.

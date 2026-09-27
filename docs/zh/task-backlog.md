@@ -18,7 +18,7 @@
 | M0 架构规范 | 0 | G0 架构已文档化并获批准 | — | ✅ 已批准 2026-09-27 |
 | M1 框架骨架 | 1 | G1 项目可启动、测试可运行 | M0 | ✅ 已批准 2026-09-27 |
 | M2 数据集基础 | 2 | G2 数据集可加载并验证 | M1 | ✅ 已批准 2026-09-27 |
-| M3 M5 适配器 | 3 | G3 M5 → 规范模型（canonical） | M2 | ⬜ |
+| M3 M5 适配器 | 3 | G3 M5 → 规范模型（canonical） | M2 | ✅ 2026-09-27（待负责人评审） |
 | M4 合成数据引擎 | 4 | G4 可复现的合成数据 | M2 | ⬜ |
 | M5 合成仓储数据 | 5 | G5 运营数据已生成 | M3, M4 | ⬜ |
 | M6 仿真引擎 | 6 | G6 仿真引擎可执行 | M2 | ⬜ |
@@ -100,18 +100,18 @@
 
 ## Phase 3 — M5 适配器（仓储包）
 
-### TASK-M5-001 — 规范零售 schema  [`feature/m5-adapter`]
+### TASK-M5-001 — 规范零售 schema  [`phase3`] ✅
 - 目标：在场景包中按照 [data-model.md §2](data-model.md) 实现 `retail.*` schema。
 
-### TASK-M5-002 — M5 形态的合成夹具  [`feature/m5-adapter`]
+### TASK-M5-002 — M5 形态的合成夹具  [`phase3`] ✅
 - 目标：`scripts/make_m5_fixture.py` 以原始 M5 文件布局将一个小型合成数据集写入 `tests/fixtures/m5_like/`（带 seed，标注为合成）。
 - 验收：重复运行生成字节级一致的文件。
 
-### TASK-M5-003 — M5 适配器  [`feature/m5-adapter`]
+### TASK-M5-003 — M5 适配器  [`phase3`] ✅
 - 目标：原始 M5（或子集）→ 带归属元数据的规范 `DatasetBundle`；宽表→长表逆透视；星期重新编码；事件转为行。
 - 测试：基于夹具：行数、外键有效性、星期映射、无负数量。  **Gate 3。**
 
-### TASK-M5-004 — 子集提取脚本  [`feature/m5-subset-script`]
+### TASK-M5-004 — 子集提取脚本  [`phase3`] ✅
 - 目标：`scripts/make_m5_subset.py --stores CA_1 --dept FOODS_3 --top-n 50`，供用户在本地基于完整 Kaggle 文件运行；写入 `data/raw/m5_subset/` + `SOURCE.json`。
 - 验收：可在夹具上运行；以流式方式处理大型销售文件，而不将其全部加载到内存。
 - 非目标：从 Kaggle 下载。

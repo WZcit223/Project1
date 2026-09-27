@@ -5,6 +5,62 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 3: M5 adapter (TASK-M5-001 … 004)
+
+### Branch
+`phase3` — based on `phase2` @ `ec945b5`
+
+### Objective
+Gate 3: M5 can be converted to the canonical schema — without real M5 data in the repository.
+
+### Changes
+- **M5-001** `industrial_ai_warehouse.schemas.retail`: ten canonical retail schemas (1.0.0) with
+  primary/foreign keys, time index and entity keys.
+- **M5-002** `adapters.m5.source` (`M5Source` = `SOURCE.json`, `SubsetFilters`, M5 constants) and
+  `adapters.m5.fixture` + `scripts/make_m5_fixture.py`: synthetic, M5-layout fixture in
+  `tests/fixtures/m5_like/` (2 stores × 2 departments × 6 items × 1,100 days), byte-identical on
+  regeneration, labelled `source_type=fixture`.
+- **M5-003** `adapters.m5.M5Adapter` (`m5` 1.0.0): unpivot, ISO weekday (cross-checked), event and
+  SNAP rows, deterministic sorting, attribution + per-table provenance; bundle validates with no
+  failed or skipped checks.
+- **M5-004** `adapters.m5.subset` + `scripts/make_m5_subset.py`: streaming subset extraction with
+  verbatim values and `SOURCE.json`; optional `pytest -m m5_local` check of `data/raw/m5_subset/`.
+- mypy also covers `scripts/`; pytest marker `m5_local` registered.
+
+### Decisions / assumptions
+- SNAP flags modelled as long table `retail.calendar_snap` instead of per-state calendar columns
+  (keeps the canonical calendar region-agnostic); data-model.md updated (EN + ZH).
+- Without `SOURCE.json`, a folder is treated as original Kaggle files (`reference`, id `m5`,
+  download date unknown — recorded as such, never invented).
+- Canonical tables take `created_at` from `SOURCE.json`, so conversion is fully deterministic.
+- Prices are kept only for product/store series present in the sales file.
+- The adapter targets subsets; the full 30,490-series unpivot is not supported in v0.1 (memory).
+- Subset top-N ranks items by total sales across the selected stores; ties broken by item id.
+
+### Files / Modules
+`scenarios/warehouse/src/industrial_ai_warehouse/{schemas,adapters}/`, `scripts/make_m5_fixture.py`,
+`scripts/make_m5_subset.py`, `tests/fixtures/m5_like/`, `tests/unit/warehouse/`,
+`tests/integration/test_m5_local.py`, `docs/data-model.md` §2, §5 (+ ZH), `README.md`, `pyproject.toml`.
+
+### Tests / checks
+ruff format + lint, mypy strict (src, pack, tests, scripts), pytest: 167 passed, 1 skipped
+(`m5_local`, no local subset). CI on `phase3`: see Actions.
+
+### Commits
+574bd29 retail schemas, b2664c9 fixture + SOURCE.json, 4e6282d M5 adapter, 7ece2c0 subset script,
++ docs(log) for this entry.
+
+### Known issues
+- Not yet run on the real M5 subset: needs the owner to run `make_m5_subset.py` and upload / place
+  the output in `data/raw/m5_subset/`.
+- M5 sales are observed sales (censored by stockouts); documented, not corrected.
+
+### Next
+Owner review of Gate 3 (and real-subset upload when convenient) → Phase 4 (Synthetic Data Engine)
+on branch `phase4` from `phase3`.
+
+---
+
 ## 2026-09-27 — Gate 2 approved
 
 ### Branch
