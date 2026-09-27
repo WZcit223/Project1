@@ -5,6 +5,61 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 8: Inventory simulation + metrics (TASK-INV-001, TASK-INV-002)
+
+### Branch
+`phase8` — based on `phase7` @ `57c0bb4`
+
+### Objective
+Warehouse inventory simulation plugin (daily, single-echelon, lost sales) with ledger and purchase-order
+outputs and the KPI set of data-model §6; Gate 7.
+
+### Changes
+- Strategy protocol in `industrial_ai_warehouse.strategies` (`ReplenishmentStrategy.create_policy` →
+  `ItemPolicy.order_quantity`, `ItemContext`, `DailyObservation`, `ForecastView` without look-ahead,
+  strategy registry). Delivered here because the simulation needs it; the three strategies follow in Phase 9.
+- `inventory_simulation` 1.0.0: receive → serve → review → order; case pack / MOQ rounding; sampled lead
+  times with late deliveries; supply scenario effects (`lead_time_delta`, `supply_capacity_factor`,
+  disruption window, `planner_aware`); outputs `sim.inventory_ledger` and `sim.purchase_order`.
+- `inventory_metrics`: all data-model §6 metrics plus per-product service level.
+- Specs updated: scenario-spec §5, plugin-spec §4, data-model §4/§6 (EN + ZH).
+
+### Decisions / assumptions (for review)
+- Strategy protocol defined in Phase 8 (backlog had it in TASK-STR-001) and changed from the Gate 0 sketch
+  (`initialise`/`decide`/`OrderDecision`) to `create_policy`/`order_quantity`; rounding stays in the simulation.
+- Lead-time noise, lateness and delays are pre-sampled per item and day (common random numbers), so strategies
+  compared on the same seed see the same supply conditions.
+- The unshipped share under reduced supply capacity is lost (not back-ordered).
+- `disruption_duration_days = 0` means the whole horizon.
+- Warehouse capacity is reported as a warning when exceeded, not enforced (v0.1).
+- Lost-sales value uses the mean reference price (`derived.product_price`).
+- Initial `on_order` (0 by default) would arrive after the mean lead time.
+
+### Real-subset check (descriptive only, not committed as a test)
+CA_1 / FOODS_3 / top 50, 91-day synthetic horizon, seed 20260927, temporary test order-up-to strategy
+(daily review): level 100 → service 0.668, level 300 → 0.929; supply disruption (+7 days lead time, 50 %
+capacity, days 14–41) → 0.574 / 0.879. ≈ 0.7 s per run. Ordering cost (≈ 143 k USD) dwarfs holding cost
+(≈ 156 USD), because the test strategy orders almost daily and FOODS_3 unit costs are low.
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 265 passed (accounting identities, hand-computed 10-day example,
+metric recomputation from the ledger, CRN, scenario effects, Gate 7 pipeline on the fixture).
+
+### Commits
+412e62c feat(warehouse): strategy protocol · 0b51933 feat(warehouse): inventory simulation + metrics ·
+docs(spec) / docs(zh) / docs(plan) / docs(log) (this round).
+
+### Known issues
+- Cost balance of the synthetic operations (order cost 20–60 USD vs. low FOODS_3 unit costs) makes ordering
+  cost dominate; review when the Phase 9 strategies with order cycles run on the real subset.
+- Capacity not enforced; single echelon; no backorders (by scope).
+
+### Next
+Gate 7 / M8 review → Phase 9 on branch `phase9` (from `phase8`): reorder point, safety stock, dynamic
+strategies, compared on identical demand via `engine.compare` (Gate 8).
+
+---
+
 ## 2026-09-27 — M7 approved
 
 ### Branch
