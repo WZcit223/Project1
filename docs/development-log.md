@@ -5,6 +5,22 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 6 approved
+
+### Branch
+`phase6`
+
+### Changes
+- Owner approved Gate 6 and the four Phase 6 decisions (engine-only datasets/provenance, no failed
+  result objects, upstream by name, constraints passed to plugins). M6 ✅ in the backlog (EN + ZH).
+- Owner chose option B for the real M5 subset (commit it; the repository will be made private later)
+  and explicitly accepted that it is publicly visible until then. Implemented on `phase7`.
+
+### Next
+Phase 7 (forecast plugins) on branch `phase7` created from `phase6`.
+
+---
+
 ## 2026-09-27 — Phase 6: Simulation Engine (TASK-SIM-001)
 
 ### Branch
