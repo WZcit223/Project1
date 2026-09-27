@@ -1,6 +1,6 @@
 # ADR-003: M5 enters through an adapter into a canonical model
 
-- Status: Proposed (Gate 0)
+- Status: Accepted (Gate 0, 2026-09-27)
 - Date: 2026-09-27
 
 ## Context

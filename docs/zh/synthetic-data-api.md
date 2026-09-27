@@ -1,6 +1,6 @@
 # 合成数据 API — v0.1
 
-状态：**Gate 0 评审草案** · English (authoritative): [../synthetic-data-api.md](../synthetic-data-api.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../synthetic-data-api.md](../synthetic-data-api.md)
 包 (Package)：`industrial_ai.synthetic` · 相关：[plugin-spec.md](plugin-spec.md)、[ADR-002](../adr/ADR-002-plugin-architecture.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。

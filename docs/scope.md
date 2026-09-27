@@ -1,6 +1,6 @@
 # Scope & Non-goals — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/scope.md](zh/scope.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/scope.md](zh/scope.md)
 
 > Architecture first, extensibility first, scenario validation second; productionization later.
 

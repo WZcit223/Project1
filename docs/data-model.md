@@ -1,6 +1,6 @@
 # Data Model — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/data-model.md](zh/data-model.md) · Related: [ADR-003](adr/ADR-003-m5-canonical-adapter.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/data-model.md](zh/data-model.md) · Related: [ADR-003](adr/ADR-003-m5-canonical-adapter.md)
 
 This document defines (1) the domain-neutral dataset abstraction of the framework,
 (2) the canonical retail-demand model used by the Warehouse pack, (3) the synthetic operational

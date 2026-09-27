@@ -1,6 +1,6 @@
 # Application API — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/application-api.md](zh/application-api.md) · Related: [ADR-001](adr/ADR-001-api-first.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/application-api.md](zh/application-api.md) · Related: [ADR-001](adr/ADR-001-api-first.md)
 
 The Application API is the **only** interface the UI (and any future React / mobile / enterprise
 client) uses. HTTP + JSON, served by FastAPI under `/api`, OpenAPI schema at `/api/openapi.json`.

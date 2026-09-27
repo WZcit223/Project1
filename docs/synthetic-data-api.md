@@ -1,6 +1,6 @@
 # Synthetic Data API — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/synthetic-data-api.md](zh/synthetic-data-api.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/synthetic-data-api.md](zh/synthetic-data-api.md)
 Package: `industrial_ai.synthetic` · Related: [plugin-spec.md](plugin-spec.md), [ADR-002](adr/ADR-002-plugin-architecture.md)
 
 Signatures below are **normative interface sketches**; exact typing is finalised in Phase 4 and

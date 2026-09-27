@@ -1,6 +1,6 @@
 # 插件规格说明（Plugin Specification）— v0.1
 
-状态：**Gate 0 评审草案** · English (authoritative): [../plugin-spec.md](../plugin-spec.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../plugin-spec.md](../plugin-spec.md)
 相关：[ADR-002](../adr/ADR-002-plugin-architecture.md)，[ADR-004](../adr/ADR-004-scenario-pack-packaging.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。

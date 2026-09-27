@@ -1,6 +1,6 @@
 # Task Backlog & Phase Plan — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/task-backlog.md](zh/task-backlog.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/task-backlog.md](zh/task-backlog.md)
 
 Each task is small enough for one coding-agent round (1–5 atomic commits). Branching follows [CLAUDE.md](../CLAUDE.md) §7: each major round (phase or significant feature) gets a new branch created from the latest working branch (`phase<N>` with N = the phase number below, e.g. Phase 0 → `phase0`; `feature/<name>` inside a phase); nothing is merged to `main` during work in progress. Do **one task
 at a time**, in order, unless dependencies allow otherwise. Every task inherits the rules in
@@ -13,7 +13,7 @@ Branch name suggestion in brackets.
 
 | Milestone | Phase | Gate | Depends on | Status |
 |---|---|---|---|---|
-| M0 Architecture spec | 0 | G0 Architecture documented & approved | — | 🟡 in review |
+| M0 Architecture spec | 0 | G0 Architecture documented & approved | — | ✅ approved 2026-09-27 |
 | M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ⬜ |
 | M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ⬜ |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ⬜ |
@@ -33,9 +33,9 @@ Branch name suggestion in brackets.
 
 ## Phase 0 — Architecture
 
-### TASK-ARCH-001 — Architecture baseline  [`phase0`] ✅ submitted for review
+### TASK-ARCH-001 — Architecture baseline  [`phase0`] ✅ approved at Gate 0 (2026-09-27)
 Objective: uv project, CLAUDE.md, all specs in `docs/`, ADRs, backlog, bilingual mirror. No app logic.
-Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; PR open for Gate 0.
+Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; approved by the project owner (Gate 0).
 
 ## Phase 1 — Skeleton
 

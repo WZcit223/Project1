@@ -1,6 +1,6 @@
 # 需求 (Requirements) — v0.1
 
-状态：**Gate 0 评审草案** · 语言：中文镜像 · English (authoritative): [../requirements.md](../requirements.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · 语言：中文镜像 · English (authoritative): [../requirements.md](../requirements.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 

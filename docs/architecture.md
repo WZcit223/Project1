@@ -1,6 +1,6 @@
 # Architecture — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/architecture.md](zh/architecture.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/architecture.md](zh/architecture.md)
 Related ADRs: [ADR-001](adr/ADR-001-api-first.md), [ADR-002](adr/ADR-002-plugin-architecture.md),
 [ADR-003](adr/ADR-003-m5-canonical-adapter.md), [ADR-004](adr/ADR-004-scenario-pack-packaging.md)
 

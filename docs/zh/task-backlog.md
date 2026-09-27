@@ -1,6 +1,6 @@
 # 任务待办与阶段计划 — v0.1
 
-状态：**Gate 0 评审稿** · English (authoritative): [../task-backlog.md](../task-backlog.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../task-backlog.md](../task-backlog.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
@@ -15,7 +15,7 @@
 
 | 里程碑 | 阶段 | 关卡（Gate） | 依赖 | 状态 |
 |---|---|---|---|---|
-| M0 架构规范 | 0 | G0 架构已文档化并获批准 | — | 🟡 评审中 |
+| M0 架构规范 | 0 | G0 架构已文档化并获批准 | — | ✅ 已批准 2026-09-27 |
 | M1 框架骨架 | 1 | G1 项目可启动、测试可运行 | M0 | ⬜ |
 | M2 数据集基础 | 2 | G2 数据集可加载并验证 | M1 | ⬜ |
 | M3 M5 适配器 | 3 | G3 M5 → 规范模型（canonical） | M2 | ⬜ |
@@ -35,9 +35,9 @@
 
 ## Phase 0 — 架构
 
-### TASK-ARCH-001 — 架构基线  [`phase0`] ✅ 已提交评审
+### TASK-ARCH-001 — 架构基线  [`phase0`] ✅ 已于 Gate 0 批准（2026-09-27）
 目标：uv 项目、CLAUDE.md、`docs/` 中的全部规范、ADR、待办清单、双语镜像。不含应用逻辑。
-验收：文档内部一致；`uv run pytest`、`ruff`、`mypy` 通过；已为 Gate 0 开启 PR。
+验收：文档内部一致；`uv run pytest`、`ruff`、`mypy` 通过；已获项目负责人批准（Gate 0）。
 
 ## Phase 1 — 骨架
 

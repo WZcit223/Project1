@@ -1,6 +1,6 @@
 # Validation Specification — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/validation.md](zh/validation.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/validation.md](zh/validation.md)
 
 > v0.1 validates the **framework**, not the real-world accuracy of synthetic data.
 > Allowed claim: *"The framework validates synthetic data generation and scenario execution at the prototype level."*

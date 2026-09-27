@@ -10,7 +10,7 @@ The first validation scenario is **Warehouse / Inventory — Demand Forecasting 
 Simulation**, built on the M5 Forecasting Accuracy reference dataset plus synthetic operational data.
 Warehouse is a *scenario plugin*, not the framework itself.
 
-> Status: **Phase 0 — Architecture Specification** (v0.1.0.dev0). No application logic is implemented yet.
+> Status: **Phase 0 — Architecture Specification approved (Gate 0)** (v0.1.0.dev0). No application logic is implemented yet.
 > This is a prototype; see [docs/validation.md](docs/validation.md) for what is and is not validated.
 
 ## Documentation

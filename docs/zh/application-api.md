@@ -1,6 +1,6 @@
 # 应用 API（Application API）— v0.1
 
-状态：**Gate 0 评审草案** · English (authoritative): [../application-api.md](../application-api.md) · 相关：[ADR-001](../adr/ADR-001-api-first.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../application-api.md](../application-api.md) · 相关：[ADR-001](../adr/ADR-001-api-first.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 

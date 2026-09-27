@@ -1,6 +1,6 @@
 # Requirements — v0.1
 
-Status: **Draft for Gate 0 review** · Language: English (authoritative) · 中文: [zh/requirements.md](zh/requirements.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · Language: English (authoritative) · 中文: [zh/requirements.md](zh/requirements.md)
 
 ## 1. Background
 

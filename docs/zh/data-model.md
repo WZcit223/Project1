@@ -1,6 +1,6 @@
 # 数据模型 — v0.1
 
-状态：**Gate 0 评审草案** · English (authoritative): [../data-model.md](../data-model.md) · 相关：[ADR-003](../adr/ADR-003-m5-canonical-adapter.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../data-model.md](../data-model.md) · 相关：[ADR-003](../adr/ADR-003-m5-canonical-adapter.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 

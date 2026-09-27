@@ -5,6 +5,28 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 0 approved
+
+### Branch
+`phase0`
+
+### Objective
+Record the project owner's Gate 0 approval of the architecture baseline.
+
+### Changes
+- All specs (EN + ZH) marked "Approved at Gate 0 (2026-09-27), v0.1 baseline".
+- ADR-001 … ADR-004 status: Accepted.
+- Task backlog: M0 ✅, TASK-ARCH-001 approved. README status updated.
+- Approval is recorded here, not via a PR: per CLAUDE.md §7 nothing is merged to `main` during work in progress.
+
+### Tests / checks
+Docs-only change; ruff, mypy, pytest and link check re-run — pass.
+
+### Next
+Phase 1 (Skeleton): branch `phase1` created from `phase0`, starting with TASK-CORE-001.
+
+---
+
 ## 2026-09-27 — Branch policy update
 
 ### Branch

@@ -1,6 +1,6 @@
 # 架构 (Architecture) — v0.1
 
-状态：**Gate 0 评审草案** · English (authoritative): [../architecture.md](../architecture.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../architecture.md](../architecture.md)
 相关 ADR：[ADR-001](../adr/ADR-001-api-first.md)、[ADR-002](../adr/ADR-002-plugin-architecture.md)、
 [ADR-003](../adr/ADR-003-m5-canonical-adapter.md)、[ADR-004](../adr/ADR-004-scenario-pack-packaging.md)
 

@@ -1,6 +1,6 @@
 # UI Specification — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/ui-spec.md](zh/ui-spec.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/ui-spec.md](zh/ui-spec.md)
 
 ## 1. Principles
 

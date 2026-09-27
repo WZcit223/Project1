@@ -1,6 +1,6 @@
 # Plugin Specification — v0.1
 
-Status: **Draft for Gate 0 review** · 中文: [zh/plugin-spec.md](zh/plugin-spec.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/plugin-spec.md](zh/plugin-spec.md)
 Related: [ADR-002](adr/ADR-002-plugin-architecture.md), [ADR-004](adr/ADR-004-scenario-pack-packaging.md)
 
 ## 1. Plugin types

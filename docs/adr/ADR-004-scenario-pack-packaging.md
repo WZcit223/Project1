@@ -1,6 +1,6 @@
 # ADR-004: Scenario packs are separate packages in a uv workspace
 
-- Status: Proposed (Gate 0)
+- Status: Accepted (Gate 0, 2026-09-27)
 - Date: 2026-09-27
 
 ## Context
