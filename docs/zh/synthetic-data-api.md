@@ -5,17 +5,17 @@
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
-以下签名为**规范性接口草图 (normative interface sketches)**；确切的类型定义将在 Phase 4 定稿，
-届时本文档将同步更新。
+以下接口已在 `industrial_ai.synthetic` 中**实现 (implemented)**（Phase 4）。
 
 ## 1. 生成器接口
 
 ```python
 class SyntheticDataGenerator(Protocol):
-    generator_id: str          # e.g. "time_series"
-    generator_version: str     # semver, e.g. "1.0.0"
+    generator_id: str                    # e.g. "time_series"
+    generator_version: str               # semver, e.g. "1.0.0"
     description: str
-    parameter_model: type[BaseModel]   # Pydantic model validating `parameters`
+    parameter_model: type[BaseModel]     # Pydantic model validating `parameters`
+    scenario_parameters: frozenset[str]  # scenario parameters this generator can apply
 
     def generate(
         self,
@@ -24,9 +24,9 @@ class SyntheticDataGenerator(Protocol):
         scenario: ScenarioSpec | None,
         seed: int,
         size: GenerationSize,
-        parameters: Mapping[str, Any],
+        parameters: BaseModel,           # instance of parameter_model, validated by the engine
         reference: Dataset | DatasetBundle | None = None,
-    ) -> SyntheticDataset: ...
+    ) -> GeneratedData: ...              # data + transformation steps + warnings
 ```
 
 | 参数 | 含义 |
@@ -35,31 +35,31 @@ class SyntheticDataGenerator(Protocol):
 | `constraints` | schema 之外的额外约束（范围、关联关系、求和），见 §3 |
 | `scenario` | 其参数用于调整生成过程的场景（例如 `demand_multiplier`）；`None` = 中性 |
 | `seed` | 整数种子；随机性的**唯一**来源（`numpy.random.default_rng(seed)`） |
-| `size` | 行数、实体数 × 期数，或日期范围，取决于生成器（`GenerationSize`） |
+| `size` | 表使用 `GenerationSize(rows=…)`，日序列使用 `(start=…, periods=…)`；未设置的字段由系统推导（例如每个参考行对应一行） |
 | `parameters` | 生成器特定参数，由 `parameter_model` 校验 |
 | `reference` | 可选的参考数据，用于校准 (calibration)（例如 M5 子集） |
+
+生成器返回的是 `GeneratedData`，而不是数据集：哈希、溯源信息 (provenance) 与校验均由**引擎 (engine)**
+计算，因此插件无法产出缺失溯源信息或溯源信息被伪造的数据。
 
 规则：
 - 生成器相对于输入是**纯函数 (pure)**：不使用全局随机数生成器 (RNG)，不依赖系统时钟，不访问网络。
 - 无效参数抛出 `GeneratorParameterError`；输出违反约束时抛出
-  `ConstraintViolationError`。除非截断规则是一个显式且被记录的参数，否则生成器绝不静默地截断
-  (clip) 或丢弃数据。
+  `ConstraintViolationError`（附带 `ValidationReport`）。除非截断规则是一个显式且被记录的参数，
+  否则生成器绝不静默地截断 (clip) 或丢弃数据。
+- 生成器未应用的场景参数会作为**警告 (warnings)** 列出（记录在结果和溯源信息中），绝不被静默忽略。
 
 ## 2. 输出：`SyntheticDataset`
 
 ```
-SyntheticDataset
-├── data               pandas.DataFrame
-├── schema             DatasetSchema
-├── metadata           DatasetMetadata (source_type = "synthetic")
-├── generation_config  {schema_id, constraints, scenario, size, parameters}  (fully serialisable)
-├── generator_id
-├── generator_version
-├── random_seed
-└── provenance         ProvenanceRecord
+SyntheticDataset (a Dataset subtype)
+├── data, schema, metadata (source_type = "synthetic"), provenance
+├── generation_config   GenerationConfig: generator id/version, schema id/version, constraints,
+│                       scenario, seed, size, validated parameters (fully serialisable)
+├── validation_report   ValidationReport (always passed; failures raise instead)
+├── warnings
+└── generator_id / generator_version / random_seed   (properties of generation_config)
 ```
-
-`SyntheticDataset` 是 `Dataset` 的子类型，因此所有下游 API 均可接受它。
 
 ## 3. 约束
 
@@ -81,25 +81,32 @@ SyntheticDataset
 ## 4. 注册表与引擎
 
 ```python
-registry = GeneratorRegistry()
-registry.register(TimeSeriesGenerator())            # key: ("time_series", "1.0.0")
-registry.get("time_series")                         # latest version
-registry.get("time_series", "1.0.0")                # exact version
-registry.list()                                      # [GeneratorInfo(id, version, description, parameter_schema)]
+registry = new_generator_registry()                 # core Registry keyed by (generator_id, version)
+registry.register(TimeSeriesGenerator())
+registry.get("time_series")                          # latest version
+describe(registry.get("time_series"))                # GeneratorInfo incl. parameter JSON schema
 
-engine = SyntheticEngine(registry, catalog)
-result = engine.generate(GenerationRequest(
-    generator_id="time_series", generator_version="1.0.0",
-    schema_id="retail.sales", scenario_id="high_demand",
-    seed=20260927, size=..., parameters={...},
-    reference_dataset_id="m5_subset_ca1_foods3",
-))
+engine = SyntheticEngine(registry, catalog)          # catalog optional
+result = engine.generate(
+    GenerationRequest(
+        generator_id="time_series",                  # generator_version=None → latest (recorded)
+        dataset_id="syn_demand_high", version="1",
+        output_schema=SYNTHETIC_DEMAND_SCHEMA,
+        constraints=ConstraintSet(...),
+        scenario=high_demand,                        # ScenarioSpec or None
+        seed=20260927,
+        size=GenerationSize(start=date(2016, 1, 1), periods=182),
+        parameters={...},
+        reference_dataset_id="m5_subset_ca_1_foods_3_top50.sales",   # or pass reference=...
+    ),
+    register=True,
+)
 ```
 
-引擎的处理流程：解析生成器与 schema → 校验参数 → 调用 `generate` → 校验
-约束 → 计算内容哈希 → 写入溯源信息 (provenance) → 在目录 (catalog) 中注册数据集。
-重复注册相同的 `(id, version)` 会抛出错误。插件发现 (plugin discovery)：见
-[plugin-spec.md](plugin-spec.md)。
+引擎的处理流程：解析生成器 → 校验参数 → 解析参考数据（来自参数或目录 (catalog)）→ 调用 `generate` →
+构建带溯源信息的数据集（通过哈希固定的输入、组件、已校验的参数、场景、种子、变换、警告）→ 校验
+schema 与约束（失败时抛出 `ConstraintViolationError`）→ 在溯源信息中记录校验结果 → 可选地在
+目录中注册该数据集。
 
 UI 与文档中使用的显示 id：`rule_based_v1`、`statistical_v1`、`time_series_v1`。
 
@@ -128,32 +135,45 @@ UI 与文档中使用的显示 id：`rule_based_v1`、`statistical_v1`、`time_s
 变换 → 生成的数据集*。仅凭溯源记录即可重新执行一次运行（前提是源数据相同），
 并通过比较 `content_hash` 验证复现结果。
 
-## 6. 初始生成器（v0.1 — 恰好三个）
+## 6. 初始生成器（v0.1 — 恰好三个，位于 `industrial_ai.synthetic.generators`）
 
 ### 6.1 `rule_based` v1.0.0
-确定性或规则驱动的表：实体列表、属性规则（`unit_cost = price × cost_ratio`）、
-基于小型白名单规则词汇（constant、choice、linear、lookup、derived）的逐行表达式。
-用于：仓库、供应商属性、商品-供应商映射、初始库存、补货策略。
-不对任意代码执行 `eval`。
+基于白名单规则词汇逐列构建表（不对任何代码或表达式求值）：`constant`、`sequence`（如 `SUP001`
+之类的 id）、`choice`（可选权重）、`uniform`（整数或浮点数）、`linear`（`source × scale + offset`）、
+`lookup`（带默认值的映射）以及 `reference_column`（每个参考行对应一个输出行）。规则可以使用先前的列
+和参考列。用于：仓库、供应商属性、商品-供应商映射、初始库存、补货策略。
 
 ### 6.2 `statistical` v1.0.0
-从参数化分布（正态、对数正态、伽马、泊松、负二项、均匀、分类）中抽样，
-并可选地在数值列之间施加高斯 Copula (Gaussian-copula) 相关性。
-用于：提前期参数、成本比率、可靠性、箱规 (case pack)。
+从 `normal`、`lognormal`、`gamma`、`poisson`、`negative_binomial`（均值、离散度 (dispersion)）、
+`uniform` 和 `categorical` 分布中对列进行抽样；`copy_from_reference` 按行复制 id 列。可选地通过
+Iman–Conover 方法在数值列之间施加**秩相关 (rank correlation)**（边缘分布被精确保留，目标相关性
+近似达成；矩阵会被校验是否为合法的相关矩阵）。截断（`clip_min`/`clip_max`）、取整以及整数输出均为
+显式参数；被截断的数量记录在溯源信息中。用于：提前期参数、成本比率、可靠性、箱规 (case pack)。
 
 ### 6.3 `time_series` v1.0.0
-按实体生成计数型时间序列：
+按实体生成的日计数序列：
 
 ```
-λ_t = level · trend_t · weekly[dow_t] · yearly[doy_t] · event_t · scenario_t
-y_t ~ NegativeBinomial(mean = λ_t, dispersion = φ)       (Poisson if φ → ∞)
+rate_t   = level · season_t · event_t · level_multiplier · shock_t
+season_t = max(0, 1 + seasonality_multiplier · (weekly[dow_t] · monthly[month_t] − 1))
+y_t ~ NegativeBinomial(mean = rate_t, dispersion = φ / noise_scale²)   or Poisson(rate_t)
+noise_scale = 0 → y_t = round(rate_t)
 ```
 
-- **校准 (Calibration)**（可选，基于 `reference`）：针对每条序列，从参考需求中估计水平、周度模式、年度
-  模式、事件提升 (event uplift) 以及离散度 (dispersion)；作为一个变换 (transformation) 记录。
-- **场景效应 (Scenario effects)**：`demand_multiplier`、`seasonality_multiplier`（围绕 1 缩放季节性
-  振幅）、冲击窗口（在 `[shock_start, shock_start + duration)` 区间内施加 `shock_multiplier`）、噪声尺度。
-- 输出符合 `retail.sales` + `scenario_id`（`ops.synthetic_demand`）。
+- **画像 (Profiles)**：显式的 `profiles`（水平、周度因子 ×7、月度因子 ×12、离散度），或基于参考历史
+  （最近 `history_window_days` 天，默认 730）的**逐序列校准 (per-series calibration)**：水平 = 均值，
+  周度/月度因子归一化为均值 1，离散度采用矩估计法 (method of moments)（无过度离散时 ≈ 泊松）。每条序列
+  **在首次销售之前的前导零会被排除**。v1 不含趋势项，也不含经校准的事件提升 (event uplift)（事件：显式的
+  `event_dates` × `event_multiplier`）。
+- **场景效应 (Scenario effects)**（通用名称）：`level_multiplier`、`seasonality_multiplier`、`noise_scale`、
+  `shock_multiplier`、`shock_start_day`、`shock_duration_days`（自预测区间 (horizon) 起点起算的天数）。
+  `scenario_mapping` 将它们映射到场景中的名称，例如 `{"level_multiplier": "demand_multiplier"}`；
+  仅应用并报告场景中实际存在的效应。
+- 每条序列使用一条独立的随机流（`SeedSequence(seed).spawn`），行先按时间、再按实体排序。输出：
+  时间列、实体列、值列，以及可选的 `constant_columns` 和 `scenario_id_column`（例如
+  `ops.synthetic_demand`）。
+- **已知局限 (Known limitation)**（在真实 M5 子集上观察到，仅为描述性结论）：星期模式与场景比率
+  能够被复现，但真实数据中连续的零销量日（很可能是缺货）无法被复现，因此合成数据中的零销量日更少。
 
 v0.1 明确**不**包含：GAN、VAE、扩散模型 (diffusion)、基于智能体 (agent-based) 的方法、LLM 生成的数据。
 
