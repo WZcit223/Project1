@@ -5,6 +5,68 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 2: Dataset foundation (TASK-DATA-001 … 005)
+
+### Branch
+`phase2` — based on `phase1` @ `82129d9`
+
+### Objective
+Gate 2: a dataset can be loaded, validated, registered and reloaded unchanged.
+
+### Changes
+- **DATA-003** (done first; the dataset model embeds it) `foundation.provenance`: deterministic
+  `content_hash()` (index- and column-order-independent, logical dtype families, row order kept,
+  stable across Parquet), `file_hash()`, immutable `ProvenanceRecord` / `Lineage`.
+- **DATA-001** `foundation.datasets`: `FieldSpec`, `DatasetSchema`, `SourceInfo`, `DatasetMetadata`,
+  `Dataset` (invariants re-checked on construction), `build_dataset()`, `DatasetBundle`.
+- **DATA-002** `foundation.validation`: declarative constraints (range, not_null, unique, integer,
+  foreign_key, relation), `validate_dataset()` / `validate_bundle()`, reports with
+  passed / failed / skipped and offending-row counts.
+- **DATA-004** `foundation.catalog.DatasetCatalog`: SQLite (SQLModel) + Parquet; hash verified on
+  write and on read; list, preview, bundles.
+- **DATA-005** `foundation.ingestion`: `load_table()` for CSV/Parquet with strict type conversion,
+  `DatasetAdapter` protocol and adapter registry.
+- mypy now also type-checks `tests/` (strict).
+- Integration test: file → load → validate → register → fresh catalog → reload, hash unchanged.
+
+### Dependencies added
+Runtime: pandas 3, pyarrow, sqlmodel (with numpy, sqlalchemy). Dev: pandas-stubs.
+
+### Decisions / assumptions
+- Content hash keeps row order (generators/adapters produce deterministic order) but ignores index,
+  column order and physical dtype width.
+- Provenance field `component` (not `generator`), since loaders and adapters also produce datasets;
+  synthetic-data-api.md example updated (EN + ZH).
+- Metadata `entities` made precise as `entity_counts` (distinct values per entity key).
+- Validation reports checks that cannot run as `skipped` (visible, not counted as passed).
+- Dataset versions are free-form strings; "latest" = most recently registered. Plugin and schema
+  versions stay semver.
+- Loader rejects unconvertible CSV values instead of coercing them to missing.
+- Phase 2 tasks were implemented directly on `phase2` (each a separate commit).
+
+### Files / Modules
+`src/industrial_ai/foundation/{provenance,datasets,validation,catalog,ingestion}/`,
+`src/industrial_ai/core/errors.py`, `tests/unit/foundation/`, `tests/integration/`,
+`docs/data-model.md` §1.3–1.7, `docs/synthetic-data-api.md` §5 (+ ZH), `pyproject.toml`, `uv.lock`.
+
+### Tests / checks
+ruff format + lint, mypy strict (src + tests), pytest: 140 passed, including a cross-process
+reload test and the Gate 2 integration test. CI green on `phase2`.
+
+### Commits
+baa1a7a provenance/hashing, ecb1185 datasets, 8aa8cd0 mypy tests, dce5ee7 validation,
+3217f9a catalog, 6ecfb2c ingestion, 4ea4f57 integration test, + docs(log) for this entry.
+
+### Known issues
+- `foundation.transformation` and `foundation.entities` are not built yet (not needed until later phases).
+- Observed-sales-vs-true-demand limitation of M5 remains documented, not corrected (data-model.md §2).
+
+### Next
+Owner review of Gate 2 → Phase 3 (M5 adapter: canonical retail schemas, synthetic M5-shaped
+fixture, adapter, subset-extraction script) on branch `phase3` from `phase2`.
+
+---
+
 ## 2026-09-27 — Gate 1 approved
 
 ### Branch

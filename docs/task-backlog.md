@@ -15,7 +15,7 @@ Branch name suggestion in brackets.
 |---|---|---|---|---|
 | M0 Architecture spec | 0 | G0 Architecture documented & approved | — | ✅ approved 2026-09-27 |
 | M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ approved 2026-09-27 |
-| M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ⬜ |
+| M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ✅ 2026-09-27 (awaiting owner review) |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ⬜ |
 | M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ⬜ |
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ⬜ |
@@ -74,25 +74,25 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 2 — Dataset foundation
 
-### TASK-DATA-001 — Dataset model  [`feature/dataset-foundation`]
+### TASK-DATA-001 — Dataset model  [`phase2`] ✅
 - Objective: `FieldSpec`, `DatasetSchema`, `DatasetMetadata`, `Dataset`, `DatasetBundle` per [data-model.md §1](data-model.md#1-framework-dataset-abstraction-domain-neutral-industrial_aifoundation).
 - Acceptance: models serialise to/from JSON; schema JSON round-trip.
 - Tests: construction, validation errors.
 
-### TASK-DATA-002 — Schema & constraint validation  [`feature/dataset-foundation`]
+### TASK-DATA-002 — Schema & constraint validation  [`phase2`] ✅
 - Objective: `foundation.validation.validate(dataset, constraints) → ValidationReport` (types, nulls, ranges, allowed values, PK uniqueness, FKs within a bundle).
 - Tests: one passing and one failing case per constraint type.
 
-### TASK-DATA-003 — Provenance record & content hashing  [`feature/provenance`]
+### TASK-DATA-003 — Provenance record & content hashing  [`phase2`] ✅
 - Objective: `ProvenanceRecord` model; deterministic SHA-256 of a DataFrame (stable column order, dtype normalisation).
 - Acceptance: same data → same hash regardless of row index; different data → different hash.
 
-### TASK-DATA-004 — Catalog & artifact store  [`feature/dataset-catalog`]
+### TASK-DATA-004 — Catalog & artifact store  [`phase2`] ✅
 - Objective: SQLite (SQLModel) catalog of datasets + Parquet artifact storage; register, get, list, preview.
 - Dependencies added: pandas, pyarrow, sqlmodel.
 - Acceptance: register → reload in a new process → identical hash.  **Gate 2.**
 
-### TASK-DATA-005 — Tabular loaders & adapter protocol  [`feature/ingestion`]
+### TASK-DATA-005 — Tabular loaders & adapter protocol  [`phase2`] ✅
 - Objective: CSV/Parquet loader into a `Dataset` given a schema; `DatasetAdapter` protocol + `AdapterRegistry`.
 - Tests: load fixture CSV, schema mismatch error.
 

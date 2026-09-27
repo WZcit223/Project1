@@ -17,7 +17,7 @@
 |---|---|---|---|---|
 | M0 架构规范 | 0 | G0 架构已文档化并获批准 | — | ✅ 已批准 2026-09-27 |
 | M1 框架骨架 | 1 | G1 项目可启动、测试可运行 | M0 | ✅ 已批准 2026-09-27 |
-| M2 数据集基础 | 2 | G2 数据集可加载并验证 | M1 | ⬜ |
+| M2 数据集基础 | 2 | G2 数据集可加载并验证 | M1 | ✅ 2026-09-27（待负责人评审） |
 | M3 M5 适配器 | 3 | G3 M5 → 规范模型（canonical） | M2 | ⬜ |
 | M4 合成数据引擎 | 4 | G4 可复现的合成数据 | M2 | ⬜ |
 | M5 合成仓储数据 | 5 | G5 运营数据已生成 | M3, M4 | ⬜ |
@@ -76,25 +76,25 @@
 
 ## Phase 2 — 数据集基础
 
-### TASK-DATA-001 — 数据集模型  [`feature/dataset-foundation`]
+### TASK-DATA-001 — 数据集模型  [`phase2`] ✅
 - 目标：按照 [data-model.md §1](data-model.md) 实现 `FieldSpec`、`DatasetSchema`、`DatasetMetadata`、`Dataset`、`DatasetBundle`。
 - 验收：模型可与 JSON 互相序列化；schema JSON 往返一致。
 - 测试：构造、校验错误。
 
-### TASK-DATA-002 — Schema 与约束校验  [`feature/dataset-foundation`]
+### TASK-DATA-002 — Schema 与约束校验  [`phase2`] ✅
 - 目标：`foundation.validation.validate(dataset, constraints) → ValidationReport`（类型、空值、范围、允许值、主键唯一性、bundle 内外键）。
 - 测试：每种约束类型各一个通过用例和一个失败用例。
 
-### TASK-DATA-003 — 溯源记录与内容哈希  [`feature/provenance`]
+### TASK-DATA-003 — 溯源记录与内容哈希  [`phase2`] ✅
 - 目标：`ProvenanceRecord` 模型；DataFrame 的确定性 SHA-256（稳定的列顺序、dtype 归一化）。
 - 验收：相同数据 → 相同哈希（与行索引无关）；不同数据 → 不同哈希。
 
-### TASK-DATA-004 — 目录与制品存储  [`feature/dataset-catalog`]
+### TASK-DATA-004 — 目录与制品存储  [`phase2`] ✅
 - 目标：基于 SQLite（SQLModel）的数据集目录（catalog）+ Parquet 制品（artifact）存储；注册、获取、列表、预览。
 - 新增依赖：pandas、pyarrow、sqlmodel。
 - 验收：注册 → 在新进程中重新加载 → 哈希一致。  **Gate 2。**
 
-### TASK-DATA-005 — 表格加载器与适配器协议  [`feature/ingestion`]
+### TASK-DATA-005 — 表格加载器与适配器协议  [`phase2`] ✅
 - 目标：根据给定 schema 将 CSV/Parquet 加载为 `Dataset`；`DatasetAdapter` 协议 + `AdapterRegistry`。
 - 测试：加载夹具 CSV、schema 不匹配报错。
 
