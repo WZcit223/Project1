@@ -5,63 +5,70 @@
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
-签名为规范性草图 (normative sketches)，将在 Phase 6 定稿。
+§1–3 中的接口已在 `industrial_ai.simulation` 中**实现**（Phase 6）；§4 中的插件将在 Phase 7–9 中陆续提供。
 
 ## 1. 插件接口
 
 ```python
 class SimulationPlugin(Protocol):
-    plugin_id: str               # e.g. "seasonal_naive", "lightgbm", "inventory_simulation"
-    plugin_version: str          # semver
-    kind: PluginKind             # "forecast" | "simulation" | "strategy_evaluation"
-                                 # reserved: "optimization" | "causal"
+    plugin_id: str                    # e.g. "seasonal_naive", "lightgbm", "inventory_simulation"
+    plugin_version: str               # semver
+    kind: PluginKind                  # forecast | simulation | strategy_evaluation
+                                      # reserved: optimization | causal
+    description: str
     parameter_model: type[BaseModel]
-    required_inputs: list[str]   # schema_ids the plugin needs, e.g. ["retail.sales"]
+    required_inputs: tuple[str, ...]  # schema ids the dataset/bundle must contain
 
     def run(
         self,
         dataset: Dataset | DatasetBundle,
-        scenario: ScenarioSpec,
-        parameters: Mapping[str, Any],
+        scenario: ScenarioSpec | None,
+        parameters: BaseModel,        # instance of parameter_model, validated by the engine
         constraints: ConstraintSet,
         context: RunContext,
-    ) -> SimulationResult: ...
+    ) -> PluginOutput: ...            # prediction / tables (schema + DataFrame), metrics,
+                                      # warnings, applied_scenario_parameters
 ```
 
-`RunContext` 携带 `run_id`、`seed`、仿真期间（`start_date`、`end_date`）、上游结果
-（例如库存仿真所使用的预测结果）以及一个日志记录器 (logger)。插件的所有随机性都必须使用
-`context.seed`。
+`RunContext` 携带 `run_id`、`seed`、仿真期间 (horizon)（`start_date`、`end_date`，均为闭区间端点）、
+具名的 `upstream` 上游结果（例如 `"forecast"`，通过 `context.require_upstream("forecast")` 读取），
+以及一个可选的固定 `created_at`。插件的所有随机性都必须使用 `context.seed`。与生成器 (generator) 一样，
+插件只返回原始输出；由**引擎 (engine)** 构建数据集、溯源信息 (provenance) 和元数据 (metadata)。
 
 ## 2. 输出：`SimulationResult`
 
 ```
 SimulationResult
-├── prediction          optional table (e.g. sim.forecast) — forecasts / estimates
-├── simulation_result   optional tables (e.g. sim.inventory_ledger, sim.purchase_order)
+├── prediction          Dataset | None   (e.g. forecasts)
+├── simulation_result   {name: Dataset}  (e.g. inventory ledger, purchase orders)
 ├── scenario_result     {scenario_id, scenario_version, applied_parameters}
-├── metrics             list[Metric(metric_id, value, unit, scope)]
-└── metadata            {plugin_id, plugin_version, kind, run_id, seed, parameters,
-                         input content hashes, started_at, finished_at, status, warnings}
+├── metrics             tuple[Metric(metric_id, value | None, unit, scope)]
+└── metadata            RunMetadata: plugin id/version, kind, run_id, seed, validated parameters,
+                        input content hashes (incl. upstream tables), started/finished, status, warnings
 ```
 
-各表均为 `Dataset` 对象（带溯源信息 (provenance)）。`status` 为 `succeeded` 或 `failed`；失败时抛出异常并
-被记录；引擎绝不返回虚假的成功结果。
+输出数据集命名为 `<run_id>.<plugin_id>.<table>`，携带溯源信息（输入——包括通过哈希固定的上游表、
+插件、参数、场景、种子），并按其模式 (schema) 进行校验。`status` 始终为 `succeeded`：任何失败
+（未知插件、缺少输入或上游结果、参数无效、输出无效）都会**抛出异常**；引擎绝不返回失败的或虚假的结果。
+指标值在未定义时为 `None`（例如需求为零时的满足率 (fill rate)），绝不使用编造的数字。
 
 ## 3. 引擎与组合
 
 ```python
-engine = SimulationEngine(registry)
-forecast = engine.run("lightgbm", dataset, scenario, params, constraints, ctx)
-results = engine.compare(
-    plugin_id="inventory_simulation",
-    dataset=bundle, scenario=scenario, constraints=constraints, context=ctx.with_upstream(forecast),
+engine = SimulationEngine(registry)          # registry = new_simulation_registry()
+forecast = engine.run("lightgbm", bundle, scenario, {...}, ctx)
+comparison = engine.compare(
+    "inventory_simulation", bundle, scenario,
     variants={"reorder_point": {...}, "safety_stock": {...}, "dynamic": {...}},
-)   # -> ComparisonResult: same data, same scenario, same seed, different strategy parameters
+    context=ctx.with_upstream("forecast", forecast),
+)
+comparison.metrics_table()                   # variants × metric ids (pandas DataFrame)
 ```
 
-组合规则 —— **一个数据集，多种仿真 (one dataset, many simulations)**：任何已注册且其 `required_inputs`
-得到满足的插件，都可以在某个数据集上、于其能理解参数的任意场景下运行；未被使用的
-场景参数会在 `metadata.warnings` 中报告，绝不静默忽略。
+`compare()` 在相同的数据、场景和种子上，以不同参数运行同一个插件；每个变体 (variant) 的运行 id 为
+`<run_id>.<variant>`。组合规则 —— **一个数据集，多种仿真 (one dataset, many simulations)**：任何已注册且其
+`required_inputs` 得到满足的插件，都可以在某个数据集上、于任意场景下运行；某次运行未应用的场景参数
+会在 `metadata.warnings` 中报告，绝不静默忽略。
 
 ## 4. 初始插件 (v0.1)
 
