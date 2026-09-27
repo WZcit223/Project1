@@ -5,6 +5,67 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 9: Replenishment strategies (TASK-STR-001 … 003)
+
+### Branch
+`phase9` — based on `phase8` @ `91861dc`
+
+### Objective
+Three replenishment strategies behind the Phase 8 protocol, compared on identical demand via
+`engine.compare` (Gate 8).
+
+### Changes
+- `reorder_point` 1.0.0 (s, Q) from mean historical demand, no safety stock; `safety_stock` 1.0.0 (s, S)
+  from the forecast and forecast-error std, fixed at the horizon start; `dynamic` 1.0.0 periodic
+  order-up-to every R days from the latest forecast and recent errors. `builtin_strategies()` registry.
+- `derived.demand_timeline` + `build_demand_timeline()`: observed sales followed by the synthetic horizon
+  demand — the input of the rolling forecast during a simulation (no look-ahead).
+- Gate 8 integration test: fixture → operations → demand → timeline → seasonal-naive forecast with
+  56-day warm-up → inventory simulation × 3 strategies.
+- Specs: plugin-spec §4, scenario-spec §6, data-model §3, simulation-api status (EN + ZH).
+
+### Decisions / assumptions (for review)
+- R = the item's `order_cycle_days` (14) for all three (override `cycle_days`). The dynamic strategy
+  orders every R days, not on every daily review, so its order frequency is comparable with A and B.
+- σ_e comes from forecast errors before the horizon: the forecast run starts a **warm-up** (56 days)
+  before the horizon and needs `forecast_horizon_days` ≥ reforecast interval + L̄ + R (56 used).
+  Missing warm-up or coverage raises an error rather than falling back silently.
+- B's levels are set at the first review (horizon start) because `ItemContext` has no date; the
+  protocol stays unchanged.
+- Forecast demand is read from the day after the review (the order cannot serve today's demand);
+  μ_f is the mean over ⌈L̄ + R⌉ days, scaled to L̄ + R.
+- σ_e scales with √days (independent daily errors); lead-time variability is not in the safety stock
+  (textbook formula as specified).
+- A with no demand history never orders.
+
+### Real-subset check (descriptive only; CA_1 / FOODS_3 / top 50, 91 days, seed 20260927)
+Service level (inventory cost USD) — reorder_point / safety_stock / dynamic:
+- baseline: 0.847 (18,361) / 0.862 (19,400) / 0.938 (18,625)
+- high_demand ×1.3: 0.750 (20,610) / 0.777 (21,492) / 0.911 (18,742)
+- supply_disruption (+7 d, 50 %, days 28–69): 0.669 (19,014) / 0.711 (20,526) / 0.776 (18,369)
+The dynamic strategy holds about twice the stock (holding 829 vs 444 USD at baseline); ordering cost
+(~18 k USD) still dominates. ≈ 5 s per scenario incl. forecast.
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 280 passed (hand-computed rules for each strategy, warm-up and
+coverage errors, timeline, Gate 8 comparison, reproducibility, high demand hurts the static strategy more).
+
+### Commits
+e863502 feat(warehouse): demand timeline · 3ca286d feat(warehouse): three strategies ·
+0021a7e test(warehouse): Gate 8 comparison · 039f239 docs(spec) · docs(zh) / docs(plan) / docs(log) (this round).
+
+### Known issues
+- Ordering cost dominates inventory cost (synthetic order cost 20–60 USD vs low FOODS_3 unit costs), so
+  "inventory cost" mostly measures order count; consider tuning `OperationsConfig.order_cost_range`
+  (owner decision, affects the demo narrative).
+- Safety stock B only modestly beats A: its σ_e is estimated at the start and fixed, and the textbook
+  formula ignores lead-time variability.
+
+### Next
+Gate 8 / M9 review → Phase 10 (scenario engine) on branch `phase10` from `phase9`.
+
+---
+
 ## 2026-09-27 — Gate 7 / M8 approved
 
 ### Branch
