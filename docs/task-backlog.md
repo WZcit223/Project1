@@ -21,7 +21,7 @@ Branch name suggestion in brackets.
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ✅ approved 2026-09-27 |
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ✅ approved 2026-09-27 |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ✅ approved 2026-09-27 |
-| M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ⬜ |
+| M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | 🟡 awaiting owner review |
 | M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ⬜ |
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ⬜ |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |
@@ -145,14 +145,14 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 8–9 — Inventory simulation & strategies (warehouse pack)
 
-### TASK-INV-001 — Inventory simulation plugin  [`feature/inventory-simulation`]
+### TASK-INV-001 — Inventory simulation plugin  [`phase8`] ✅
 - Model per [scenario-spec.md §5](scenario-spec.md#5-inventory-simulation-model); ledger + PO tables.
 - Tests: accounting identities; hand-computed 10-day example.  **Gate 7.**
 
-### TASK-INV-002 — Metrics  [`feature/inventory-metrics`]
+### TASK-INV-002 — Metrics  [`phase8`] ✅
 - All metrics in [data-model.md §6](data-model.md#6-metrics-definitions); tests recompute from ledger.
 
-### TASK-STR-001 — Strategy protocol + Reorder Point  [`feature/replenishment-strategies`]
+### TASK-STR-001 — Strategy protocol + Reorder Point  [`phase9`] (protocol delivered early in `phase8`)
 ### TASK-STR-002 — Safety Stock strategy
 ### TASK-STR-003 — Dynamic replenishment strategy
 - Acceptance: three strategies compared on identical demand via `engine.compare`.  **Gate 8.**

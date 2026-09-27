@@ -23,7 +23,7 @@
 | M5 合成仓储数据 | 5 | G5 运营数据已生成 | M3, M4 | ✅ 已批准 2026-09-27 |
 | M6 仿真引擎 | 6 | G6 仿真引擎可执行 | M2 | ✅ 已批准 2026-09-27 |
 | M7 预测插件 | 7 | （G6/G7 的一部分） | M6 | ✅ 已批准 2026-09-27 |
-| M8 库存仿真 | 8 | G7 库存仿真可工作 | M6, M5 | ⬜ |
+| M8 库存仿真 | 8 | G7 库存仿真可工作 | M6, M5 | 🟡 待负责人审阅 |
 | M9 策略 | 9 | G8 策略可比较 | M8, M7 | ⬜ |
 | M10 场景引擎 | 10 | （G8/G9 的一部分） | M4, M6 | ⬜ |
 | M11 Golden Path | 11 | G9 Golden Path 可工作 | M5–M10 | ⬜ |
@@ -147,14 +147,14 @@
 
 ## Phase 8–9 — 库存仿真与策略（仓储包）
 
-### TASK-INV-001 — 库存仿真插件  [`feature/inventory-simulation`]
+### TASK-INV-001 — 库存仿真插件  [`phase8`] ✅
 - 模型按照 [scenario-spec.md §5](scenario-spec.md)；台账（ledger）+ 采购订单（PO）表。
 - 测试：会计恒等式；手工计算的 10 天示例。  **Gate 7。**
 
-### TASK-INV-002 — 指标  [`feature/inventory-metrics`]
+### TASK-INV-002 — 指标  [`phase8`] ✅
 - [data-model.md §6](data-model.md) 中的全部指标；测试由台账重新计算。
 
-### TASK-STR-001 — 策略协议 + 再订货点  [`feature/replenishment-strategies`]
+### TASK-STR-001 — 策略协议 + 再订货点  [`phase9`]（协议已在 `phase8` 提前交付）
 ### TASK-STR-002 — 安全库存策略
 ### TASK-STR-003 — 动态补货策略
 - 验收：通过 `engine.compare` 在相同需求下比较三种策略。  **Gate 8。**
