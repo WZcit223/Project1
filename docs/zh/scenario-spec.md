@@ -39,7 +39,7 @@ tags: [demand]
 | `shock_duration_days` | int | 0 | ≥ 0 | 0 = 无冲击 |
 | `lead_time_delta` | int（天） | 0 | −30 – 60 | 叠加到供应商平均提前期上（结果下限为 1） |
 | `disruption_start_day` | int | 0 | ≥ 0 | 相对预测期起点的偏移天数 |
-| `disruption_duration_days` | int | 0 | ≥ 0 | 0 = lead_time_delta 作用于整个预测期 |
+| `disruption_duration_days` | int | 0 | ≥ 0 | 0 = 从 `disruption_start_day` 到预测期结束（默认起点为 0 时即整个预测期） |
 | `supply_capacity_factor` | float | 1.00 | 0.00 – 1.00 | 中断窗口内供应商对每笔订货实际发货的比例 |
 | `planner_aware` | bool | false | — | 策略看到的是调整后的提前期（true）还是名义提前期（false） |
 
@@ -74,7 +74,8 @@ tags: [demand]
    `ceil(quantity · supply_capacity_factor_t)`；未发货部分即告损失。`lead_time_delta` 与
    `supply_capacity_factor` 作用于在中断窗口
    `[disruption_start_day, disruption_start_day + disruption_duration_days)` 内下达的订单；当持续时间为 0 时
-   作用于整个预测期。若 `planner_aware = true`，策略看到的是调整后的平均提前期。
+   则作用于从 `disruption_start_day` 到预测期结束期间下达的订单。窗口按**下单日期**判定：窗口开始时已在途的订单
+   保持原有提前期；当盘点周期 > 1 时，不包含任何盘点日的窗口不会影响任何订单。若 `planner_aware = true`，策略看到的是调整后的平均提前期。
 6. **记录（Record）** — 台账行（`sim.inventory_ledger`）、采购订单（`sim.purchase_order`）与 KPI
    （data-model §6）。
 

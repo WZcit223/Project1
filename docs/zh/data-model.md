@@ -196,21 +196,37 @@ uv run python scripts/make_m5_subset.py --input <存放 Kaggle CSV 的文件夹>
 单位成本 *cᵢ*，单价 *pᵢ*（平均参考价格，`derived.product_price`），年持有成本率 *h*，订货成本 *k*，期间长度 *T* 天，
 商品数 *N*。
 
-| 指标 id | 名称 | 定义 | 单位 |
-|---|---|---|---|
-| `demand_total` | 需求量 (Demand) | Σ Dᵢₜ | units |
-| `service_level` | 服务水平 (Service level / **fill rate**，满足率) | Σ Fᵢₜ / Σ Dᵢₜ（若 Σ D = 0 则无定义 → 报告为 `null`） | 比率 0–1 |
-| `stockout_rate` | 缺货率 (Stockout rate) | #{(i,t) : Lᵢₜ > 0} / (N · T) | 比率 0–1 |
-| `lost_sales_units` | 损失销量 (Lost sales) | Σ Lᵢₜ | units |
-| `lost_sales_value` | 损失销售额 (Lost sales value)（单独报告，**不**计入库存成本） | Σ Lᵢₜ · pᵢ | USD |
-| `avg_inventory_units` | 平均库存水平 (Average inventory level) | (1 / T) Σₜ Σᵢ Iᵢₜ | units |
-| `avg_inventory_value` | 平均库存价值 (Average inventory value) | (1 / T) Σₜ Σᵢ Iᵢₜ · cᵢ | USD |
-| `holding_cost` | 持有成本 (Holding cost) | Σ Iᵢₜ · cᵢ · h / 365 | USD |
-| `ordering_cost` | 订货成本 (Ordering cost) | （采购订单数）· k | USD |
-| `inventory_cost` | 库存成本 (Inventory cost) | `holding_cost` + `ordering_cost` | USD |
-| `order_frequency` | 订货频率 (Order frequency) | （采购订单数）/ (N · T / 7) | 每商品每周订单数 |
-| `inventory_turnover` | 库存周转率 (Inventory turnover)（年化） | (Σ Fᵢₜ · cᵢ) / `avg_inventory_value` · 365 / T（若平均价值 = 0 则报告为 `null`） | 次 / 年 |
+| 分组 | 指标 id | 名称 | 定义 | 单位 |
+|---|---|---|---|---|
+| 服务 (Service) | `demand_total` | 需求量 (Demand) | Σ Dᵢₜ | units |
+| 服务 (Service) | `fulfilled_units` | 已满足需求 (Fulfilled demand) | Σ Fᵢₜ | units |
+| 服务 (Service) | `lost_sales_units` | 未满足需求（损失销量）(Unfulfilled demand / lost sales) | Σ Lᵢₜ | units |
+| 服务 (Service) | `fill_rate` | **满足率 (Fill rate，β 服务水平)** | Σ Fᵢₜ / Σ Dᵢₜ——需求发生当天由库存满足的需求单位数占比；若 Σ D = 0 则为 `null` | 比率 0–1 |
+| 服务 (Service) | `stockout_days` | 缺货天数 (Stockout days) | #{(i,t) : Lᵢₜ > 0}——存在任何未满足需求的商品-日数 | 商品-日 (item-days) |
+| 服务 (Service) | `stockout_day_rate` | 缺货日比率 (Stockout-day rate) | `stockout_days` / (N · T) | 比率 0–1 |
+| 库存 (Stock) | `avg_on_hand_units` | 平均在库库存 (Average on-hand inventory) | (1 / T) Σₜ Σᵢ Iᵢₜ（期末在库量；不含在途库存） | units |
+| 库存 (Stock) | `avg_on_hand_value` | 平均在库库存价值 (Average on-hand inventory value) | (1 / T) Σₜ Σᵢ Iᵢₜ · cᵢ | USD |
+| 库存 (Stock) | `inventory_turnover` | 库存周转率 (Inventory turnover)（年化） | (Σ Fᵢₜ · cᵢ) / `avg_on_hand_value` · 365 / T；若平均价值 = 0 则为 `null` | 次 / 年 |
+| 订货 (Ordering) | `purchase_orders` | 采购订单数 (Purchase orders) | 期间内下达的采购订单数量 | 订单数 |
+| 订货 (Ordering) | `units_ordered` | 订货数量 (Units ordered) | Σ 订货数量（取整后；任何供应能力削减之前） | units |
+| 订货 (Ordering) | `order_frequency` | 订货频率 (Order frequency) | `purchase_orders` / (N · T / 7) | 每商品每周订单数 |
+| 成本 (Cost) | `ordering_cost` | 总订货成本 (Total ordering cost) | 对所有采购订单求和供应商订货成本 k | USD |
+| 成本 (Cost) | `holding_cost` | 总持有成本 (Total holding cost) | Σ Iᵢₜ · cᵢ · h / 365 | USD |
+| 成本 (Cost) | `inventory_cost` | 库存成本 (Inventory cost) | `ordering_cost` + `holding_cost`（不含损失销售） | USD |
+| 成本 (Cost) | `lost_sales_cost` | 总损失销售（缺货）成本 (Total lost-sales / stockout cost) | Σ Lᵢₜ · pᵢ——以损失收入作为缺货惩罚的代理指标（v0.1 假设；损失毛利应为 (pᵢ − cᵢ) · Lᵢₜ） | USD |
+| 成本 (Cost) | `total_cost` | 总成本 (Total cost) | `inventory_cost` + `lost_sales_cost` | USD |
 
-商品采购成本不计入库存成本（在满足需求相同的前提下，除期末库存外，各策略的采购成本
+按商品范围（`scope = product:<id>`）：`fill_rate`。
+
+**服务水平术语。** 唯一报告的服务类指标是上文定义的**满足率**（`fill_rate`，β 服务水平）。
+`ops.replenishment_policy` 中的计划设置 `target_service_level` 是另一个量：**周期服务水平**
+（cycle service level，α——一个补货周期内不发生缺货的目标概率），仅用于在 `safety_stock` 和 `dynamic`
+策略中推导安全系数 z = Φ⁻¹(α)。因此满足率不应被期望等于该目标值，且 v0.1 不报告实际实现的周期服务水平。
+指标中不使用不加限定的"服务水平"一词。
+
+**成本解读。** 各成本分项应并列报告；在 v0.1 的合成校准下（订货成本为每单 20–60 USD，FOODS_3 单位成本较低），
+`ordering_cost` 在 `inventory_cost` 中占主导，因此库存成本主要反映订单数量。该校准是有意保留的（负责人决定，Gate 8）。
+
+商品采购成本不计入任何成本（在满足需求相同的前提下，除期末库存外，各策略的采购成本
 相同）。预测准确度指标（MAE、RMSE、WAPE，以及可选的 M5 WRMSSE 作为参考）由预测插件
 (forecast plugin) 单独报告。
