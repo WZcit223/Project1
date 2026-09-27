@@ -99,6 +99,11 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
 
 数据集版本为自由格式字符串（例如 `"1"`、`"2026-09-27"`）；插件与 Schema 版本为语义化版本。
 
+### 1.7 数据导入（`industrial_ai.foundation.ingestion`）
+
+- `load_table(path, schema, dataset_id=…, version=…, source=…)` 读取 `.csv` 或 `.parquet` 文件，其列必须与 Schema 字段完全一致。CSV 文本按逻辑类型转换（`int` → `int64`，若含缺失值则为 `Int64`；`bool` 接受 true/false/1/0/yes/no；日期为 ISO 8601）。无法转换的值会引发 `IngestionError`，并指明列名与示例值——绝不会被悄悄转为缺失值。溯源会记录加载器（`tabular_loader` 1.0.0）、文件名、格式以及文件的 SHA-256（不记录与机器相关的路径）。
+- `DatasetAdapter` 协议（`adapter_id`、`adapter_version`、`description`、`load(source) → DatasetBundle`）以及 `new_adapter_registry()`。具体适配器（例如 M5）位于场景包中（ADR-003）。
+
 ## 2. 规范零售需求模型（Warehouse 包，`schema_version 1.0`）
 
 框架本身从不接触 M5 列名；这些表由 M5 适配器 (adapter) 生成。

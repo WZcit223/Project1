@@ -43,3 +43,7 @@ class DatasetAlreadyRegisteredError(CatalogError):
 
 class DatasetNotFoundError(CatalogError, LookupError):
     """No dataset (or bundle) is registered under the requested id and version."""
+
+
+class IngestionError(DatasetError):
+    """An external file cannot be read into a dataset (unreadable, wrong columns, bad values)."""

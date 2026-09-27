@@ -105,6 +105,17 @@ metadata and provenance as JSON; the data is a Parquet file under
 
 Dataset versions are free-form strings (e.g. `"1"`, `"2026-09-27"`); plugin and schema versions are semver.
 
+### 1.7 Ingestion (`industrial_ai.foundation.ingestion`)
+
+- `load_table(path, schema, dataset_id=…, version=…, source=…)` reads a `.csv` or `.parquet` file whose
+  columns are exactly the schema's fields. CSV text is converted per logical type (`int` → `int64`, or
+  `Int64` if it has missing values; `bool` accepts true/false/1/0/yes/no; dates are ISO 8601). A value
+  that cannot be converted raises `IngestionError` naming the column and examples — it is never
+  silently turned into a missing value. Provenance records the loader (`tabular_loader` 1.0.0), the
+  file name, format and the file's SHA-256 (no machine-specific paths).
+- `DatasetAdapter` protocol (`adapter_id`, `adapter_version`, `description`, `load(source) → DatasetBundle`)
+  and `new_adapter_registry()`. Concrete adapters (e.g. M5) live in scenario packs (ADR-003).
+
 ## 2. Canonical retail-demand model (Warehouse pack, `schema_version 1.0`)
 
 The framework never sees M5 column names; the M5 adapter produces these tables.
