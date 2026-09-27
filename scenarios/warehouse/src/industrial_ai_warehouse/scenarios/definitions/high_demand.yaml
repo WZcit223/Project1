@@ -1,0 +1,9 @@
+scenario_id: high_demand
+version: 1.0.0
+pack: warehouse
+title: High Demand
+description: Sustained 30% demand increase with stronger seasonality.
+parameters:
+  demand_multiplier: 1.30
+  seasonality_multiplier: 1.20
+tags: [demand]

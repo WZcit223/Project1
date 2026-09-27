@@ -1,0 +1,7 @@
+scenario_id: baseline
+version: 1.0.0
+pack: warehouse
+title: Baseline
+description: Reference conditions; all parameters at their defaults.
+parameters: {}
+tags: [reference]
