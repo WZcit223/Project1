@@ -5,6 +5,81 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 10: Gate 8 follow-ups (TASK-STR-004) + scenario engine (TASK-SCN-001/002)
+
+### Branch
+`phase10` — based on `phase9` @ `c894578`
+
+### Objective
+Close the Gate 8 follow-ups, then build the scenario registry, YAML scenario configuration, the four
+warehouse scenarios and the Level-3 scenario tests, keeping scenarios independent of strategies.
+
+### Changes — Gate 8 follow-ups
+- **Metrics** separated and renamed: `fill_rate` (β service level; was `service_level`),
+  `stockout_days`, `stockout_day_rate`, `fulfilled_units`, `lost_sales_units`, `avg_on_hand_units` /
+  `_value`, `purchase_orders`, `units_ordered`, `order_frequency`, `ordering_cost`, `holding_cost`,
+  `inventory_cost` (= ordering + holding), `lost_sales_cost` (lost revenue as shortage-penalty proxy),
+  `total_cost` (= all three). data-model §6 distinguishes the reported fill rate from the planning
+  `target_service_level` (cycle service level used only for z). `order_cost_range` unchanged.
+- **No-look-ahead regression test:** demand tripled after day D; forecasts from origins ≤ D, ledger and
+  orders through D identical for all strategies, later results differ.
+- **Failure-mode tests:** no history / cold start, sparse demand, zero forecasts, one forecast error,
+  NaN / inf / negative forecasts, disruption windows between / on / just before review days, orders in
+  transit. They found two defects, now fixed:
+  - `ForecastView` silently skipped NaN forecasts (pandas sum) → now raises `SimulationInputError`.
+  - `disruption_duration_days = 0` ignored `disruption_start_day` → now means "from the start day to
+    the horizon end" (unchanged for the default start 0).
+- **Docs:** adaptation frequencies as intentional design, inventory-position semantics, cold start as a
+  v0.1 limitation (+ roadmap), Gate 8 acceptance statement, real-subset results labelled descriptive.
+
+### Changes — scenario engine
+- `industrial_ai.scenario`: `ScenarioRegistry` (per pack, keyed by id + version, validates every spec
+  against the pack's parameter model at registration), `load_scenario` / `load_scenarios` /
+  `register_directory` (YAML, `safe_load`), `ScenarioValidationError`.
+- Dependency added: `pyyaml` (+ `types-pyyaml` dev) — the spec requires YAML; stdlib has no parser.
+- Warehouse pack: `WarehouseScenarioParameters` (scenario-spec §3), `definitions/*.yaml` for
+  baseline, high_demand, demand_shock, supply_disruption; `builtin_scenarios()`. The YAML files ship in
+  the wheel (checked).
+- Tests: framework registry / loader (incl. malformed and unsafe YAML), pack definitions, "every
+  parameter applied by exactly one plugin", scenarios package imports no strategy / simulation /
+  generator code, Level-3 checks in `tests/scenario/` (every scenario × every strategy).
+
+### Decisions / assumptions (for review)
+- Metric ids renamed (pre-API, no external consumers yet); lost-sales cost = lost revenue Σ L·p (an
+  upper bound; lost margin would be (p − c)·L).
+- High Demand Level-3 check measured on **expected** demand (noise_scale = 0): fixture expected ratio
+  1.345; the sampled ratio is 1.24 because Poisson noise on small counts does not cancel even with
+  common random numbers. The sampled ratio must still exceed 1.15. Threshold not widened.
+- The disruption window is judged by order date (in-transit orders keep their lead time).
+- `high_demand` drops the no-op `lead_time_delta 0` from the spec table.
+- User-defined scenarios (SQLite, `source: user`) deferred to Phase 12–13; no `source` field yet.
+
+### Real-subset check (descriptive / smoke-test evidence only; CA_1 / FOODS_3 / top 50, 91 days, one seed)
+Fill rate · total cost (USD) — reorder_point / safety_stock / dynamic:
+- baseline: 0.847 · 39,248 / 0.862 · 36,995 / 0.938 · 29,136
+- high_demand: 0.743 · 70,030 / 0.769 · 62,865 / 0.899 · 39,865
+- demand_shock: 0.743 · 65,611 / 0.779 · 55,316 / 0.832 · 47,913
+- supply_disruption: 0.669 · 67,552 / 0.711 · 61,131 / 0.776 · 54,007
+Total cost is now dominated by lost-sales cost (valued at full price); ordering cost ≈ 16–21 k, holding
+cost < 1.3 k. Not evidence of economic or algorithmic superiority.
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 321 passed.
+
+### Commits
+5e0f6de metrics · 9e48ef7 no-look-ahead test · e803083 / 6e06a70 fixes · b01915d failure-mode tests ·
+904ca92 docs · b669220 docs(zh) · 3d62f0d build(deps) · 4089709 scenario registry · 7310527 warehouse
+scenarios · 6ea8550 Level-3 tests · 27c3358 docs(spec) · 8410029 docs(zh) · docs(plan) / docs(log) (this round).
+
+### Known issues
+- Sampled scenario ratios on the small fixture carry a few percent of noise (see decision above).
+- Lost-sales cost at full price is a proxy; with it, `total_cost` favours high-stock strategies.
+
+### Next
+M10 review → Phase 11 (Golden Path) on branch `phase11` from `phase10`.
+
+---
+
 ## 2026-09-27 — Gate 8 / M9 approved with follow-ups
 
 ### Branch
