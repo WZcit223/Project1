@@ -17,7 +17,7 @@ Branch name suggestion in brackets.
 | M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ approved 2026-09-27 |
 | M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ✅ approved 2026-09-27 |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ✅ approved 2026-09-27 |
-| M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ✅ 2026-09-27 (awaiting owner review) |
+| M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ✅ approved 2026-09-27 |
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ⬜ |
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ⬜ |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ⬜ |

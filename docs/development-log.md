@@ -5,6 +5,21 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 4 approved
+
+### Branch
+`phase4`
+
+### Changes
+- Owner approved Gate 4 and the four Phase 4 decisions (engine-only provenance, generic scenario
+  effect names with pack mapping, no trend / calibrated event uplift in v1, Iman–Conover correlation).
+  M4 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 5 (synthetic warehouse operational data) on branch `phase5` created from `phase4`.
+
+---
+
 ## 2026-09-27 — Phase 4: Synthetic Data Engine (TASK-SYN-001 … 005)
 
 ### Branch
