@@ -14,7 +14,7 @@ Branch name suggestion in brackets.
 | Milestone | Phase | Gate | Depends on | Status |
 |---|---|---|---|---|
 | M0 Architecture spec | 0 | G0 Architecture documented & approved | — | ✅ approved 2026-09-27 |
-| M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ 2026-09-27 (awaiting owner review) |
+| M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ approved 2026-09-27 |
 | M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ⬜ |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ⬜ |
 | M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ⬜ |

@@ -5,6 +5,28 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 1 approved
+
+### Branch
+`phase1`
+
+### Objective
+Record the owner's Gate 1 approval and review decisions.
+
+### Changes
+- Gate 1 (project starts, tests run) approved; M1 ✅ in the backlog (EN + ZH).
+- Phase 1 decisions accepted: tasks on `phase1` directly, explicit layer dependency table,
+  `api` limited to `core` + `application`.
+- CLAUDE.md §0.1: replies to the owner are always bilingual (English + Chinese).
+
+### Tests / checks
+Docs-only change; checks re-run — pass.
+
+### Next
+Phase 2 (Dataset foundation) on branch `phase2` created from `phase1`.
+
+---
+
 ## 2026-09-27 — Phase 1: Framework skeleton (TASK-CORE-001 … 006)
 
 ### Branch

@@ -27,6 +27,11 @@ Act as a senior software engineer, architect and technical lead, not only as a c
 
 > Build the framework first. Use Warehouse to prove it. Do not turn the framework into a Warehouse application.
 
+## 0.1 Communication
+
+Replies to the project owner are always **bilingual: English first, then Chinese (中文)**, with the
+same content in both. Code, identifiers, commit messages and English specs stay in English.
+
 ## 1. Project in one paragraph
 
 A reusable **Industrial AI Application Framework Prototype**:
