@@ -82,6 +82,7 @@ def bundle(
     moq: int = 0,
     review: int = 1,
     capacity: int = 1000,
+    history_qty: int = 3,
 ) -> DatasetBundle:
     ops = OPERATIONS_SCHEMAS
     dates = [START + timedelta(days=i) for i in range(len(demand))]
@@ -174,7 +175,12 @@ def bundle(
             "sales",
             RETAIL_SCHEMAS["sales"],
             [
-                {"date": pd.Timestamp(d), "product_id": "P1", "store_id": "S1", "quantity": 3}
+                {
+                    "date": pd.Timestamp(d),
+                    "product_id": "P1",
+                    "store_id": "S1",
+                    "quantity": history_qty,
+                }
                 for d in history
             ],
         ),
