@@ -3,17 +3,17 @@
 Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/synthetic-data-api.md](zh/synthetic-data-api.md)
 Package: `industrial_ai.synthetic` · Related: [plugin-spec.md](plugin-spec.md), [ADR-002](adr/ADR-002-plugin-architecture.md)
 
-Signatures below are **normative interface sketches**; exact typing is finalised in Phase 4 and
-this document is updated with it.
+Interfaces below are **implemented** in `industrial_ai.synthetic` (Phase 4).
 
 ## 1. Generator interface
 
 ```python
 class SyntheticDataGenerator(Protocol):
-    generator_id: str          # e.g. "time_series"
-    generator_version: str     # semver, e.g. "1.0.0"
+    generator_id: str                    # e.g. "time_series"
+    generator_version: str               # semver, e.g. "1.0.0"
     description: str
-    parameter_model: type[BaseModel]   # Pydantic model validating `parameters`
+    parameter_model: type[BaseModel]     # Pydantic model validating `parameters`
+    scenario_parameters: frozenset[str]  # scenario parameters this generator can apply
 
     def generate(
         self,
@@ -22,9 +22,9 @@ class SyntheticDataGenerator(Protocol):
         scenario: ScenarioSpec | None,
         seed: int,
         size: GenerationSize,
-        parameters: Mapping[str, Any],
+        parameters: BaseModel,           # instance of parameter_model, validated by the engine
         reference: Dataset | DatasetBundle | None = None,
-    ) -> SyntheticDataset: ...
+    ) -> GeneratedData: ...              # data + transformation steps + warnings
 ```
 
 | Argument | Meaning |
@@ -33,31 +33,32 @@ class SyntheticDataGenerator(Protocol):
 | `constraints` | Extra constraints beyond the schema (ranges, relationships, sums), see §3 |
 | `scenario` | Scenario whose parameters adjust generation (e.g. `demand_multiplier`); `None` = neutral |
 | `seed` | Integer seed; the **only** source of randomness (`numpy.random.default_rng(seed)`) |
-| `size` | Rows, entities × periods, or date range, depending on generator (`GenerationSize`) |
+| `size` | `GenerationSize(rows=…)` for tables or `(start=…, periods=…)` for daily series; unset fields are derived (e.g. one row per reference row) |
 | `parameters` | Generator-specific parameters, validated by `parameter_model` |
 | `reference` | Optional reference data used for calibration (e.g. M5 subset) |
+
+Generators return `GeneratedData`, not a dataset: the **engine** computes hashes, provenance and
+validation, so a plugin cannot emit data with missing or fabricated provenance.
 
 Rules:
 - Generators are **pure** with respect to inputs: no global RNG, no wall-clock dependence, no network.
 - Invalid parameters raise `GeneratorParameterError`; constraint violations in output raise
-  `ConstraintViolationError`. Generators never silently clip or drop data unless the clipping rule is
-  an explicit, recorded parameter.
+  `ConstraintViolationError` (with the `ValidationReport`). Generators never silently clip or drop
+  data unless the clipping rule is an explicit, recorded parameter.
+- Scenario parameters a generator does not apply are listed as **warnings** (in the result and in
+  provenance), never silently ignored.
 
 ## 2. Output: `SyntheticDataset`
 
 ```
-SyntheticDataset
-├── data               pandas.DataFrame
-├── schema             DatasetSchema
-├── metadata           DatasetMetadata (source_type = "synthetic")
-├── generation_config  {schema_id, constraints, scenario, size, parameters}  (fully serialisable)
-├── generator_id
-├── generator_version
-├── random_seed
-└── provenance         ProvenanceRecord
+SyntheticDataset (a Dataset subtype)
+├── data, schema, metadata (source_type = "synthetic"), provenance
+├── generation_config   GenerationConfig: generator id/version, schema id/version, constraints,
+│                       scenario, seed, size, validated parameters (fully serialisable)
+├── validation_report   ValidationReport (always passed; failures raise instead)
+├── warnings
+└── generator_id / generator_version / random_seed   (properties of generation_config)
 ```
-
-`SyntheticDataset` is a `Dataset` subtype, so every downstream API accepts it.
 
 ## 3. Constraints
 
@@ -79,25 +80,33 @@ it is stored with the dataset metadata.
 ## 4. Registry and engine
 
 ```python
-registry = GeneratorRegistry()
-registry.register(TimeSeriesGenerator())            # key: ("time_series", "1.0.0")
-registry.get("time_series")                         # latest version
-registry.get("time_series", "1.0.0")                # exact version
-registry.list()                                      # [GeneratorInfo(id, version, description, parameter_schema)]
+registry = new_generator_registry()                 # core Registry keyed by (generator_id, version)
+registry.register(TimeSeriesGenerator())
+registry.get("time_series")                          # latest version
+describe(registry.get("time_series"))                # GeneratorInfo incl. parameter JSON schema
 
-engine = SyntheticEngine(registry, catalog)
-result = engine.generate(GenerationRequest(
-    generator_id="time_series", generator_version="1.0.0",
-    schema_id="retail.sales", scenario_id="high_demand",
-    seed=20260927, size=..., parameters={...},
-    reference_dataset_id="m5_subset_ca1_foods3",
-))
+engine = SyntheticEngine(registry, catalog)          # catalog optional
+result = engine.generate(
+    GenerationRequest(
+        generator_id="time_series",                  # generator_version=None → latest (recorded)
+        dataset_id="syn_demand_high", version="1",
+        output_schema=SYNTHETIC_DEMAND_SCHEMA,
+        constraints=ConstraintSet(...),
+        scenario=high_demand,                        # ScenarioSpec or None
+        seed=20260927,
+        size=GenerationSize(start=date(2016, 1, 1), periods=182),
+        parameters={...},
+        reference_dataset_id="m5_subset_ca_1_foods_3_top50.sales",   # or pass reference=...
+    ),
+    register=True,
+)
 ```
 
-The engine: resolves generator and schema → validates parameters → calls `generate` → validates
-constraints → computes content hash → writes provenance → registers the dataset in the catalog.
-Duplicate registration of the same `(id, version)` raises an error. Plugin discovery: see
-[plugin-spec.md](plugin-spec.md).
+The engine: resolves the generator → validates parameters → resolves the reference (argument or
+catalog) → calls `generate` → builds the dataset with provenance (inputs pinned by hash, component,
+validated parameters, scenario, seed, transformations, warnings) → validates schema + constraints
+(failure raises `ConstraintViolationError`) → records the validation in provenance → optionally
+registers it in the catalog.
 
 Display ids used in UI and docs: `rule_based_v1`, `statistical_v1`, `time_series_v1`.
 

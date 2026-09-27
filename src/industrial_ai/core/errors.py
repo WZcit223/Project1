@@ -47,3 +47,19 @@ class DatasetNotFoundError(CatalogError, LookupError):
 
 class IngestionError(DatasetError):
     """An external file cannot be read into a dataset (unreadable, wrong columns, bad values)."""
+
+
+class GeneratorError(IndustrialAIError):
+    """Base class for synthetic data generation errors."""
+
+
+class GeneratorParameterError(GeneratorError, ValueError):
+    """Generator parameters (or size / reference inputs) are invalid."""
+
+
+class ConstraintViolationError(GeneratorError):
+    """Generated data violates its schema or constraints (see the attached report)."""
+
+    def __init__(self, message: str, report: object) -> None:
+        super().__init__(message)
+        self.report = report
