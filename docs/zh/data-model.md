@@ -115,7 +115,8 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
 | `retail.category` | category_id | category_id（例如 `FOODS`） |
 | `retail.department` | department_id | department_id（例如 `FOODS_3`）、category_id → category |
 | `retail.product` | product_id | product_id、department_id → department、category_id → category |
-| `retail.calendar` | date | date、week_id、weekday（1=周一…7=周日）、month、year、`snap_<region>`（每个区域一个 bool） |
+| `retail.calendar` | date | date、week_id、weekday（1=周一…7=周日）、month、year |
+| `retail.calendar_snap` | (date, region_id) | date → calendar、region_id → region、snap_active（bool）。采用长表格式，使日历不必硬编码区域 |
 | `retail.calendar_event` | (date, event_name) | date → calendar、event_name、event_type（`Sporting`、`Cultural`、`National`、`Religious`） |
 | `retail.sales` | (date, product_id, store_id) | date、product_id、store_id、quantity（int ≥ 0，`units`） |
 | `retail.price` | (week_id, product_id, store_id) | week_id、product_id、store_id、unit_price（float > 0，`USD`） |
@@ -163,7 +164,7 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
 | `calendar.wm_yr_wk` | `retail.calendar.week_id`、`retail.price.week_id` |
 | `calendar.wday` (1 = Saturday) | `weekday` 按 ISO 重新编码（1 = 周一） |
 | `calendar.event_name_1/_2`、`event_type_1/_2` | `retail.calendar_event` 中的行 |
-| `calendar.snap_CA/TX/WI` | `snap_CA/TX/WI` |
+| `calendar.snap_CA/TX/WI` | 每个日期、每个区域一行 `retail.calendar_snap` |
 | `sales.item_id` | `product_id` |
 | `sales.dept_id`、`cat_id`、`store_id`、`state_id` | department_id、category_id、store_id、region_id |
 | `sales.d_*` 值 | `retail.sales.quantity` |

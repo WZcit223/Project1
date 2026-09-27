@@ -127,7 +127,8 @@ The framework never sees M5 column names; the M5 adapter produces these tables.
 | `retail.category` | category_id | category_id (e.g. `FOODS`) |
 | `retail.department` | department_id | department_id (e.g. `FOODS_3`), category_id → category |
 | `retail.product` | product_id | product_id, department_id → department, category_id → category |
-| `retail.calendar` | date | date, week_id, weekday (1=Mon…7=Sun), month, year, `snap_<region>` (bool per region) |
+| `retail.calendar` | date | date, week_id, weekday (1=Mon…7=Sun), month, year |
+| `retail.calendar_snap` | (date, region_id) | date → calendar, region_id → region, snap_active (bool). Long format, so the calendar does not hard-code regions |
 | `retail.calendar_event` | (date, event_name) | date → calendar, event_name, event_type (`Sporting`, `Cultural`, `National`, `Religious`) |
 | `retail.sales` | (date, product_id, store_id) | date, product_id, store_id, quantity (int ≥ 0, `units`) |
 | `retail.price` | (week_id, product_id, store_id) | week_id, product_id, store_id, unit_price (float > 0, `USD`) |
@@ -175,7 +176,7 @@ Reference: Kaggle M5 Forecasting Accuracy. v0.1 uses `calendar.csv`, `sell_price
 | `calendar.wm_yr_wk` | `retail.calendar.week_id`, `retail.price.week_id` |
 | `calendar.wday` (1 = Saturday) | `weekday` re-encoded ISO (1 = Monday) |
 | `calendar.event_name_1/_2`, `event_type_1/_2` | rows in `retail.calendar_event` |
-| `calendar.snap_CA/TX/WI` | `snap_CA/TX/WI` |
+| `calendar.snap_CA/TX/WI` | one `retail.calendar_snap` row per date and region |
 | `sales.item_id` | `product_id` |
 | `sales.dept_id`, `cat_id`, `store_id`, `state_id` | department_id, category_id, store_id, region_id |
 | `sales.d_*` values | `retail.sales.quantity` |
