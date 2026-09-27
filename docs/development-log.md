@@ -5,6 +5,24 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 5 approved
+
+### Branch
+`phase5`
+
+### Changes
+- Owner approved Gate 5 and the five Phase 5 decisions (supplier / lead-time split,
+  strategy-independent policy settings, no `as_of_date`, operational defaults as assumptions, common
+  random numbers). M5 ✅ in the backlog (EN + ZH).
+- Owner asked whether the real M5 subset can be pushed to GitHub. Not done: the repository is public
+  and the data is under Kaggle competition rules (no redistribution; CLAUDE.md §13). Options put to
+  the owner for decision.
+
+### Next
+Phase 6 (Simulation Engine) on branch `phase6` created from `phase5`.
+
+---
+
 ## 2026-09-27 — Phase 5: Synthetic warehouse data (TASK-WH-001)
 
 ### Branch
