@@ -172,9 +172,14 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
 
 适配器（`industrial_ai_warehouse.adapters.m5.M5Adapter`，id `m5` v1.0.0）：读取包含 `calendar.csv`、`sell_prices.csv`、`sales_train_evaluation.csv`（若无则用 `sales_train_validation.csv`）以及可选 `SOURCE.json` 的目录；返回包含十张规范表（`<dataset_id>.<table>`）的 `DatasetBundle`，各表按主键排序，因此相同输入始终得到相同哈希。以下情况会引发 `IngestionError`：缺少文件或列、`wday` 与日期不一致、缺少 `snap_<STATE>` 列、销量中的日期不在日历中。若没有 `SOURCE.json`，数据被视为 Kaggle 原始文件（`source_type=reference`、数据集 id 为 `m5`、下载日期未知）。价格仅保留销量文件中存在的商品/门店序列。适配器面向子集设计。
 
-子集抽取（`scripts/make_m5_subset.py`，由用户在本地运行）：按门店、品类/部门以及总销量
-前 N 的商品进行过滤；以原始 M5 布局输出小型 CSV 至 `data/raw/m5_subset/`，并附带
-`SOURCE.json`，记录过滤条件、源文件哈希及下载日期。
+子集抽取（`scripts/make_m5_subset.py`，由数据所有者在本地对完整 Kaggle 文件运行）：
+
+```bash
+uv run python scripts/make_m5_subset.py --input <存放 Kaggle CSV 的文件夹> --download-date YYYY-MM-DD
+# 默认值：--store CA_1 --department FOODS_3 --top-n 50 --output data/raw/m5_subset
+```
+
+脚本分块流式读取大文件，保留所选门店 / 部门 / 品类以及总销量前 N 的商品（销量相同时按商品 id 排序），逐字复制原始值（日历文件逐字节复制），并写出 `SOURCE.json`（`source_type=reference`），记录过滤条件、每个原始文件的 SHA-256 以及下载日期。输出是真实的 M5 数据：保存在被 Git 忽略的 `data/raw/` 中。存在该目录时，`uv run pytest -m m5_local` 会对其进行转换和校验。
 
 ## 6. 指标定义
 

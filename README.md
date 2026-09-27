@@ -50,6 +50,13 @@ uv run python -m industrial_ai.api   # start the Application API (http://127.0.0
 
 ## Data
 
-Raw external data (M5) is **never committed**. Place it under `data/raw/` locally
-(git-ignored). Source: <https://www.kaggle.com/competitions/m5-forecasting-accuracy/data>
-(Kaggle competition rules apply). Tests use a small synthetic, M5-shaped fixture instead.
+Raw external data (M5) is **never committed**. Source:
+<https://www.kaggle.com/competitions/m5-forecasting-accuracy/data> (Kaggle competition rules apply).
+Tests use a small synthetic, M5-shaped fixture (`tests/fixtures/m5_like/`) instead.
+
+To use real M5 data, download the Kaggle files and extract a small subset locally:
+
+```bash
+uv run python scripts/make_m5_subset.py --input <folder with the Kaggle CSVs> --download-date YYYY-MM-DD
+uv run pytest -m m5_local      # converts and validates data/raw/m5_subset/
+```

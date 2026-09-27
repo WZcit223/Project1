@@ -47,6 +47,9 @@ mypy_path = ["src", "scenarios/warehouse/src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+markers = [
+    "m5_local: needs the owner's real M5 subset in data/raw/m5_subset (skipped otherwise)",
+]
 
 [dependency-groups]
 dev = [

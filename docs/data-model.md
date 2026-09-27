@@ -191,9 +191,18 @@ It fails with `IngestionError` on missing files/columns, a `wday` inconsistent w
 treated as original Kaggle files (`source_type=reference`, dataset id `m5`, download date unknown).
 Prices are kept only for product/store series present in the sales file. Designed for subsets.
 
-Subset extraction (`scripts/make_m5_subset.py`, run locally by the user): filter by store(s),
-category/department and top-N items by total sales; output small CSVs in the original M5 layout into
-`data/raw/m5_subset/`, with a `SOURCE.json` recording filters, source file hashes and download date.
+Subset extraction (`scripts/make_m5_subset.py`, run locally by the data owner on the full Kaggle files):
+
+```bash
+uv run python scripts/make_m5_subset.py --input <folder with the Kaggle CSVs> --download-date YYYY-MM-DD
+# defaults: --store CA_1 --department FOODS_3 --top-n 50 --output data/raw/m5_subset
+```
+
+It streams the large files in chunks, keeps the selected stores / departments / categories and the
+top-N items by total sales (ties by item id), copies values verbatim (calendar byte-for-byte) and
+writes a `SOURCE.json` (`source_type=reference`) with the filters, SHA-256 of each original file and the
+download date. The output is real M5 data: it stays in git-ignored `data/raw/`. With it present,
+`uv run pytest -m m5_local` converts and validates it.
 
 ## 6. Metrics definitions
 
