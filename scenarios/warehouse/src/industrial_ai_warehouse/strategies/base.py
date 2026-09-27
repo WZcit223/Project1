@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 
+from industrial_ai.core.errors import SimulationInputError
 from industrial_ai.core.registry import Registry
 
 
@@ -26,6 +27,12 @@ class ForecastView:
     def __init__(self, forecasts: pd.DataFrame) -> None:
         """``forecasts``: rows (origin_date, date, forecast, actual) for one item."""
         frame = forecasts[["origin_date", "date", "forecast", "actual"]].copy()
+        values = pd.to_numeric(frame["forecast"], errors="coerce").to_numpy(dtype="float64")
+        invalid = ~np.isfinite(values) | (values < 0)
+        if invalid.any():
+            raise SimulationInputError(
+                f"forecast has {int(invalid.sum())} invalid values (NaN, infinite or negative)"
+            )
         frame["origin_date"] = pd.to_datetime(frame["origin_date"])
         frame["date"] = pd.to_datetime(frame["date"])
         self._frame = frame.sort_values(["origin_date", "date"]).reset_index(drop=True)
