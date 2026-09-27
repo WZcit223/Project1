@@ -5,6 +5,39 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Real M5 subset check · Gate 3 approved
+
+### Branch
+`phase3`
+
+### Objective
+Confirm the adapter on real M5 data supplied by the owner, and record Gate 3 approval.
+
+### Changes
+- Owner ran `scripts/m5_subset_standalone.py` (added in e54be5b: same output as the project script,
+  needs only Python ≥ 3.10 + pandas) on the Kaggle files and uploaded the output; it was placed in
+  git-ignored `data/raw/m5_subset/` (**not committed**).
+- Gate 3 and the four Phase 3 decisions approved by the owner; M3 ✅ in the backlog (EN + ZH).
+
+### Real-data check (`uv run pytest -m m5_local` + profile)
+- `SOURCE.json`: `m5_subset_ca_1_foods_3_top50`, reference data, downloaded 2026-09-20, filters
+  CA_1 / FOODS_3 / top 50; `calendar.csv` SHA-256 equals the recorded hash of the original file.
+- Conversion: all 10 canonical tables; `validate_bundle`: 85 checks, 0 failed, 0 skipped.
+- Sales: 50 items × 1,941 days (2011-01-29 … 2016-05-22) = 97,050 rows; 1,580,183 units; no
+  negative or missing values. Per-item daily mean 7.8 – 66.4 (median 13.8); share of zero-sale days
+  median 20.5 %, max 53.1 %; 11 items have their first sale after 2011-03-01 (late launch).
+- Prices: 13,227 weekly rows, 0.20 – 4.98 USD. Calendar 1,969 days (to 2016-06-19), 167 events.
+
+### Known issues / notes for later phases
+- Leading zeros before an item's first sale (not yet on sale) must not be treated as zero demand when
+  calibrating synthetic demand (Phase 4/5).
+- Observed sales remain censored by stockouts (documented limitation).
+
+### Next
+Phase 4 (Synthetic Data Engine) on branch `phase4` created from `phase3`.
+
+---
+
 ## 2026-09-27 — Phase 3: M5 adapter (TASK-M5-001 … 004)
 
 ### Branch
