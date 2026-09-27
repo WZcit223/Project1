@@ -4,7 +4,10 @@ version = "0.1.0.dev0"
 description = "Industrial AI Application Framework Prototype: synthetic data, simulation and scenario-based decision support."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+]
 
 [build-system]
 requires = ["uv_build>=0.8.17,<0.9.0"]
