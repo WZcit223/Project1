@@ -114,7 +114,7 @@ UI 与文档中使用的显示 id：`rule_based_v1`、`statistical_v1`、`time_s
   "created_at": "2026-09-27T10:00:00Z",
   "framework_version": "0.1.0",
   "inputs": [{"dataset_id": "m5_subset_ca1_foods3", "version": "1", "content_hash": "sha256:…"}],
-  "generator": {"id": "time_series", "version": "1.0.0"},
+  "component": {"id": "time_series", "version": "1.0.0"},
   "parameters": {"noise_scale": 1.0, "calibration": "per_series_negbin"},
   "scenario": {"scenario_id": "high_demand", "version": "1.0.0", "parameters": {"demand_multiplier": 1.3}},
   "seed": 20260927,
@@ -124,7 +124,7 @@ UI 与文档中使用的显示 id：`rule_based_v1`、`statistical_v1`、`time_s
 }
 ```
 
-它回答了以下链路：*源数据集 → 生成器 → 版本 → 参数 → 场景 → 种子 →
+`component` 指明带版本的生产者——此处为生成器；对于导入的数据则为适配器或加载器。它回答了以下链路：*源数据集 → 生成器 → 版本 → 参数 → 场景 → 种子 →
 变换 → 生成的数据集*。仅凭溯源记录即可重新执行一次运行（前提是源数据相同），
 并通过比较 `content_hash` 验证复现结果。
 

@@ -112,7 +112,7 @@ Every generated dataset stores a `ProvenanceRecord`:
   "created_at": "2026-09-27T10:00:00Z",
   "framework_version": "0.1.0",
   "inputs": [{"dataset_id": "m5_subset_ca1_foods3", "version": "1", "content_hash": "sha256:…"}],
-  "generator": {"id": "time_series", "version": "1.0.0"},
+  "component": {"id": "time_series", "version": "1.0.0"},
   "parameters": {"noise_scale": 1.0, "calibration": "per_series_negbin"},
   "scenario": {"scenario_id": "high_demand", "version": "1.0.0", "parameters": {"demand_multiplier": 1.3}},
   "seed": 20260927,
@@ -122,7 +122,7 @@ Every generated dataset stores a `ProvenanceRecord`:
 }
 ```
 
-This answers: *source dataset → generator → version → parameters → scenario → seed →
+`component` names the versioned producer — a generator here; an adapter or loader for ingested data. This answers: *source dataset → generator → version → parameters → scenario → seed →
 transformations → generated dataset*. A run can be re-executed from its provenance record alone
 (given the same source data), and reproduction is verified by comparing `content_hash`.
 

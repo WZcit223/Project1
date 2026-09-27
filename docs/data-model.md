@@ -43,23 +43,31 @@ entities, (4) simulation output tables, (5) M5 mapping and (6) **metric definiti
 | `metadata` | DatasetMetadata | see below |
 | `provenance` | ProvenanceRecord | see [synthetic-data-api.md §5](synthetic-data-api.md#5-provenance) |
 
+Datasets are created with `build_dataset(dataset_id, version, schema, data, source, lineage)`, which
+reorders columns to schema order and **computes** row count, content hash, time range, entity counts
+and the provenance output from the data. A `Dataset` re-checks these invariants on construction, so its
+metadata and provenance can never disagree with its data. Value-level checks are separate
+(`validate_dataset`, see §1.5).
+
 A logical dataset composed of several tables (e.g. sales + prices + calendar) is a **`DatasetBundle`**:
-`bundle_id`, `version`, `tables: dict[str, Dataset]`, `metadata`, `provenance`.
+`bundle_id`, `version`, `tables: dict[str, Dataset]`, `source`, `lineage`; its `content_hash` is
+derived from the member tables' names and hashes.
 
 ### 1.4 `DatasetMetadata`
 
 | Attribute | Notes |
 |---|---|
-| `name`, `description` | |
+| `name`, `description` | Fields supplied by the producer (`SourceInfo`): name … tags |
 | `source_type` | `reference` (real external), `synthetic`, `derived`, `fixture` |
 | `source` | e.g. `M5 Forecasting Accuracy` |
 | `source_url` | |
 | `dataset_version` / `download_date` | for external sources |
 | `license_notes` | e.g. "Kaggle competition rules; do not redistribute" |
 | `time_range` | `{start, end}` |
-| `row_count`, `entities` | computed |
+| `row_count` | computed |
+| `entity_counts` | computed: distinct values per entity key, e.g. `{"product_id": 50}` |
 | `created_at` | UTC timestamp |
-| `content_hash` | SHA-256 of the canonical Parquet serialization |
+| `content_hash` | computed: `sha256:` over values per column (sorted by name, logical dtype family, row order kept, index ignored); unchanged by a Parquet round trip |
 | `tags` | free-form labels (e.g. `demo`, `prototype`) |
 
 ## 2. Canonical retail-demand model (Warehouse pack, `schema_version 1.0`)

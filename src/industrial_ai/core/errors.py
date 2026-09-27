@@ -27,3 +27,7 @@ class DuplicatePluginError(RegistryError):
 
 class PluginNotFoundError(RegistryError, LookupError):
     """No plugin is registered under the requested id (and version)."""
+
+
+class DatasetError(IndustrialAIError):
+    """A dataset is malformed or inconsistent with its schema, metadata or provenance."""

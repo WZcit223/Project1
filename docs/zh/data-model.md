@@ -45,23 +45,26 @@
 | `metadata` | DatasetMetadata | 见下文 |
 | `provenance` | ProvenanceRecord | 见 [synthetic-data-api.md §5](synthetic-data-api.md) |
 
+数据集通过 `build_dataset(dataset_id, version, schema, data, source, lineage)` 创建：该函数按 Schema 顺序重排列，并根据数据本身**计算**行数、内容哈希、时间范围、实体计数以及溯源输出。`Dataset` 在构造时会重新校验这些不变量，因此其元数据与溯源永远不会与数据不一致。数值层面的校验另行进行（`validate_dataset`，见 §1.5）。
+
 由多张表（例如 sales + prices + calendar）组成的逻辑数据集称为 **`DatasetBundle`**：
-`bundle_id`、`version`、`tables: dict[str, Dataset]`、`metadata`、`provenance`。
+`bundle_id`、`version`、`tables: dict[str, Dataset]`、`source`、`lineage`；其 `content_hash` 由各成员表的名称与哈希推导得出。
 
 ### 1.4 `DatasetMetadata`
 
 | 属性 | 说明 |
 |---|---|
-| `name`、`description` | |
+| `name`、`description` | 由生产者提供的字段（`SourceInfo`）：name … tags |
 | `source_type` | `reference`（真实外部数据）、`synthetic`、`derived`、`fixture` |
 | `source` | 例如 `M5 Forecasting Accuracy` |
 | `source_url` | |
 | `dataset_version` / `download_date` | 用于外部数据源 |
 | `license_notes` | 例如 "Kaggle competition rules; do not redistribute"（遵循 Kaggle 竞赛规则；不得再分发） |
 | `time_range` | `{start, end}` |
-| `row_count`、`entities` | 计算得出 |
+| `row_count` | 计算得出 |
+| `entity_counts` | 计算得出：每个实体键的不同取值数，例如 `{"product_id": 50}` |
 | `created_at` | UTC 时间戳 |
-| `content_hash` | 规范 Parquet 序列化结果的 SHA-256 |
+| `content_hash` | 计算得出：按列（按名称排序、逻辑数据类型族、保留行顺序、忽略索引）对值计算 `sha256:`；Parquet 往返后保持不变 |
 | `tags` | 自由格式标签（例如 `demo`、`prototype`） |
 
 ## 2. 规范零售需求模型（Warehouse 包，`schema_version 1.0`）
