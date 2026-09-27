@@ -5,6 +5,21 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — M7 approved
+
+### Branch
+`phase7`
+
+### Changes
+- Owner approved milestone M7 and the five Phase 7 decisions (native LightGBM API, direct multi-step,
+  no price/event features in v1, forecasts beyond the last observation, 4-week seasonal naive).
+  M7 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 8 (inventory simulation + metrics) on branch `phase8` created from `phase7`.
+
+---
+
 ## 2026-09-27 — Phase 7: Forecast plugins (TASK-FC-001, TASK-FC-002) · M5 subset committed
 
 ### Branch
