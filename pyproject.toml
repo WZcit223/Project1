@@ -11,6 +11,7 @@ dependencies = [
     "pyarrow>=16",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
+    "pyyaml>=6.0",
     "sqlmodel>=0.0.22",
     "uvicorn>=0.30",
 ]
@@ -60,4 +61,5 @@ dev = [
     "pandas-stubs>=3.0.5.260914",
     "pytest>=9.1.1",
     "ruff>=0.16.9",
+    "types-pyyaml>=6.0.12.20260906",
 ]
