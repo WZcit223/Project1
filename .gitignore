@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Environments
+.venv/
+.env
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Data: raw / intermediate / processed data never enters Git (see docs/data-model.md, AI-AGENT rules §51)
+data/raw/*
+data/interim/*
+data/processed/*
+!data/*/.gitkeep
+
+# Local databases and generated artifacts
+*.sqlite
+*.sqlite3
+*.db
+artifacts/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
