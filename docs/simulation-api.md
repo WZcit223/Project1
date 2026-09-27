@@ -3,7 +3,7 @@
 Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/simulation-api.md](zh/simulation-api.md)
 Package: `industrial_ai.simulation` · Related: [plugin-spec.md](plugin-spec.md), [scenario-spec.md](scenario-spec.md)
 
-Interfaces in §1–3 are **implemented** in `industrial_ai.simulation` (Phase 6); forecast plugins in §4 are implemented (Phase 7); inventory simulation and strategies follow in Phases 8–9.
+Interfaces in §1–3 are **implemented** in `industrial_ai.simulation` (Phase 6); forecast plugins in §4 are implemented (Phase 7); the inventory simulation (Phase 8) and the replenishment strategies (Phase 9) are implemented in the warehouse pack.
 
 ## 1. Plugin interface
 

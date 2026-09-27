@@ -92,11 +92,21 @@ fulfilled. Strategies do **not** mutate inventory; the inventory simulation owns
 rounding (case pack, minimum order quantity) and purchase orders. Strategies are registered in a
 pack-local `StrategyRegistry` (core `Registry`) and selected by the simulation parameter `strategy_id`.
 
+Implemented in `industrial_ai_warehouse.strategies` (Phase 9); `builtin_strategies()` returns a registry
+with all three.
+
 | Strategy | Rule (per item) | Uses forecast |
 |---|---|---|
-| **A `reorder_point`** (s, Q) | s = μ_hist · L̄ ; when inventory position ≤ s order Q = μ_hist · R (R = review/cycle days, default 14). μ_hist = mean daily demand over the trailing history window, computed once. No safety stock. | No |
-| **B `safety_stock`** (s, S) | SS = z · σ_e · √L̄ ; s = μ_f · L̄ + SS ; S = s + μ_f · R ; when position ≤ s order S − position. μ_f = mean forecast daily demand, σ_e = forecast error std on the training window, z from target service level (default 0.95 → 1.645). Parameters fixed at horizon start. | Yes (once) |
-| **C `dynamic`** (periodic order-up-to) | Every review day: S_t = Σ forecast over next (L̄ + R) days + z · σ_e,t · √(L̄ + R), σ_e,t = rolling recent forecast error; order max(0, S_t − position). Adapts to scenario changes. | Yes (rolling) |
+| **A `reorder_point`** 1.0.0 (s, Q) | s = μ_hist · L̄ ; on a review day with inventory position ≤ s order Q = μ_hist · R. μ_hist = mean daily demand over the item's history window (active period), computed once; no history → no orders. No safety stock. | No |
+| **B `safety_stock`** 1.0.0 (s, S) | SS = z · σ_e · √L̄ ; s = μ_f · L̄ + SS ; S = s + μ_f · R ; when position ≤ s order S − position. Set at the **first review (horizon start)** and then fixed: μ_f = mean forecast daily demand over the next ⌈L̄ + R⌉ days, σ_e = std of daily forecast errors in the `error_window_days` (56) before the horizon start. | Yes (once) |
+| **C `dynamic`** 1.0.0 (periodic order-up-to) | Every R days (first review on or after the due day): S_t = μ_f,t · (L̄ + R) + z · σ_e,t · √(L̄ + R) with μ_f,t from the latest forecast and σ_e,t from the errors of the last `error_window_days`; order max(0, S_t − position). Adapts to scenario changes. | Yes (rolling) |
+
+Common parameters: `cycle_days` (R; default the item's `order_cycle_days`, 14), and for B and C
+`service_level` (default the item's `target_service_level`, 0.95 → z = 1.645) and `error_window_days`.
+Forecasts are read from the day after the review (the order cannot serve today's demand). B and C raise
+`SimulationInputError` instead of guessing when σ_e cannot be estimated (fewer than two past errors:
+the forecast run needs a warm-up before the horizon) or when the forecast does not cover the next
+⌈L̄ + R⌉ days. The quantity returned is rounded by the simulation (MOQ, case pack).
 
 L̄ = supplier mean lead time (scenario-adjusted as known to the planner). These are deliberately simple
 textbook policies; no optimisation.

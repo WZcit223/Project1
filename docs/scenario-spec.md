@@ -92,4 +92,8 @@ as "not applied" in its warnings.
   deterministically (no resampling); useful as a sanity check.
 
 Forecast models are trained only on data **before** the horizon start and see horizon demand only
-as it is observed day by day (no look-ahead).
+as it is observed day by day (no look-ahead): the forecast runs on `derived.demand_timeline` (observed
+history + synthetic horizon demand), each origin seeing only earlier days. Forecast-based strategies
+need forecast errors from before the horizon, so the forecast run starts a **warm-up** period
+(e.g. 56 days) before the horizon start, and its `forecast_horizon_days` must cover
+reforecast interval + L̄ + R (e.g. 56).

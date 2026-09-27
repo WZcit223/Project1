@@ -159,7 +159,9 @@ Derived tables (`source_type=derived`, component `warehouse.derive` 1.0.0) are d
 summaries used as generator inputs: `derived.product_price` (mean weekly price per product),
 `derived.store_demand` (Σ product mean daily demand per store) and `derived.planning_input`
 (μ = mean daily demand over the last 365 active days, leading zeros excluded; supplier mean lead time
-L̄; initial stock target). `build_hybrid_bundle(retail, ops)` joins real reference and synthetic tables
+L̄; initial stock target). `derived.demand_timeline` (date, product_id, store_id, quantity,
+origin ∈ {observed, synthetic}; `build_demand_timeline()`) appends a run's synthetic horizon demand to the
+observed sales: it is the input of the rolling forecast during a simulation. `build_hybrid_bundle(retail, ops)` joins real reference and synthetic tables
 into the Hybrid Validation Environment; its foreign keys all resolve inside the bundle.
 
 **Lead time** is a per-supplier distribution (`ops.supplier_lead_time`) sampled per purchase order
