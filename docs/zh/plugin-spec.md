@@ -67,21 +67,27 @@ warehouse = "industrial_ai_warehouse.pack:pack"
 ## 4. 补货策略插件
 
 ```python
-class ReplenishmentStrategy(Protocol):
+class ReplenishmentStrategy(Protocol):            # industrial_ai_warehouse.strategies
     strategy_id: str
     strategy_version: str
+    description: str
     parameter_model: type[BaseModel]
+    uses_forecast: bool                           # simulation then requires an upstream forecast
 
-    def initialise(self, history: ItemHistory, supplier: SupplierInfo,
-                   parameters: BaseModel) -> StrategyState: ...
+    def create_policy(self, item: ItemContext, parameters: BaseModel) -> ItemPolicy: ...
 
-    def decide(self, state: StrategyState, observation: DailyObservation,
-               forecast: ForecastView | None) -> OrderDecision: ...
+class ItemPolicy(Protocol):
+    def order_quantity(self, observation: DailyObservation) -> float: ...   # ≥ 0, before rounding
 ```
 
-`DailyObservation` = 日期、on_hand（在库量）、on_order（在途量，即库存位置 inventory position）、当日需求/已满足量。
-`OrderDecision` = 订货数量（int ≥ 0，向上取整到箱规 / 最小订货量）+ 原因字符串。
-策略**不会**修改库存；库存状态转移由库存仿真负责。
+`ItemContext`（在预测期起点已知）：商品、仓库、日需求 `history`（活跃期，排除前导零，取最近
+`history_window_days` 天）、计划员所知的 `lead_time_mean_days` / `lead_time_std_days`、
+`review_period_days`、`order_cycle_days`、`target_service_level`，以及一个 `ForecastView`（或 `None`）。
+`ForecastView.total(day, days)` 对起点 ≤ `day` 的最新一次预测求和；
+`ForecastView.recent_errors(day, days)` 返回每个过去日期当时所用预测的误差 — 不做前视（no look-ahead）。
+`DailyObservation` = day、date、on_hand（在库量）、on_order（在途量）、inventory_position（库存位置）、当日需求 /
+已满足量。策略**不会**修改库存；库存状态转移、取整（箱规、最小订货量）及采购订单均由库存仿真负责。
+策略注册在场景包本地的 `StrategyRegistry`（核心 `Registry`）中，并通过仿真参数 `strategy_id` 选择。
 
 | 策略 | 规则（按单品） | 是否使用预测 |
 |---|---|---|

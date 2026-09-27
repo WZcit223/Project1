@@ -146,12 +146,17 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
 
 ## 4. 仿真输出表
 
+输出数据集命名为 `<run_id>.<plugin_id>.<table>`（运行与所比较的变体已包含在 id 中），因此运行和策略不再作为列重复出现。
+Schema 版本均为 1.0.0。
+
 | 表 | 主键 | 字段 |
 |---|---|---|
-| `sim.inventory_ledger` | (run_id, strategy_id, date, product_id) | opening_on_hand、arrivals、demand、fulfilled、lost_sales、closing_on_hand、on_order、inventory_position、order_qty |
-| `sim.purchase_order` | (run_id, strategy_id, po_id) | product_id、supplier_id、order_date、quantity、sampled_lead_time_days、expected_arrival_date、received_date、received_qty、status（`open`、`received`、`partially_received`） |
-| `sim.forecast` | (run_id, model_id, origin_date, date, product_id) | forecast_qty、actual_qty（事后回填） |
-| `sim.metrics` | (run_id, strategy_id, metric_id, scope) | value、unit、scope（`total` 或 `product:<id>`） |
+| `sim.inventory_ledger` | (date, product_id, warehouse_id) | opening_on_hand、arrivals、demand、fulfilled、lost_sales、closing_on_hand、on_order、inventory_position、order_qty（均为 int ≥ 0） |
+| `sim.purchase_order` | po_id | product_id、warehouse_id、supplier_id、order_date、quantity、shipped_qty、sampled_lead_time_days、expected_arrival_date、received_date（仅在预测期内到货时有值，否则为 null）、status（`received`、`partially_received`、`open`、`not_shipped`） |
+| `sim.forecast` | (origin_date, date, 实体列) | forecast（≥ 0）、actual（可为空） — 见 simulation-api.md §4 |
+
+KPI 以 `Metric` 记录（`metric_id`、`value`、`unit`、`scope` = `total` 或
+`product:<id>`）的形式在仿真结果中返回，而不是作为表。
 
 ## 5. M5 → 规范模型映射
 
@@ -188,7 +193,7 @@ uv run python scripts/make_m5_subset.py --input <存放 Kaggle CSV 的文件夹>
 除非 scope 另有说明，所有指标均按每次运行 (run) 的每个策略在**仿真期间 (simulation horizon)**
 内计算，并对所有仿真的商品-日 (item-day) 进行汇总。记号：对商品 *i*、第 *t* 天：
 需求 *Dᵢₜ*，满足量 *Fᵢₜ = min(Dᵢₜ, available)*，损失量 *Lᵢₜ = Dᵢₜ − Fᵢₜ*，期末在库量 *Iᵢₜ*，
-单位成本 *cᵢ*，单价 *pᵢₜ*，年持有成本率 *h*，订货成本 *k*，期间长度 *T* 天，
+单位成本 *cᵢ*，单价 *pᵢ*（平均参考价格，`derived.product_price`），年持有成本率 *h*，订货成本 *k*，期间长度 *T* 天，
 商品数 *N*。
 
 | 指标 id | 名称 | 定义 | 单位 |
@@ -197,7 +202,7 @@ uv run python scripts/make_m5_subset.py --input <存放 Kaggle CSV 的文件夹>
 | `service_level` | 服务水平 (Service level / **fill rate**，满足率) | Σ Fᵢₜ / Σ Dᵢₜ（若 Σ D = 0 则无定义 → 报告为 `null`） | 比率 0–1 |
 | `stockout_rate` | 缺货率 (Stockout rate) | #{(i,t) : Lᵢₜ > 0} / (N · T) | 比率 0–1 |
 | `lost_sales_units` | 损失销量 (Lost sales) | Σ Lᵢₜ | units |
-| `lost_sales_value` | 损失销售额 (Lost sales value)（单独报告，**不**计入库存成本） | Σ Lᵢₜ · pᵢₜ | USD |
+| `lost_sales_value` | 损失销售额 (Lost sales value)（单独报告，**不**计入库存成本） | Σ Lᵢₜ · pᵢ | USD |
 | `avg_inventory_units` | 平均库存水平 (Average inventory level) | (1 / T) Σₜ Σᵢ Iᵢₜ | units |
 | `avg_inventory_value` | 平均库存价值 (Average inventory value) | (1 / T) Σₜ Σᵢ Iᵢₜ · cᵢ | USD |
 | `holding_cost` | 持有成本 (Holding cost) | Σ Iᵢₜ · cᵢ · h / 365 | USD |

@@ -57,23 +57,32 @@ tags: [demand]
 
 ## 5. 库存仿真模型
 
-按日离散时间、按单品、单级（single-echelon）、缺货损失（lost sales）模型。对预测期内每一天 *t*，依次执行：
+由 Warehouse 插件 `inventory_simulation` 1.0.0（`industrial_ai_warehouse.simulation`）实现。
+按日离散时间、按单品（product × warehouse）、单级（single-echelon）、缺货损失（lost sales）模型。对预测期内每一天 *t*，
+依次执行：
 
-1. **收货（Receive）** — `arrival_date = t` 的采购订单按其（可能被削减的）数量入库：
-   `opening_on_hand_t = closing_on_hand_{t−1} + arrivals_t`。
-2. **需求（Demand）** — `fulfilled_t = min(opening_on_hand_t, demand_t)`，`lost_sales_t = demand_t − fulfilled_t`。
+1. **收货（Receive）** — 在 *t* 日到达的发货入库：`opening_on_hand_t = closing_on_hand_{t−1} + arrivals_t`。
+2. **需求（Demand）** — `fulfilled_t = min(opening_on_hand_t, demand_t)`，`lost_sales_t = demand_t − fulfilled_t`
+   （直接损失，不做延期交货 back-order）。
 3. **结存（Close）** — `closing_on_hand_t = opening_on_hand_t − fulfilled_t`。
    （等价于 *Inventory(t+1) = Inventory(t) + Arrivals(t) − Demand(t)*，缺货损失下限为 0。）
-4. **盘点（Review）** — 在盘点日，策略观察 `inventory_position_t = closing_on_hand_t + on_order_t`
-   并返回订货数量。
-5. **订货（Order）** — 若数量 > 0，则创建采购订单；使用运行种子采样提前期
-   `L ~ max(1, round(Normal(mean + lead_time_delta_t, std)))`；以概率
-   `1 − on_time_probability` 增加 1–3 天延迟；`arrival_date = t + L`；在中断窗口内，发货数量 =
-   `ceil(quantity · supply_capacity_factor_t)`。
-6. **记录（Record）** 台账行与成本。
+4. **盘点（Review）** — 每隔 `review_period_days` 天，策略的 policy 观察 `DailyObservation`
+   （在库量、在途量、库存位置 = 在库量 + 在途量、当日需求与已满足量）并返回一个数量；仿真先应用供应商的
+   最小订货量，再将其向上取整到箱规。
+5. **订货（Order）** — 提前期 `L = max(1, round(mean + lead_time_delta_t + std · z_t))`；以概率
+   `1 − on_time_probability` 增加 1–3 天（`max_extra_delay_days`）；到货日为 `t + L`；发货数量为
+   `ceil(quantity · supply_capacity_factor_t)`；未发货部分即告损失。`lead_time_delta` 与
+   `supply_capacity_factor` 作用于在中断窗口
+   `[disruption_start_day, disruption_start_day + disruption_duration_days)` 内下达的订单；当持续时间为 0 时
+   作用于整个预测期。若 `planner_aware = true`，策略看到的是调整后的平均提前期。
+6. **记录（Record）** — 台账行（`sim.inventory_ledger`）、采购订单（`sim.purchase_order`）与 KPI
+   （data-model §6）。
 
-初始状态：`ops.initial_inventory`（默认在库量 = μ · (L̄ + R/2)，在途量 = 0）。
-容量上限（`ops.warehouse.capacity_units`）超出时仅作为警告报告，不强制执行（v0.1）。
+`z_t`、是否延迟及延迟天数均由运行种子**按单品、按日**预先采样，因此在同一种子下比较的各策略面对完全相同的
+供应条件（公共随机数，common random numbers）。初始状态：
+`ops.initial_inventory`（在库量 = μ · (L̄ + order_cycle/2)，在途量 0）。容量上限
+（`ops.warehouse.capacity_units`）超出时仅作为警告报告，不强制执行（v0.1）。
+需求侧场景参数由上游的需求生成器应用，因此仿真会在其警告中将它们列为"未应用（not applied）"。
 
 ## 6. 预测期需求
 
