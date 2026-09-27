@@ -169,6 +169,25 @@ SYNTHETIC_DEMAND = DatasetSchema(
     description="Scenario-specific synthetic daily demand over the simulation horizon.",
 )
 
+DEMAND_TIMELINE = DatasetSchema(
+    schema_id="derived.demand_timeline",
+    schema_version=SCHEMA_VERSION,
+    fields=(
+        FieldSpec(name="date", dtype=DType.DATE),
+        FieldSpec(name="product_id", dtype=DType.STR),
+        FieldSpec(name="store_id", dtype=DType.STR),
+        FieldSpec(name="quantity", dtype=DType.INT, min=0, unit="units"),
+        FieldSpec(name="origin", dtype=DType.STR, allowed_values=("observed", "synthetic")),
+    ),
+    primary_key=("date", "product_id", "store_id"),
+    time_index="date",
+    entity_keys=("product_id", "store_id"),
+    description=(
+        "Observed sales history followed by the scenario's synthetic horizon demand: the series "
+        "a planner's rolling forecast sees as the horizon unfolds."
+    ),
+)
+
 OPERATIONS_SCHEMAS: dict[str, DatasetSchema] = {
     "product_price": PRODUCT_PRICE,
     "store_demand": STORE_DEMAND,
