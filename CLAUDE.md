@@ -100,14 +100,18 @@ Structure changes need a strong engineering reason and must be documented (ADR i
 ## 7. Git workflow
 
 - `main` = latest stable, tested state. **Never develop directly on `main`. Never force-push `main`.**
-- Every development iteration happens on a branch:
-  `feature/<name>`, `fix/<name>`, `docs/<name>`, `refactor/<name>`.
-  When the execution environment assigns a branch (e.g. `claude/...` in Claude Code on the web),
-  that branch plays the role of the feature branch.
+- **Branch per major round (stacked, no merge to `main` while work is in progress):**
+  - Each major round (a phase, or a significant feature / function) gets a **new branch created from
+    the latest working branch**, not from `main`. The previous branch stays untouched as a snapshot.
+  - Phase branches: `phase<N>` (e.g. `phase1`, `phase2`). Feature / function rounds inside a phase:
+    `feature/<name>`; fixes `fix/<name>`; docs-only `docs/<name>`; refactors `refactor/<name>`.
+  - The branch lineage is recorded in each `docs/development-log.md` entry ("Branch" + "Based on").
+  - If the execution environment assigns its own branch name (e.g. `claude/...`), rename it to the
+    agreed branch name before pushing.
 - Before starting: `git status`, `git branch --show-current`, `git log --oneline -10`;
-  branch from an up-to-date `main` (`git pull --ff-only origin main`).
-- Merge to `main` via Pull Request only when the acceptance criteria are met and tests pass.
-  Squash when intermediate commits are noise; keep atomic commits when they carry useful history.
+  create the new branch from the latest working branch (`git checkout -b <new> <latest>`).
+- `main` is updated only at milestones the project owner chooses, via Pull Request, when acceptance
+  criteria are met and tests pass. Do not open PRs or merge to `main` unless asked.
 - Do not rewrite published history; avoid `git reset --hard` / `git push --force` on shared branches.
 
 ### Commits

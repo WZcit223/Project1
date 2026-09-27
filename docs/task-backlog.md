@@ -2,7 +2,7 @@
 
 Status: **Draft for Gate 0 review** · 中文: [zh/task-backlog.md](zh/task-backlog.md)
 
-Each task is small enough for one coding-agent round (one branch, 1–5 atomic commits). Do **one task
+Each task is small enough for one coding-agent round (1–5 atomic commits). Branching follows [CLAUDE.md](../CLAUDE.md) §7: each major round (phase or significant feature) gets a new branch created from the latest working branch (`phase<N>`, `feature/<name>`); nothing is merged to `main` during work in progress. Do **one task
 at a time**, in order, unless dependencies allow otherwise. Every task inherits the rules in
 [CLAUDE.md](../CLAUDE.md) (tests, docs, dev log, commit, push) and the Definition of Done.
 
@@ -33,7 +33,7 @@ Branch name suggestion in brackets.
 
 ## Phase 0 — Architecture
 
-### TASK-ARCH-001 — Architecture baseline  [`claude/…` session branch] ✅ submitted for review
+### TASK-ARCH-001 — Architecture baseline  [`phase1`] ✅ submitted for review
 Objective: uv project, CLAUDE.md, all specs in `docs/`, ADRs, backlog, bilingual mirror. No app logic.
 Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; PR open for Gate 0.
 

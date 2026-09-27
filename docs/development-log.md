@@ -5,10 +5,32 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Branch policy update
+
+### Branch
+`phase1` (renamed from `claude/focused-lamport-421rvy`)
+
+### Objective
+Adopt the owner's branching policy: one new branch per major round (phase / feature / function),
+created from the latest working branch; no merges to `main` while work is in progress.
+
+### Changes
+- CLAUDE.md §7 rewritten (stacked `phase<N>` / `feature/<name>` branches, `main` updated only at
+  owner-chosen milestones, lineage recorded in this log).
+- Task backlog (EN + ZH) references updated; TASK-ARCH-001 branch is `phase1`.
+
+### Tests / checks
+Docs-only change; ruff, mypy, pytest and link check re-run — pass.
+
+### Next
+Gate 0 review, then TASK-CORE-001 on a new branch created from `phase1`.
+
+---
+
 ## 2026-09-27 — TASK-ARCH-001 Architecture baseline
 
 ### Branch
-`claude/focused-lamport-421rvy` (session-assigned branch, based on `main` @ `c3a62bc`; plays the role of `docs/architecture-v01`)
+`phase1` (based on `main` @ `c3a62bc`; originally pushed as the session branch `claude/focused-lamport-421rvy`, renamed to `phase1`)
 
 ### Objective
 Establish the architecture baseline (Phase 0) for review at Gate 0: project environment, working
@@ -55,4 +77,4 @@ docs(adr) 3fc3e04, docs(plan) 0060334, docs(zh) ×2, docs(log) (this entry).
 - Network policy of the cloud environment blocks kaggle.com; M5 subset must be supplied by the user.
 
 ### Next
-Gate 0 review → merge PR to `main` → TASK-CORE-001 (workspace & package skeleton).
+Gate 0 review → new branch from `phase1` for TASK-CORE-001 (workspace & package skeleton). No merge to `main` during work in progress.
