@@ -3,63 +3,71 @@
 Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/simulation-api.md](zh/simulation-api.md)
 Package: `industrial_ai.simulation` · Related: [plugin-spec.md](plugin-spec.md), [scenario-spec.md](scenario-spec.md)
 
-Signatures are normative sketches, finalised in Phase 6.
+Interfaces in §1–3 are **implemented** in `industrial_ai.simulation` (Phase 6); §4 plugins follow in Phases 7–9.
 
 ## 1. Plugin interface
 
 ```python
 class SimulationPlugin(Protocol):
-    plugin_id: str               # e.g. "seasonal_naive", "lightgbm", "inventory_simulation"
-    plugin_version: str          # semver
-    kind: PluginKind             # "forecast" | "simulation" | "strategy_evaluation"
-                                 # reserved: "optimization" | "causal"
+    plugin_id: str                    # e.g. "seasonal_naive", "lightgbm", "inventory_simulation"
+    plugin_version: str               # semver
+    kind: PluginKind                  # forecast | simulation | strategy_evaluation
+                                      # reserved: optimization | causal
+    description: str
     parameter_model: type[BaseModel]
-    required_inputs: list[str]   # schema_ids the plugin needs, e.g. ["retail.sales"]
+    required_inputs: tuple[str, ...]  # schema ids the dataset/bundle must contain
 
     def run(
         self,
         dataset: Dataset | DatasetBundle,
-        scenario: ScenarioSpec,
-        parameters: Mapping[str, Any],
+        scenario: ScenarioSpec | None,
+        parameters: BaseModel,        # instance of parameter_model, validated by the engine
         constraints: ConstraintSet,
         context: RunContext,
-    ) -> SimulationResult: ...
+    ) -> PluginOutput: ...            # prediction / tables (schema + DataFrame), metrics,
+                                      # warnings, applied_scenario_parameters
 ```
 
-`RunContext` carries `run_id`, `seed`, horizon (`start_date`, `end_date`), upstream results
-(e.g. the forecast consumed by the inventory simulation), and a logger. Plugins must use
-`context.seed` for all randomness.
+`RunContext` carries `run_id`, `seed`, the horizon (`start_date`, `end_date`, inclusive), named
+`upstream` results (e.g. `"forecast"`, read with `context.require_upstream("forecast")`) and an optional
+fixed `created_at`. Plugins must use `context.seed` for all randomness. As with generators, plugins
+return raw output; the **engine** builds the datasets, provenance and metadata.
 
 ## 2. Output: `SimulationResult`
 
 ```
 SimulationResult
-├── prediction          optional table (e.g. sim.forecast) — forecasts / estimates
-├── simulation_result   optional tables (e.g. sim.inventory_ledger, sim.purchase_order)
+├── prediction          Dataset | None   (e.g. forecasts)
+├── simulation_result   {name: Dataset}  (e.g. inventory ledger, purchase orders)
 ├── scenario_result     {scenario_id, scenario_version, applied_parameters}
-├── metrics             list[Metric(metric_id, value, unit, scope)]
-└── metadata            {plugin_id, plugin_version, kind, run_id, seed, parameters,
-                         input content hashes, started_at, finished_at, status, warnings}
+├── metrics             tuple[Metric(metric_id, value | None, unit, scope)]
+└── metadata            RunMetadata: plugin id/version, kind, run_id, seed, validated parameters,
+                        input content hashes (incl. upstream tables), started/finished, status, warnings
 ```
 
-Tables are `Dataset` objects (with provenance). `status` is `succeeded` or `failed`; failures raise and
-are recorded; the engine never returns a fake success.
+Output datasets are named `<run_id>.<plugin_id>.<table>`, carry provenance (inputs incl. upstream
+tables pinned by hash, plugin, parameters, scenario, seed) and are validated against their schemas.
+`status` is always `succeeded`: any failure (unknown plugin, missing inputs or upstream, invalid
+parameters, invalid output) **raises**; the engine never returns a failed or fake result. A metric
+value is `None` when undefined (e.g. fill rate with zero demand), never a made-up number.
 
 ## 3. Engine and composition
 
 ```python
-engine = SimulationEngine(registry)
-forecast = engine.run("lightgbm", dataset, scenario, params, constraints, ctx)
-results = engine.compare(
-    plugin_id="inventory_simulation",
-    dataset=bundle, scenario=scenario, constraints=constraints, context=ctx.with_upstream(forecast),
+engine = SimulationEngine(registry)          # registry = new_simulation_registry()
+forecast = engine.run("lightgbm", bundle, scenario, {...}, ctx)
+comparison = engine.compare(
+    "inventory_simulation", bundle, scenario,
     variants={"reorder_point": {...}, "safety_stock": {...}, "dynamic": {...}},
-)   # -> ComparisonResult: same data, same scenario, same seed, different strategy parameters
+    context=ctx.with_upstream("forecast", forecast),
+)
+comparison.metrics_table()                   # variants × metric ids (pandas DataFrame)
 ```
 
-Composition rule — **one dataset, many simulations**: any registered plugin whose `required_inputs`
-are satisfied can run on a dataset, under any scenario whose parameters it understands; unused
-scenario parameters are reported in `metadata.warnings`, never silently ignored.
+`compare()` runs one plugin on the same data, scenario and seed with different parameters; each
+variant gets run id `<run_id>.<variant>`. Composition rule — **one dataset, many simulations**: any
+registered plugin whose `required_inputs` are satisfied can run on a dataset, under any scenario;
+scenario parameters a run does not apply are reported in `metadata.warnings`, never silently ignored.
 
 ## 4. Initial plugins (v0.1)
 

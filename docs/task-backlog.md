@@ -19,7 +19,7 @@ Branch name suggestion in brackets.
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ✅ approved 2026-09-27 |
 | M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ✅ approved 2026-09-27 |
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ✅ approved 2026-09-27 |
-| M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ⬜ |
+| M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ✅ 2026-09-27 (awaiting owner review) |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ⬜ |
 | M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ⬜ |
 | M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ⬜ |
@@ -136,7 +136,7 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 6–7 — Simulation engine & forecasting
 
-### TASK-SIM-001 — Simulation protocol, result model, registry, engine  [`feature/simulation-engine`]
+### TASK-SIM-001 — Simulation protocol, result model, registry, engine  [`phase6`] ✅
 - Per [simulation-api.md](simulation-api.md), including `compare()`. **Gate 6** with a dummy plugin.
 
 ### TASK-FC-001 — Baseline forecasts (seasonal naive, moving average)  [`feature/forecast-baseline`]

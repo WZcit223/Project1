@@ -5,6 +5,46 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 6: Simulation Engine (TASK-SIM-001)
+
+### Branch
+`phase6` — based on `phase5` @ `c16d16c`
+
+### Objective
+Gate 6: the simulation engine executes registered plugins, composes them through upstream results
+and compares variants — with provenance, validation and no fake results.
+
+### Changes
+- `industrial_ai.simulation`: `SimulationPlugin` protocol, `PluginKind` (optimization / causal
+  reserved), `RunContext` (horizon, seed, named upstream), `PluginOutput` / `OutputTable`, `Metric`,
+  `SimulationResult`, `RunMetadata`, registry (`describe`, `plugins_of_kind`), `SimulationEngine.run()`
+  and `.compare()` → `ComparisonResult.metrics_table()`.
+- simulation-api.md §1–3 describe the implemented interfaces (EN + ZH).
+
+### Decisions / assumptions (for review)
+- Plugins return `PluginOutput`; only the engine builds datasets, provenance and metadata (same pattern
+  as synthetic generators).
+- No `failed` status objects: every failure raises; `status` is always `succeeded`. (The Gate 0 sketch
+  mentioned "succeeded or failed".)
+- Upstream results are passed by name in the `RunContext`; their tables become provenance inputs of
+  downstream outputs.
+- Output tables are validated against their schemas; the run's `constraints` are passed to the plugin
+  (e.g. for capacity rules) rather than applied to outputs.
+- `compare()` uses the same seed for all variants (common random numbers).
+
+### Tests / checks
+ruff, mypy strict, pytest: 231 passed locally (incl. `m5_local`); 8 new engine tests with a dummy
+forecast and a dummy stock simulation.
+
+### Commits
+73c4311 simulation engine, + docs commit.
+
+### Next
+Owner review of Gate 6 → Phase 7 (forecast plugins: seasonal naive, moving average, LightGBM) on
+`phase7` from `phase6`.
+
+---
+
 ## 2026-09-27 — Gate 5 approved
 
 ### Branch
