@@ -63,3 +63,11 @@ class ConstraintViolationError(GeneratorError):
     def __init__(self, message: str, report: object) -> None:
         super().__init__(message)
         self.report = report
+
+
+class SimulationError(IndustrialAIError):
+    """Base class for simulation errors; a failed run raises instead of returning a result."""
+
+
+class SimulationInputError(SimulationError, ValueError):
+    """The dataset, parameters or upstream results do not satisfy the plugin's requirements."""
