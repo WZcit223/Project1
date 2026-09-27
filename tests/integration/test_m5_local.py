@@ -32,3 +32,36 @@ def test_real_m5_subset_hybrid_environment_is_valid() -> None:
     report = validate_bundle(build_hybrid_bundle(retail, generate_operations(retail, seed=1)))
     assert report.passed, report.failures
     assert not report.skipped
+
+
+def test_forecast_plugins_run_on_real_subset() -> None:
+    """All three forecasters run on 26 rolling origins; LightGBM beats the moving average (WAPE)."""
+    from datetime import date
+
+    from pydantic import JsonValue
+
+    from industrial_ai.simulation import RunContext, SimulationEngine, new_simulation_registry
+    from industrial_ai.simulation.forecasting import (
+        LightGBMForecast,
+        MovingAverageForecast,
+        SeasonalNaiveForecast,
+    )
+
+    registry = new_simulation_registry()
+    for plugin in (SeasonalNaiveForecast(), MovingAverageForecast(), LightGBMForecast()):
+        registry.register(plugin)
+    engine = SimulationEngine(registry)
+    bundle = M5Adapter().load(SUBSET_DIR)
+    context = RunContext(
+        run_id="m5", seed=1, start_date=date(2015, 11, 23), end_date=date(2016, 5, 22)
+    )
+    params: dict[str, JsonValue] = {
+        "entity_columns": ["product_id", "store_id"],
+        "input_table": "sales",
+    }
+    wape = {}
+    for plugin_id in ("seasonal_naive", "moving_average", "lightgbm"):
+        value = engine.run(plugin_id, bundle, None, params, context).metric("wape").value
+        assert value is not None
+        wape[plugin_id] = value
+    assert wape["lightgbm"] < wape["moving_average"]
