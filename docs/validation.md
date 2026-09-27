@@ -47,8 +47,8 @@ Production Validation. v0.1 reaches **Prototype + Synthetic Validation** only.
 | High Demand | Total demand / baseline total demand ∈ [1.25, 1.35] |
 | Demand Shock | Mean demand inside window / baseline inside window ≈ shock_multiplier (±10%); outside window ≈ baseline (±5%) |
 | Supply Disruption | Mean realised lead time of POs placed in window ≥ baseline + 5 days; received qty in window ≤ ordered qty |
-| Simulation responds | Stockout rate under High Demand or Supply Disruption ≥ baseline for the static strategy `reorder_point` |
-| Strategies differ | At least two strategies differ in service level or inventory cost by a non-trivial margin under baseline |
+| Simulation responds | Stockout-day rate under High Demand or Supply Disruption ≥ baseline for the static strategy `reorder_point` |
+| Strategies differ | At least two strategies differ in fill rate or total cost by a non-trivial margin under baseline |
 | Accounting identity | For every item-day: opening = previous closing + arrivals; fulfilled + lost = demand; closing ≥ 0 |
 | Metric correctness | Metrics recomputed from the ledger in the test equal reported metrics |
 

@@ -87,29 +87,39 @@ def test_metrics_match_their_definitions() -> None:
     def value(metric_id: str) -> float:
         return metric(result, metric_id)
 
+    stockout_days = (frame["lost_sales"] > 0).sum()
     assert value("demand_total") == sum(demand)
-    assert value("service_level") == pytest.approx(frame["fulfilled"].sum() / sum(demand))
-    assert value("stockout_rate") == pytest.approx((frame["lost_sales"] > 0).sum() / t)
+    assert value("fulfilled_units") == frame["fulfilled"].sum()
     assert value("lost_sales_units") == frame["lost_sales"].sum()
-    assert value("lost_sales_value") == pytest.approx(frame["lost_sales"].sum() * 2.0)
-    assert value("avg_inventory_units") == pytest.approx(frame["closing_on_hand"].sum() / t)
-    assert value("avg_inventory_value") == pytest.approx(frame["closing_on_hand"].sum() * 1.0 / t)
+    assert value("fill_rate") == pytest.approx(frame["fulfilled"].sum() / sum(demand))
+    assert value("stockout_days") == stockout_days
+    assert value("stockout_day_rate") == pytest.approx(stockout_days / t)
+    assert value("avg_on_hand_units") == pytest.approx(frame["closing_on_hand"].sum() / t)
+    assert value("avg_on_hand_value") == pytest.approx(frame["closing_on_hand"].sum() * 1.0 / t)
+    assert value("purchase_orders") == len(po)
+    assert value("units_ordered") == po["quantity"].sum()
+    assert value("order_frequency") == pytest.approx(len(po) / (t / 7))
+    assert value("ordering_cost") == pytest.approx(len(po) * 10.0)
     assert value("holding_cost") == pytest.approx(
         frame["closing_on_hand"].sum() * 1.0 * 0.365 / 365
     )
-    assert value("ordering_cost") == pytest.approx(len(po) * 10.0)
     assert value("inventory_cost") == pytest.approx(value("holding_cost") + value("ordering_cost"))
-    assert value("order_frequency") == pytest.approx(len(po) / (t / 7))
+    assert value("lost_sales_cost") == pytest.approx(frame["lost_sales"].sum() * 2.0)
+    assert value("total_cost") == pytest.approx(
+        value("ordering_cost") + value("holding_cost") + value("lost_sales_cost")
+    )
     turnover = frame["fulfilled"].sum() / (frame["closing_on_hand"].sum() / t) * 365 / t
     assert value("inventory_turnover") == pytest.approx(turnover)
-    assert result.metric("service_level", scope="product:P1").value == value("service_level")
+    assert result.metric("fill_rate", scope="product:P1").value == value("fill_rate")
     assert value("lost_sales_units") > 0  # this run has stockouts
 
 
 def test_undefined_ratios_are_none() -> None:
     result = simulate([0] * 7, level=0, on_hand=0)
-    assert result.metric("service_level").value is None
+    assert result.metric("fill_rate").value is None
     assert result.metric("inventory_turnover").value is None
+    assert result.metric("purchase_orders").value == 0
+    assert result.metric("units_ordered").value == 0
 
 
 def test_rounding_to_case_pack_and_minimum_order_quantity() -> None:

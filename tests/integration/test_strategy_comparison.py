@@ -90,7 +90,7 @@ def test_three_strategies_compared_on_identical_demand() -> None:
 
     table = comparison.metrics_table()
     assert list(table.index) == list(STRATEGIES)
-    service = {s: comparison.variants[s].metric("service_level").value for s in STRATEGIES}
+    service = {s: comparison.variants[s].metric("fill_rate").value for s in STRATEGIES}
     cost = {s: comparison.variants[s].metric("inventory_cost").value for s in STRATEGIES}
     assert all(v is not None for v in (*service.values(), *cost.values()))
     # Strategies differ (validation.md: non-trivial difference in service level or cost).
@@ -116,8 +116,8 @@ def test_high_demand_hurts_the_static_strategy_more() -> None:
     base, stressed = compare(None), compare(high)
 
     def drop(strategy: str) -> float:
-        before = base.variants[strategy].metric("service_level").value
-        after = stressed.variants[strategy].metric("service_level").value
+        before = base.variants[strategy].metric("fill_rate").value
+        after = stressed.variants[strategy].metric("fill_rate").value
         assert before is not None and after is not None
         return before - after
 

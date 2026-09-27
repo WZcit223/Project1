@@ -232,21 +232,40 @@ demand *Dᵢₜ*, fulfilled *Fᵢₜ = min(Dᵢₜ, available)*, lost *Lᵢₜ =
 unit cost *cᵢ*, unit price *pᵢ* (mean reference price, `derived.product_price`), annual holding rate *h*, order cost *k*, horizon length *T* days,
 number of items *N*.
 
-| Metric id | Name | Definition | Unit |
-|---|---|---|---|
-| `demand_total` | Demand | Σ Dᵢₜ | units |
-| `service_level` | Service level (**fill rate**) | Σ Fᵢₜ / Σ Dᵢₜ (undefined → reported `null` if Σ D = 0) | ratio 0–1 |
-| `stockout_rate` | Stockout rate | #{(i,t) : Lᵢₜ > 0} / (N · T) | ratio 0–1 |
-| `lost_sales_units` | Lost sales | Σ Lᵢₜ | units |
-| `lost_sales_value` | Lost sales value (reported separately, **not** in inventory cost) | Σ Lᵢₜ · pᵢ | USD |
-| `avg_inventory_units` | Average inventory level | (1 / T) Σₜ Σᵢ Iᵢₜ | units |
-| `avg_inventory_value` | Average inventory value | (1 / T) Σₜ Σᵢ Iᵢₜ · cᵢ | USD |
-| `holding_cost` | Holding cost | Σ Iᵢₜ · cᵢ · h / 365 | USD |
-| `ordering_cost` | Ordering cost | (number of purchase orders) · k | USD |
-| `inventory_cost` | Inventory cost | `holding_cost` + `ordering_cost` | USD |
-| `order_frequency` | Order frequency | (number of purchase orders) / (N · T / 7) | orders per item per week |
-| `inventory_turnover` | Inventory turnover (annualised) | (Σ Fᵢₜ · cᵢ) / `avg_inventory_value` · 365 / T (reported `null` if avg value = 0) | turns / year |
+| Group | Metric id | Name | Definition | Unit |
+|---|---|---|---|---|
+| Service | `demand_total` | Demand | Σ Dᵢₜ | units |
+| Service | `fulfilled_units` | Fulfilled demand | Σ Fᵢₜ | units |
+| Service | `lost_sales_units` | Unfulfilled demand (lost sales) | Σ Lᵢₜ | units |
+| Service | `fill_rate` | **Fill rate (β service level)** | Σ Fᵢₜ / Σ Dᵢₜ — units of demand served from stock on the day they occur; `null` if Σ D = 0 | ratio 0–1 |
+| Service | `stockout_days` | Stockout days | #{(i,t) : Lᵢₜ > 0} — item-days with any unfulfilled demand | item-days |
+| Service | `stockout_day_rate` | Stockout-day rate | `stockout_days` / (N · T) | ratio 0–1 |
+| Stock | `avg_on_hand_units` | Average on-hand inventory | (1 / T) Σₜ Σᵢ Iᵢₜ (closing on hand; on-order stock excluded) | units |
+| Stock | `avg_on_hand_value` | Average on-hand inventory value | (1 / T) Σₜ Σᵢ Iᵢₜ · cᵢ | USD |
+| Stock | `inventory_turnover` | Inventory turnover (annualised) | (Σ Fᵢₜ · cᵢ) / `avg_on_hand_value` · 365 / T; `null` if the average value = 0 | turns / year |
+| Ordering | `purchase_orders` | Purchase orders | number of purchase orders placed in the horizon | orders |
+| Ordering | `units_ordered` | Units ordered | Σ ordered quantity (after rounding; before any supply-capacity cut) | units |
+| Ordering | `order_frequency` | Order frequency | `purchase_orders` / (N · T / 7) | orders per item per week |
+| Cost | `ordering_cost` | Total ordering cost | Σ over purchase orders of the supplier's order cost k | USD |
+| Cost | `holding_cost` | Total holding cost | Σ Iᵢₜ · cᵢ · h / 365 | USD |
+| Cost | `inventory_cost` | Inventory cost | `ordering_cost` + `holding_cost` (excludes lost sales) | USD |
+| Cost | `lost_sales_cost` | Total lost-sales (stockout) cost | Σ Lᵢₜ · pᵢ — lost revenue used as the shortage-penalty proxy (v0.1 assumption; lost margin would be (pᵢ − cᵢ) · Lᵢₜ) | USD |
+| Cost | `total_cost` | Total cost | `inventory_cost` + `lost_sales_cost` | USD |
 
-Purchase cost of goods is excluded from inventory cost (it is identical across strategies given the
+Per-product scope (`scope = product:<id>`): `fill_rate`.
+
+**Service-level terminology.** The only reported service metric is the **fill rate** (`fill_rate`,
+β service level) defined above. The planning setting `target_service_level` in
+`ops.replenishment_policy` is a different quantity: a **cycle service level** (α — the target probability
+of no stockout during a replenishment cycle) used only to derive the safety factor z = Φ⁻¹(α) in the
+`safety_stock` and `dynamic` strategies. A fill rate is therefore not expected to equal the target, and
+v0.1 does not report a realised cycle service level. "Service level" without qualification is not used
+for metrics.
+
+**Cost reading.** Report the components side by side; with the v0.1 synthetic calibration (order cost
+20–60 USD per order, low FOODS_3 unit costs) `ordering_cost` dominates `inventory_cost`, so inventory cost
+mostly reflects the number of orders. The calibration is kept on purpose (owner decision, Gate 8).
+
+Purchase cost of goods is excluded from all costs (it is identical across strategies given the
 same fulfilled demand, apart from end-of-horizon stock). Forecast accuracy metrics (MAE, RMSE, WAPE,
 optional M5 WRMSSE as reference) are reported separately by the forecast plugin.

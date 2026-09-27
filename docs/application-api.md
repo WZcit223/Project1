@@ -68,9 +68,9 @@ Endpoints are finalised in Phase 12; this is the target contract.
   "scenario": {"scenario_id": "high_demand", "version": "1.0.0", "parameters": {"...": "..."}},
   "results": {
     "strategies": {
-      "reorder_point": {"service_level": 0.912, "stockout_rate": 0.061, "inventory_cost": 1834.2, "...": "..."},
-      "safety_stock":  {"service_level": 0.957, "...": "..."},
-      "dynamic":       {"service_level": 0.968, "...": "..."}
+      "reorder_point": {"fill_rate": 0.912, "stockout_day_rate": 0.061, "ordering_cost": 1650.0, "holding_cost": 184.2, "total_cost": 3120.5, "...": "..."},
+      "safety_stock":  {"fill_rate": 0.957, "...": "..."},
+      "dynamic":       {"fill_rate": 0.968, "...": "..."}
     },
     "forecast": {"model": "lightgbm", "wape": 0.41}
   },

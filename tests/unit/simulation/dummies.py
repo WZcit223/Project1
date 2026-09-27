@@ -157,7 +157,7 @@ class StockSimulation:
         return PluginOutput(
             tables={"ledger": OutputTable(LEDGER, frame[["date", "item", "stock", "shortage"]])},
             metrics=(
-                Metric(metric_id="service_level", value=fill, unit="ratio"),
+                Metric(metric_id="fill_rate", value=fill, unit="ratio"),
                 Metric(
                     metric_id="shortage_units", value=float(frame["shortage"].sum()), unit="units"
                 ),

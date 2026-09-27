@@ -47,7 +47,7 @@ def run(scenario: ScenarioSpec | None, level: int) -> tuple[DatasetBundle, float
     ledger = result.table("inventory_ledger").data
     assert len(ledger) == 56 * len(ops.table("initial_inventory").data)
     assert (ledger["fulfilled"] + ledger["lost_sales"] == ledger["demand"]).all()
-    service = result.metric("service_level").value
+    service = result.metric("fill_rate").value
     cost = result.metric("inventory_cost").value
     assert service is not None and cost is not None
     return bundle, service, cost
