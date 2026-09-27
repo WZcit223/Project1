@@ -70,6 +70,25 @@ derived from the member tables' names and hashes.
 | `content_hash` | computed: `sha256:` over values per column (sorted by name, logical dtype family, row order kept, index ignored); unchanged by a Parquet round trip |
 | `tags` | free-form labels (e.g. `demo`, `prototype`) |
 
+### 1.5 Validation (`industrial_ai.foundation.validation`)
+
+`validate_dataset(dataset, constraints=(), references=None)` and `validate_bundle(bundle, constraints)`
+return a `ValidationReport` (`subject`, `results`, computed `passed`). Each `CheckResult` has `check`,
+`target`, `status` (`passed` / `failed` / `skipped`), `violations` (offending rows) and `message`.
+
+| Check | From | Rule |
+|---|---|---|
+| `dtype` | schema | Column matches the logical type (`date` values must have no time component; `str` values must be strings) |
+| `not_null` | schema (`nullable=false`) / constraint | No missing values |
+| `range` | schema `min`/`max` / constraint | Numeric values within bounds; **skipped** if the column has the wrong dtype |
+| `allowed_values` | schema | Values in the allowed set |
+| `primary_key` | schema | No duplicate and no null keys |
+| `foreign_key` | schema / constraint | Every key exists in the referenced table; **skipped** when that table is not supplied (a bundle supplies its own tables) |
+| `unique`, `integer`, `relation` | constraint | Uniqueness of fields; integral values; row-wise comparison `left op right` |
+
+Validation never modifies data and never raises for bad data. `skipped` checks do not fail a report
+but are always listed, so nothing is silently treated as passed.
+
 ## 2. Canonical retail-demand model (Warehouse pack, `schema_version 1.0`)
 
 The framework never sees M5 column names; the M5 adapter produces these tables.

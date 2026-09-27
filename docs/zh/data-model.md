@@ -67,6 +67,23 @@
 | `content_hash` | 计算得出：按列（按名称排序、逻辑数据类型族、保留行顺序、忽略索引）对值计算 `sha256:`；Parquet 往返后保持不变 |
 | `tags` | 自由格式标签（例如 `demo`、`prototype`） |
 
+### 1.5 校验（`industrial_ai.foundation.validation`）
+
+`validate_dataset(dataset, constraints=(), references=None)` 与 `validate_bundle(bundle, constraints)`
+返回 `ValidationReport`（`subject`、`results`、计算得出的 `passed`）。每个 `CheckResult` 包含 `check`、`target`、`status`（`passed` / `failed` / `skipped`）、`violations`（违规行数）和 `message`。
+
+| 检查 | 来源 | 规则 |
+|---|---|---|
+| `dtype` | Schema | 列与逻辑类型一致（`date` 值不得带时间部分；`str` 值必须为字符串） |
+| `not_null` | Schema（`nullable=false`）/ 约束 | 无缺失值 |
+| `range` | Schema `min`/`max` / 约束 | 数值在上下限内；若该列类型错误则**跳过** |
+| `allowed_values` | Schema | 值属于允许集合 |
+| `primary_key` | Schema | 无重复、无空键 |
+| `foreign_key` | Schema / 约束 | 每个键都存在于被引用表中；未提供被引用表时**跳过**（Bundle 会提供其自身的各表） |
+| `unique`、`integer`、`relation` | 约束 | 字段唯一；数值为整数；逐行比较 `left op right` |
+
+校验从不修改数据，也不会因数据有误而抛出异常。`skipped` 的检查不会使报告失败，但始终会被列出，因此不会有任何检查被悄悄视为通过。
+
 ## 2. 规范零售需求模型（Warehouse 包，`schema_version 1.0`）
 
 框架本身从不接触 M5 列名；这些表由 M5 适配器 (adapter) 生成。
