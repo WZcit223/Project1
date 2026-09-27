@@ -182,6 +182,15 @@ Reference: Kaggle M5 Forecasting Accuracy. v0.1 uses `calendar.csv`, `sell_price
 | `sales.d_*` values | `retail.sales.quantity` |
 | `sell_prices.sell_price` | `retail.price.unit_price` |
 
+Adapter (`industrial_ai_warehouse.adapters.m5.M5Adapter`, id `m5` v1.0.0): reads a directory with
+`calendar.csv`, `sell_prices.csv`, `sales_train_evaluation.csv` (or `sales_train_validation.csv` if the
+evaluation file is absent) and optional `SOURCE.json`; returns a `DatasetBundle` with the ten canonical
+tables (`<dataset_id>.<table>`), sorted by primary key so the same input always gives the same hashes.
+It fails with `IngestionError` on missing files/columns, a `wday` inconsistent with the dates, missing
+`snap_<STATE>` columns or sales days absent from the calendar. Without `SOURCE.json` the data is
+treated as original Kaggle files (`source_type=reference`, dataset id `m5`, download date unknown).
+Prices are kept only for product/store series present in the sales file. Designed for subsets.
+
 Subset extraction (`scripts/make_m5_subset.py`, run locally by the user): filter by store(s),
 category/department and top-N items by total sales; output small CSVs in the original M5 layout into
 `data/raw/m5_subset/`, with a `SOURCE.json` recording filters, source file hashes and download date.
