@@ -5,6 +5,63 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 5: Synthetic warehouse data (TASK-WH-001)
+
+### Branch
+`phase5` — based on `phase4` @ `4e74edf`
+
+### Objective
+Gate 5: warehouse operational data can be generated — reproducibly, validated, with provenance —
+completing the Hybrid Validation Environment (real M5 demand + synthetic operations).
+
+### Changes
+- `industrial_ai.synthetic.generators.builtin_registry()` (core helper: the three generators).
+- Warehouse schemas (1.0.0): `ops.warehouse`, `ops.supplier`, `ops.supplier_lead_time`,
+  `ops.product_supplier`, `ops.initial_inventory`, `ops.replenishment_policy`,
+  `ops.synthetic_demand`; derived `product_price`, `store_demand`, `planning_input`.
+- `generate_operations(retail, seed, config)`: every `ops.*` table via the engine (rule_based /
+  statistical), assumptions in `OperationsConfig`, per-table derived seeds, lineage with config and seed;
+  `build_hybrid_bundle()`.
+- `generate_synthetic_demand(retail, DemandConfig, seed, scenario)`: calibrated time series with
+  `demand_multiplier → level_multiplier`, common random numbers across scenarios.
+- data-model.md §3 rewritten for the implemented tables and rules (EN + ZH).
+
+### Decisions / assumptions (for review)
+- Supplier lead-time parameters split into `ops.supplier_lead_time` (statistical) from `ops.supplier`
+  (rule_based), so each table has one generator and a complete provenance chain.
+- `ops.replenishment_policy` holds strategy-independent settings (review period 1 day, order cycle
+  14 days, target service level 0.95); strategies derive reorder points etc. at run time (Phase 9).
+  Replaces the earlier `(…, strategy_id)` + JSON parameters sketch.
+- `as_of_date` dropped from `ops.initial_inventory`: the initial state is by definition at the
+  simulation start.
+- Derived tables (`derived.*`) are explicit datasets with provenance rather than hidden computations.
+- Operational defaults (5 suppliers, lead time mean ≈ 6.3 d, cost ratio 0.7, holding 25 %/yr,
+  capacity 60 days of demand, initial stock μ·(L̄ + 7)) are illustrative assumptions, not facts.
+- Common random numbers for scenario demand (same seed stream for all scenarios).
+
+### Real-subset check (local, not committed)
+Operations for `m5_subset_ca_1_foods_3_top50` generated in 0.3 s; hybrid bundle 194 checks,
+0 failed, 0 skipped. 1 warehouse (CA_1, capacity 43,879 units); supplier mean lead times 4.5–9.7 days;
+unit costs 0.14–3.49 USD; products per supplier 10/8/13/5/14; initial on-hand 10,066 units
+(13.8 days of demand).
+
+### Tests / checks
+ruff, mypy strict, pytest: 223 passed locally (incl. `m5_local`); CI skips `m5_local`.
+
+### Commits
+76a3ede builtin_registry, fdabfff operations + demand, + docs commit.
+
+### Known issues
+- With the small fixture and negative-binomial noise, the High-Demand demand ratio varies ±6 % around
+  1.3 across seeds even with common random numbers; the scenario effect itself is exact (tested with
+  noise off). Phase 14 Level-3 checks should use the noise-free rate or a larger horizon/sample.
+
+### Next
+Owner review of Gate 5 → Phase 6 (Simulation Engine: protocol, result model, registry, engine) on
+`phase6` from `phase5`.
+
+---
+
 ## 2026-09-27 — Gate 4 approved
 
 ### Branch

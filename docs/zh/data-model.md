@@ -126,21 +126,23 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
   真实需求；v0.1 仅记录这一局限，不做修正。
 - 价格缺失的周（商品尚未上架销售）表现为缺失行，而不是零值。
 
-## 3. 合成运营实体（Warehouse 包）
+## 3. 合成运营实体（Warehouse 场景包，Schema 版本 1.0.0）
 
-由合成数据引擎 (Synthetic Data Engine) 生成；全部携带溯源信息 (provenance)，并标记为 `source_type=synthetic`。
+由 `industrial_ai_warehouse.generators.generate_operations(retail, seed, config)` 通过合成数据引擎生成；所有表都带有溯源信息，并标注为 `source_type=synthetic`。每一项假设都是 `OperationsConfig` 的一个字段（默认值见下表），并记录在 Bundle 的 lineage 中；每张表都使用由本次运行种子派生出的独立种子。
 
-| 表 | 主键 | 字段 | 生成器 |
+| 表 | 主键 | 字段 | 生成器 · 规则 |
 |---|---|---|---|
-| `ops.warehouse` | warehouse_id | warehouse_id、store_id → store、capacity_units（int > 0）、holding_cost_rate_annual（0–1） | rule_based |
-| `ops.supplier` | supplier_id | supplier_id、lead_time_mean_days（≥ 1）、lead_time_std_days（≥ 0）、on_time_probability（0–1）、order_cost（USD ≥ 0）、min_order_qty（int ≥ 0） | rule_based + statistical |
-| `ops.product_supplier` | product_id | product_id → product、supplier_id → supplier、unit_cost（USD > 0；= 参考价格 × 成本比率）、case_pack（int ≥ 1） | rule_based + statistical |
-| `ops.initial_inventory` | (product_id, warehouse_id) | on_hand_units（int ≥ 0）、on_order_units（int ≥ 0）、as_of_date | rule_based |
-| `ops.replenishment_policy` | (product_id, warehouse_id, strategy_id) | strategy_id、parameters（JSON）、review_period_days（int ≥ 1）、target_service_level（0–1） | rule_based（由需求统计量推导） |
-| `ops.synthetic_demand` | (date, product_id, store_id) | 与 `retail.sales` 字段相同，另加 `scenario_id` | time_series |
+| `ops.warehouse` | warehouse_id | warehouse_id（`WH01`…）、store_id → store、capacity_units（int ≥ 1）、holding_cost_rate_annual（0–1） | rule_based · 每家门店一个；容量 = 60 天 × 门店需求 + 1；持有成本率 0.25 |
+| `ops.supplier` | supplier_id | supplier_id（`SUP001`…）、order_cost（USD ≥ 0）、min_order_qty（int ≥ 0） | rule_based · 5 家供应商；订货成本 U(20, 60)；最小起订量 ∈ {0, 6, 12} |
+| `ops.supplier_lead_time` | supplier_id | supplier_id → supplier、lead_time_mean_days（≥ 1）、lead_time_std_days（≥ 0，≤ 均值）、on_time_probability（0–1） | statistical · 均值 ~ Gamma(9, 0.7) ≥ 2 天；标准差 U(0.5, 2)；秩相关 0.5；准时率 U(0.85, 0.99) |
+| `ops.product_supplier` | product_id | product_id → product、supplier_id → supplier、unit_cost（USD > 0）、case_pack（int ≥ 1） | rule_based · 随机分配供应商；unit_cost = 平均售价 × 0.7；箱规 ∈ {6, 12, 24} |
+| `ops.initial_inventory` | (product_id, warehouse_id) | on_hand_units（int ≥ 0）、on_order_units（int ≥ 0）——仿真开始时的状态 | rule_based · 在库 = round(μ × (L̄ + 订货周期/2))；在途 0 |
+| `ops.replenishment_policy` | (product_id, warehouse_id) | review_period_days（≥ 1）、order_cycle_days（≥ 1）、target_service_level（0.5–0.9999） | rule_based · 1、14、0.95——与策略无关；各补货策略据此推导自身参数 |
+| `ops.synthetic_demand` | (date, product_id, store_id) | 与 `retail.sales` 字段相同，另加 `scenario_id` | time_series · `generate_synthetic_demand()`：基于 `retail.sales` 校准，`demand_multiplier → level_multiplier` |
 
-**提前期 (Lead time)** 以每个供应商的概率分布建模（`ops.supplier`），在仿真中针对每张采购
-订单进行抽样；实际实现的提前期记录在每张采购订单上。
+派生表（`source_type=derived`，组件 `warehouse.derive` 1.0.0）是作为生成器输入的确定性汇总：`derived.product_price`（每个商品的平均周售价）、`derived.store_demand`（每家门店各商品日均需求之和）以及 `derived.planning_input`（μ = 最近 365 个有效天的日均需求，排除首次销售前的零值；供应商平均提前期 L̄；初始库存目标）。`build_hybrid_bundle(retail, ops)` 将真实参考表与合成表合并为混合验证环境（Hybrid Validation Environment）；其所有外键都能在 Bundle 内部解析。
+
+**提前期（Lead time）** 是每个供应商的分布（`ops.supplier_lead_time`），在仿真中按每张采购订单抽样；实际提前期记录在每张采购订单上。同一次运行中所有场景的合成需求使用**同一随机数流**（公共随机数，common random numbers），因此场景之间的差异不是抽样噪声。
 
 ## 4. 仿真输出表
 
