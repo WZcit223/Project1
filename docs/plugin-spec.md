@@ -108,5 +108,26 @@ Forecasts are read from the day after the review (the order cannot serve today's
 the forecast run needs a warm-up before the horizon) or when the forecast does not cover the next
 ⌈L̄ + R⌉ days. The quantity returned is rounded by the simulation (MOQ, case pack).
 
+**Adaptation frequency (intentional design).** The strategies deliberately differ in how often they
+adapt; the comparison shows the effect of that difference, it is not a defect:
+
+| Strategy | Role | Information used | Updated |
+|---|---|---|---|
+| `reorder_point` | historical baseline | demand history before the horizon | never (computed once) |
+| `safety_stock` | fixed initial forecast / error-based buffer | forecast and forecast errors known at the horizon start | never after the first review |
+| `dynamic` | periodically updated forecast / error-based target | latest forecast and last `error_window_days` of errors | every R days |
+
+**Inventory position.** On every review day the simulation passes a `DailyObservation` taken after the
+day's demand and before ordering: `on_hand` = closing on-hand stock, `on_order` = units shipped by
+suppliers but not yet received (a supply-capacity cut is never counted as on order), and
+`inventory_position = on_hand + on_order`. Back-orders do not exist (lost sales). All three strategies
+compare their levels (s, S, S_t) with `inventory_position`, never with `on_hand` alone, so stock already
+in transit is not ordered twice. Order quantities are the gap to the target before rounding.
+
+**Cold start (v0.1 limitation).** Items without sales history before the horizon get μ_hist = 0 in
+`reorder_point` and are never replenished; forecast strategies rely on the forecast model, which for an
+all-zero history also predicts ≈ 0. New-item forecasting (e.g. analogue products) is out of scope for
+v0.1 and listed in [future-roadmap.md](future-roadmap.md).
+
 L̄ = supplier mean lead time (scenario-adjusted as known to the planner). These are deliberately simple
 textbook policies; no optimisation.

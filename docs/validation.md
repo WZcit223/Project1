@@ -51,6 +51,18 @@ Production Validation. v0.1 reaches **Prototype + Synthetic Validation** only.
 | Strategies differ | At least two strategies differ in fill rate or total cost by a non-trivial margin under baseline |
 | Accounting identity | For every item-day: opening = previous closing + arrivals; fulfilled + lost = demand; closing ≥ 0 |
 | Metric correctness | Metrics recomputed from the ledger in the test equal reported metrics |
+| No look-ahead | Changing demand after a decision date D leaves forecasts from origins ≤ D, ledger rows and orders through D unchanged (integration test) |
+| Fair comparison | Strategies compared via `engine.compare` see identical demand, supply draws and seed |
+
+**Gate 8 acceptance (owner, 2026-09-27).** The framework can execute and fairly compare multiple
+interchangeable replenishment strategies under identical controlled simulation conditions, with
+reproducible results and explicit temporal information boundaries. This is **not** a claim that any
+strategy (e.g. `dynamic`) is economically or operationally superior in the real world.
+
+**Real-subset runs are descriptive / smoke-test evidence.** Strategy results on the committed M5 subset
+(CA_1 / FOODS_3 / top 50, 91-day synthetic horizon, synthetic operations, one seed) show that the
+pipeline runs on real reference demand; they are not evidence of economic or algorithmic superiority
+and are never reported as validation results.
 
 Thresholds are initial proposals; if tuning is needed it is recorded in the development log with reasons.
 
