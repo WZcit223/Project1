@@ -5,6 +5,55 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 7: Forecast plugins (TASK-FC-001, TASK-FC-002) · M5 subset committed
+
+### Branch
+`phase7` — based on `phase6` @ `d82f973`
+
+### Objective
+Domain-neutral forecast plugins for the Data → Forecast → Simulation pipeline: one baseline pair and
+one practical ML model, rolling-origin, provably without look-ahead.
+
+### Changes
+- **M5 subset (owner decision, option B):** real subset committed in `data/reference/m5_subset/`
+  (65222ec) with a README on origin and Kaggle terms; CLAUDE.md §13 records the single exception;
+  `m5_local` tests read it (and therefore also run in CI).
+- `simulation.forecasting.rolling`: rolling origins (every 7 days, 28-day horizon), history strictly
+  before each origin, `sim.forecast` output with actuals, MAE / RMSE / WAPE / bias.
+- `seasonal_naive` 1.0.0 (mean of last 4 same-weekday values), `moving_average` 1.0.0 (28-day mean),
+  `lightgbm` 1.0.0 (global Poisson model trained once before the horizon; native API, deterministic).
+- `PluginOutput.details` recorded in provenance (e.g. LightGBM training rows, features, importance).
+- simulation-api.md §4 documents the implemented plugins (EN + ZH).
+
+### Decisions / assumptions (for review)
+- LightGBM via the native `lgb.train` API: the scikit-learn wrapper would add scikit-learn.
+  `lightgbm` brings `scipy` as a transitive dependency.
+- Direct multi-step LightGBM (horizon day as a feature) instead of recursive prediction: no error
+  feedback loop, simpler no-look-ahead guarantee.
+- v1 features have no price or event inputs (kept domain-neutral); candidates for a later version.
+- Forecasts beyond the last observed date are produced (needed for lead-time planning near the horizon
+  end) and have `actual = null`.
+- Seasonal naive default averages 4 weeks (N = 1 is the textbook version; 4 is more robust).
+
+### Real-subset check (m5_local test)
+50 series, 26 weekly origins, 2015-11-23 … 2016-05-22: WAPE seasonal naive 0.443, moving average 0.459,
+LightGBM 0.413 (bias +0.8 %). LightGBM run ≈ 2 s (141,400 training rows). Descriptive only.
+
+### Tests / checks
+ruff, mypy strict, pytest: 248 (incl. no-look-ahead tests for all three plugins).
+
+### Commits
+65222ec M5 subset, 45c4182 forecast plugins, aaffb3c real-subset forecast test, + docs commits.
+
+### Known issues
+- The input to forecasting during a scenario run (history + observed synthetic horizon demand) is
+  assembled by the application pipeline (Phase 11); plugins take any observed series.
+
+### Next
+Owner review of M7 → Phase 8 (inventory simulation + metrics) on `phase8` from `phase7`.
+
+---
+
 ## 2026-09-27 — Gate 6 approved
 
 ### Branch
