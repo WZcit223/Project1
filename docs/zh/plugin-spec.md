@@ -89,11 +89,20 @@ class ItemPolicy(Protocol):
 已满足量。策略**不会**修改库存；库存状态转移、取整（箱规、最小订货量）及采购订单均由库存仿真负责。
 策略注册在场景包本地的 `StrategyRegistry`（核心 `Registry`）中，并通过仿真参数 `strategy_id` 选择。
 
+已在 `industrial_ai_warehouse.strategies` 中实现（Phase 9）；`builtin_strategies()` 返回一个包含全部三种策略的
+注册表。
+
 | 策略 | 规则（按单品） | 是否使用预测 |
 |---|---|---|
-| **A `reorder_point`** (s, Q) | s = μ_hist · L̄ ；当库存位置 ≤ s 时订货 Q = μ_hist · R（R = 盘点/周期天数，默认 14）。μ_hist = 回溯历史窗口内的日均需求，仅计算一次。无安全库存。 | 否 |
-| **B `safety_stock`** (s, S) | SS = z · σ_e · √L̄ ；s = μ_f · L̄ + SS ；S = s + μ_f · R ；当库存位置 ≤ s 时订货 S − position。μ_f = 预测日均需求，σ_e = 训练窗口上的预测误差标准差，z 由目标服务水平确定（默认 0.95 → 1.645）。参数在预测期起点固定。 | 是（一次） |
-| **C `dynamic`**（周期性补货至目标水平，order-up-to） | 每个盘点日：S_t = 未来 (L̄ + R) 天预测值之和 Σ forecast + z · σ_e,t · √(L̄ + R)，σ_e,t = 滚动的近期预测误差；订货 max(0, S_t − position)。能适应场景变化。 | 是（滚动） |
+| **A `reorder_point`** 1.0.0 (s, Q) | s = μ_hist · L̄ ；在盘点日库存位置 ≤ s 时订货 Q = μ_hist · R。μ_hist = 该单品历史窗口（活跃期）内的日均需求，仅计算一次；无历史 → 不订货。无安全库存。 | 否 |
+| **B `safety_stock`** 1.0.0 (s, S) | SS = z · σ_e · √L̄ ；s = μ_f · L̄ + SS ；S = s + μ_f · R ；当库存位置 ≤ s 时订货 S − position。在**首次盘点（预测期起点）**时设定，此后固定：μ_f = 未来 ⌈L̄ + R⌉ 天的预测日均需求，σ_e = 预测期起点之前 `error_window_days`（56）天内每日预测误差的标准差。 | 是（一次） |
+| **C `dynamic`** 1.0.0（周期性补货至目标水平，order-up-to） | 每 R 天一次（首次盘点为到期日当天或之后的第一个盘点日）：S_t = μ_f,t · (L̄ + R) + z · σ_e,t · √(L̄ + R)，其中 μ_f,t 取自最新一次预测，σ_e,t 取自最近 `error_window_days` 天的误差；订货 max(0, S_t − position)。能适应场景变化。 | 是（滚动） |
+
+通用参数：`cycle_days`（R；默认取该单品的 `order_cycle_days`，14），B 和 C 还有
+`service_level`（默认取该单品的 `target_service_level`，0.95 → z = 1.645）和 `error_window_days`。
+预测从盘点日的次日开始读取（订单无法满足当天的需求）。当 σ_e 无法估计（过去的误差少于两个：
+预测运行需要在预测期之前有一段预热期）或预测未覆盖未来 ⌈L̄ + R⌉ 天时，B 和 C 会抛出
+`SimulationInputError`，而不是进行猜测。返回的数量由仿真进行取整（最小订货量 MOQ、箱规）。
 
 L̄ = 供应商平均提前期（lead time，按计划员所知的场景调整值）。以上均为刻意保持简单的
 教科书式策略；不做优化。

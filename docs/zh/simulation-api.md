@@ -5,7 +5,7 @@
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
-§1–3 中的接口已在 `industrial_ai.simulation` 中**实现**（Phase 6）；§4 中的预测插件已实现（Phase 7）；库存仿真与策略将在 Phase 8–9 中陆续提供。
+§1–3 中的接口已在 `industrial_ai.simulation` 中**实现**（Phase 6）；§4 中的预测插件已实现（Phase 7）；库存仿真（Phase 8）与补货策略（Phase 9）已在仓储场景包中实现。
 
 ## 1. 插件接口
 

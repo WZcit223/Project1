@@ -140,7 +140,7 @@ SQLite（通过 SQLModel；`IAI_DATABASE_URL`）为每个数据集与每个 Bund
 | `ops.replenishment_policy` | (product_id, warehouse_id) | review_period_days（≥ 1）、order_cycle_days（≥ 1）、target_service_level（0.5–0.9999） | rule_based · 1、14、0.95——与策略无关；各补货策略据此推导自身参数 |
 | `ops.synthetic_demand` | (date, product_id, store_id) | 与 `retail.sales` 字段相同，另加 `scenario_id` | time_series · `generate_synthetic_demand()`：基于 `retail.sales` 校准，`demand_multiplier → level_multiplier` |
 
-派生表（`source_type=derived`，组件 `warehouse.derive` 1.0.0）是作为生成器输入的确定性汇总：`derived.product_price`（每个商品的平均周售价）、`derived.store_demand`（每家门店各商品日均需求之和）以及 `derived.planning_input`（μ = 最近 365 个有效天的日均需求，排除首次销售前的零值；供应商平均提前期 L̄；初始库存目标）。`build_hybrid_bundle(retail, ops)` 将真实参考表与合成表合并为混合验证环境（Hybrid Validation Environment）；其所有外键都能在 Bundle 内部解析。
+派生表（`source_type=derived`，组件 `warehouse.derive` 1.0.0）是作为生成器输入的确定性汇总：`derived.product_price`（每个商品的平均周售价）、`derived.store_demand`（每家门店各商品日均需求之和）以及 `derived.planning_input`（μ = 最近 365 个有效天的日均需求，排除首次销售前的零值；供应商平均提前期 L̄；初始库存目标）。`derived.demand_timeline`（date、product_id、store_id、quantity、origin ∈ {observed, synthetic}；`build_demand_timeline()`）将一次运行的预测期合成需求追加到已观测销量之后：它是仿真期间滚动预测的输入。`build_hybrid_bundle(retail, ops)` 将真实参考表与合成表合并为混合验证环境（Hybrid Validation Environment）；其所有外键都能在 Bundle 内部解析。
 
 **提前期（Lead time）** 是每个供应商的分布（`ops.supplier_lead_time`），在仿真中按每张采购订单抽样；实际提前期记录在每张采购订单上。同一次运行中所有场景的合成需求使用**同一随机数流**（公共随机数，common random numbers），因此场景之间的差异不是抽样噪声。
 
