@@ -182,6 +182,9 @@ synthetic data generation and scenario execution at the prototype level".
 
 - Never commit raw external data (M5), large generated artifacts, `.env`, secrets, tokens or credentials.
   Local data lives in `data/raw|interim|processed/` (git-ignored). Use `.env.example` for configuration.
+  **Single owner-approved exception (2026-09-27):** the small M5 subset in `data/reference/m5_subset/`
+  (CA_1 / FOODS_3 / top 50, ~0.7 MB) is committed; the repository is to be made private. Do not add
+  other raw external data.
 - Every external dataset records: source, source_url, dataset_name, dataset_version, download_date,
   license/usage notes. M5 source: *M5 Forecasting Accuracy*,
   <https://www.kaggle.com/competitions/m5-forecasting-accuracy/data> (Kaggle competition rules; do not redistribute).

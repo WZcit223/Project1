@@ -1,6 +1,6 @@
-"""Optional check against the owner's real M5 subset in data/raw/m5_subset/ (never committed).
+"""Checks against the owner's real M5 subset in data/reference/m5_subset/ (owner-approved commit).
 
-Run with ``uv run pytest -m m5_local``; skipped when the folder is absent (always the case in CI).
+Select with ``uv run pytest -m m5_local``; skipped if the folder is absent.
 """
 
 from pathlib import Path
@@ -10,11 +10,11 @@ import pytest
 from industrial_ai.foundation.validation import validate_bundle
 from industrial_ai_warehouse.adapters.m5 import M5Adapter
 
-SUBSET_DIR = Path(__file__).resolve().parents[2] / "data" / "raw" / "m5_subset"
+SUBSET_DIR = Path(__file__).resolve().parents[2] / "data" / "reference" / "m5_subset"
 
 pytestmark = [
     pytest.mark.m5_local,
-    pytest.mark.skipif(not SUBSET_DIR.is_dir(), reason="no local M5 subset in data/raw/m5_subset"),
+    pytest.mark.skipif(not SUBSET_DIR.is_dir(), reason="no M5 subset in data/reference/m5_subset"),
 ]
 
 

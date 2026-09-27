@@ -58,8 +58,11 @@ To use real M5 data, download the Kaggle files and extract a small subset locall
 
 ```bash
 uv run python scripts/make_m5_subset.py --input <folder with the Kaggle CSVs> --download-date YYYY-MM-DD
-uv run pytest -m m5_local      # converts and validates data/raw/m5_subset/
+uv run pytest -m m5_local      # converts and validates data/reference/m5_subset/
 ```
+
+A small real subset (CA_1 / FOODS_3 / top 50) is committed in `data/reference/m5_subset/` by
+owner decision (see its README; Kaggle rules apply, do not redistribute).
 
 Without a checkout of this repository, use the standalone copy (needs only Python ≥ 3.10 and pandas):
 `python3 scripts/m5_subset_standalone.py --input <Kaggle folder> --output m5_subset --download-date YYYY-MM-DD`.
