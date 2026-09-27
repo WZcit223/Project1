@@ -58,6 +58,8 @@ class PluginOutput:
     metrics: tuple[Metric, ...] = ()
     warnings: tuple[str, ...] = ()
     applied_scenario_parameters: frozenset[str] = frozenset()
+    details: Mapping[str, JsonValue] = field(default_factory=dict)
+    """Plugin-specific facts recorded in provenance (e.g. training rows, feature names)."""
 
 
 @dataclass(frozen=True)

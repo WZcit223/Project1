@@ -103,6 +103,7 @@ class SimulationEngine:
                         "horizon": [context.start_date.isoformat(), context.end_date.isoformat()],
                         "upstream": list[JsonValue](sorted(context.upstream)),
                         "warnings": list[JsonValue](warnings),
+                        "plugin_details": dict(output.details),
                     },
                 ),
             ),
