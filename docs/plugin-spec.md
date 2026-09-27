@@ -69,21 +69,28 @@ User-developed generators / plugins follow the same path: a package with an entr
 ## 4. Replenishment strategy plugins
 
 ```python
-class ReplenishmentStrategy(Protocol):
+class ReplenishmentStrategy(Protocol):            # industrial_ai_warehouse.strategies
     strategy_id: str
     strategy_version: str
+    description: str
     parameter_model: type[BaseModel]
+    uses_forecast: bool                           # simulation then requires an upstream forecast
 
-    def initialise(self, history: ItemHistory, supplier: SupplierInfo,
-                   parameters: BaseModel) -> StrategyState: ...
+    def create_policy(self, item: ItemContext, parameters: BaseModel) -> ItemPolicy: ...
 
-    def decide(self, state: StrategyState, observation: DailyObservation,
-               forecast: ForecastView | None) -> OrderDecision: ...
+class ItemPolicy(Protocol):
+    def order_quantity(self, observation: DailyObservation) -> float: ...   # ≥ 0, before rounding
 ```
 
-`DailyObservation` = date, on_hand, on_order (inventory position), today's demand/fulfilled.
-`OrderDecision` = order quantity (int ≥ 0, rounded up to case pack / min order qty) + reason string.
-Strategies do **not** mutate inventory; the inventory simulation owns state transitions.
+`ItemContext` (known at the horizon start): product, warehouse, daily demand `history` (active period,
+leading zeros excluded, last `history_window_days`), planner's `lead_time_mean_days` / `lead_time_std_days`,
+`review_period_days`, `order_cycle_days`, `target_service_level` and a `ForecastView` (or `None`).
+`ForecastView.total(day, days)` sums the forecast from the latest origin ≤ `day`;
+`ForecastView.recent_errors(day, days)` returns errors of the forecasts in use on each past date — no
+look-ahead. `DailyObservation` = day, date, on_hand, on_order, inventory_position, today's demand /
+fulfilled. Strategies do **not** mutate inventory; the inventory simulation owns state transitions,
+rounding (case pack, minimum order quantity) and purchase orders. Strategies are registered in a
+pack-local `StrategyRegistry` (core `Registry`) and selected by the simulation parameter `strategy_id`.
 
 | Strategy | Rule (per item) | Uses forecast |
 |---|---|---|

@@ -55,23 +55,34 @@ bumps the scenario version.
 
 ## 5. Inventory simulation model
 
-Daily discrete-time, per item, single-echelon, lost sales. For each day *t* in the horizon, in order:
+Implemented by the Warehouse plugin `inventory_simulation` 1.0.0 (`industrial_ai_warehouse.simulation`).
+Daily discrete-time, per item (product × warehouse), single-echelon, lost sales. For each day *t* in the
+horizon, in order:
 
-1. **Receive** — purchase orders with `arrival_date = t` add their (possibly reduced) quantity:
-   `opening_on_hand_t = closing_on_hand_{t−1} + arrivals_t`.
-2. **Demand** — `fulfilled_t = min(opening_on_hand_t, demand_t)`, `lost_sales_t = demand_t − fulfilled_t`.
+1. **Receive** — shipments arriving on *t*: `opening_on_hand_t = closing_on_hand_{t−1} + arrivals_t`.
+2. **Demand** — `fulfilled_t = min(opening_on_hand_t, demand_t)`, `lost_sales_t = demand_t − fulfilled_t`
+   (lost, not back-ordered).
 3. **Close** — `closing_on_hand_t = opening_on_hand_t − fulfilled_t`.
    (Equivalent to *Inventory(t+1) = Inventory(t) + Arrivals(t) − Demand(t)* with the lost-sales floor at 0.)
-4. **Review** — on review days, the strategy observes `inventory_position_t = closing_on_hand_t + on_order_t`
-   and returns an order quantity.
-5. **Order** — if quantity > 0, create a purchase order; sample lead time
-   `L ~ max(1, round(Normal(mean + lead_time_delta_t, std)))` using the run seed; with probability
-   `1 − on_time_probability` add a delay of 1–3 days; `arrival_date = t + L`; shipped quantity =
-   `ceil(quantity · supply_capacity_factor_t)` during a disruption window.
-6. **Record** ledger row and costs.
+4. **Review** — every `review_period_days`, the strategy's policy sees `DailyObservation`
+   (on hand, on order, inventory position = on hand + on order, today's demand and fulfilment) and returns
+   a quantity; the simulation rounds it up to the case pack after applying the supplier's minimum order
+   quantity.
+5. **Order** — lead time `L = max(1, round(mean + lead_time_delta_t + std · z_t))`; with probability
+   `1 − on_time_probability` add 1–3 days (`max_extra_delay_days`); arrival `t + L`; shipped quantity
+   `ceil(quantity · supply_capacity_factor_t)`; the unshipped share is lost. `lead_time_delta` and
+   `supply_capacity_factor` apply to orders placed inside the disruption window
+   `[disruption_start_day, disruption_start_day + disruption_duration_days)`, or to the whole horizon
+   when the duration is 0. With `planner_aware = true` strategies see the adjusted mean lead time.
+6. **Record** — ledger row (`sim.inventory_ledger`), purchase order (`sim.purchase_order`) and KPIs
+   (data-model §6).
 
-Initial state: `ops.initial_inventory` (default on-hand = μ · (L̄ + R/2), on-order = 0).
-Capacity limits (`ops.warehouse.capacity_units`) are reported as a warning when exceeded, not enforced (v0.1).
+`z_t`, lateness and delay are pre-sampled **per item and day** from the run seed, so strategies compared on
+the same seed face identical supply conditions (common random numbers). Initial state:
+`ops.initial_inventory` (on hand = μ · (L̄ + order_cycle/2), on order 0). Capacity limits
+(`ops.warehouse.capacity_units`) are reported as a warning when exceeded, not enforced (v0.1).
+Demand-side scenario parameters are applied upstream by the demand generator, so the simulation lists them
+as "not applied" in its warnings.
 
 ## 6. Demand for the horizon
 

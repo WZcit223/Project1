@@ -169,12 +169,17 @@ not sampling noise.
 
 ## 4. Simulation output tables
 
+Output datasets are named `<run_id>.<plugin_id>.<table>` (the run and the compared variant are part of
+the id), so run and strategy are not repeated as columns. Schemas 1.0.0.
+
 | Table | Primary key | Fields |
 |---|---|---|
-| `sim.inventory_ledger` | (run_id, strategy_id, date, product_id) | opening_on_hand, arrivals, demand, fulfilled, lost_sales, closing_on_hand, on_order, inventory_position, order_qty |
-| `sim.purchase_order` | (run_id, strategy_id, po_id) | product_id, supplier_id, order_date, quantity, sampled_lead_time_days, expected_arrival_date, received_date, received_qty, status (`open`, `received`, `partially_received`) |
-| `sim.forecast` | (run_id, model_id, origin_date, date, product_id) | forecast_qty, actual_qty (filled after the fact) |
-| `sim.metrics` | (run_id, strategy_id, metric_id, scope) | value, unit, scope (`total` or `product:<id>`) |
+| `sim.inventory_ledger` | (date, product_id, warehouse_id) | opening_on_hand, arrivals, demand, fulfilled, lost_sales, closing_on_hand, on_order, inventory_position, order_qty (all int ≥ 0) |
+| `sim.purchase_order` | po_id | product_id, warehouse_id, supplier_id, order_date, quantity, shipped_qty, sampled_lead_time_days, expected_arrival_date, received_date (null unless received in the horizon), status (`received`, `partially_received`, `open`, `not_shipped`) |
+| `sim.forecast` | (origin_date, date, entity columns) | forecast (≥ 0), actual (nullable) — see simulation-api.md §4 |
+
+KPIs are returned as `Metric` records (`metric_id`, `value`, `unit`, `scope` = `total` or
+`product:<id>`) in the simulation result rather than as a table.
 
 ## 5. M5 → canonical mapping
 
@@ -222,7 +227,7 @@ download date. The output is real M5 data: it stays in git-ignored `data/raw/`. 
 All metrics are computed per strategy per run over the **simulation horizon**, aggregated over all
 simulated item-days unless the scope says otherwise. Notation: for item *i*, day *t*:
 demand *Dᵢₜ*, fulfilled *Fᵢₜ = min(Dᵢₜ, available)*, lost *Lᵢₜ = Dᵢₜ − Fᵢₜ*, closing on-hand *Iᵢₜ*,
-unit cost *cᵢ*, unit price *pᵢₜ*, annual holding rate *h*, order cost *k*, horizon length *T* days,
+unit cost *cᵢ*, unit price *pᵢ* (mean reference price, `derived.product_price`), annual holding rate *h*, order cost *k*, horizon length *T* days,
 number of items *N*.
 
 | Metric id | Name | Definition | Unit |
@@ -231,7 +236,7 @@ number of items *N*.
 | `service_level` | Service level (**fill rate**) | Σ Fᵢₜ / Σ Dᵢₜ (undefined → reported `null` if Σ D = 0) | ratio 0–1 |
 | `stockout_rate` | Stockout rate | #{(i,t) : Lᵢₜ > 0} / (N · T) | ratio 0–1 |
 | `lost_sales_units` | Lost sales | Σ Lᵢₜ | units |
-| `lost_sales_value` | Lost sales value (reported separately, **not** in inventory cost) | Σ Lᵢₜ · pᵢₜ | USD |
+| `lost_sales_value` | Lost sales value (reported separately, **not** in inventory cost) | Σ Lᵢₜ · pᵢ | USD |
 | `avg_inventory_units` | Average inventory level | (1 / T) Σₜ Σᵢ Iᵢₜ | units |
 | `avg_inventory_value` | Average inventory value | (1 / T) Σₜ Σᵢ Iᵢₜ · cᵢ | USD |
 | `holding_cost` | Holding cost | Σ Iᵢₜ · cᵢ · h / 365 | USD |
