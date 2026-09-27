@@ -5,6 +5,29 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 8 / M9 approved with follow-ups
+
+### Branch
+`phase9` (CI green on `d22aa82`)
+
+### Changes
+- Owner approved Gate 8. Acceptance statement: *the framework can execute and fairly compare multiple
+  interchangeable replenishment strategies under identical controlled simulation conditions, with
+  reproducible results and explicit temporal information boundaries* — **not** that dynamic
+  replenishment is economically or operationally superior in the real world.
+- Owner decisions: keep `OperationsConfig.order_cost_range` (do not tune costs to improve the demo);
+  the different adaptation frequencies of the strategies are intentional and must be documented
+  (reorder point = historical baseline, safety stock = fixed initial buffer, dynamic = periodically
+  updated target); real-subset results stay labelled descriptive / smoke-test evidence.
+- Follow-ups recorded as TASK-STR-004 (cost components, exact service-level definition, inventory
+  position semantics, cold-start limitation, direct no-look-ahead regression test, failure-mode tests).
+  M9 ✅ in the backlog (EN + ZH).
+
+### Next
+Branch `phase10` from `phase9`: TASK-STR-004 follow-ups, then the scenario engine (TASK-SCN-001/002).
+
+---
+
 ## 2026-09-27 — Phase 9: Replenishment strategies (TASK-STR-001 … 003)
 
 ### Branch

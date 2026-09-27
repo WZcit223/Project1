@@ -22,7 +22,7 @@ Branch name suggestion in brackets.
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ✅ approved 2026-09-27 |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ✅ approved 2026-09-27 |
 | M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ✅ approved 2026-09-27 |
-| M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | 🟡 awaiting owner review |
+| M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ✅ approved 2026-09-27 (with follow-ups TASK-STR-004) |
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ⬜ |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ⬜ |
@@ -156,6 +156,24 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 ### TASK-STR-002 — Safety Stock strategy  [`phase9`] ✅
 ### TASK-STR-003 — Dynamic replenishment strategy  [`phase9`] ✅
 - Acceptance: three strategies compared on identical demand via `engine.compare`.  **Gate 8.**
+- Gate 8 acceptance statement (owner, 2026-09-27): *the framework can execute and fairly compare multiple
+  interchangeable replenishment strategies under identical controlled simulation conditions, with
+  reproducible results and explicit temporal information boundaries.* It is **not** a demonstration that
+  any strategy is economically or operationally superior in the real world.
+
+### TASK-STR-004 — Gate 8 follow-ups  [`phase10`]
+- Keep `OperationsConfig.order_cost_range` unchanged (the cost structure exposes ordering-cost dominance).
+- Separate cost components and volume metrics (ordering / holding / lost-sales cost, total cost, average
+  on-hand units and value, purchase orders, units ordered, fill rate, stockout days, unfulfilled demand).
+- Label real-subset results as descriptive / smoke-test evidence only.
+- Direct no-look-ahead regression test: change demand after a decision date; forecasts, orders and
+  decisions before it stay unchanged.
+- Define the service-level metric exactly (no ambiguous "service level").
+- Document inventory-position semantics per strategy, the intentional adaptation frequencies
+  (A historical baseline · B fixed initial buffer · C periodically updated target) and cold start
+  (no sales history) as a v0.1 limitation.
+- Failure-mode tests: sparse / zero demand, too few forecast errors, invalid forecast values, lead-time
+  disruption around review dates.
 
 ## Phase 10 — Scenario engine
 
