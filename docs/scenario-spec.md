@@ -37,7 +37,7 @@ User-defined scenarios (Scenario Builder) are stored in SQLite with the same str
 | `shock_duration_days` | int | 0 | ≥ 0 | 0 = no shock |
 | `lead_time_delta` | int (days) | 0 | −30 – 60 | Added to supplier mean lead time (result floored at 1) |
 | `disruption_start_day` | int | 0 | ≥ 0 | Offset from horizon start |
-| `disruption_duration_days` | int | 0 | ≥ 0 | 0 = lead_time_delta applies to the whole horizon |
+| `disruption_duration_days` | int | 0 | ≥ 0 | 0 = from `disruption_start_day` to the horizon end (the whole horizon with the default start 0) |
 | `supply_capacity_factor` | float | 1.00 | 0.00 – 1.00 | Fraction of each order quantity the supplier ships during the disruption window |
 | `planner_aware` | bool | false | — | Whether strategies see the adjusted lead time (true) or the nominal one (false) |
 
@@ -72,8 +72,10 @@ horizon, in order:
    `1 − on_time_probability` add 1–3 days (`max_extra_delay_days`); arrival `t + L`; shipped quantity
    `ceil(quantity · supply_capacity_factor_t)`; the unshipped share is lost. `lead_time_delta` and
    `supply_capacity_factor` apply to orders placed inside the disruption window
-   `[disruption_start_day, disruption_start_day + disruption_duration_days)`, or to the whole horizon
-   when the duration is 0. With `planner_aware = true` strategies see the adjusted mean lead time.
+   `[disruption_start_day, disruption_start_day + disruption_duration_days)`, or from
+   `disruption_start_day` to the horizon end when the duration is 0. The window is judged by the
+   **order date**: orders already in transit when it starts keep their lead time, and with a review
+   period > 1 a window that contains no review day affects no order. With `planner_aware = true` strategies see the adjusted mean lead time.
 6. **Record** — ledger row (`sim.inventory_ledger`), purchase order (`sim.purchase_order`) and KPIs
    (data-model §6).
 

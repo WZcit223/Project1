@@ -95,6 +95,12 @@ class SupplyEffects(BaseModel):
     planner_aware: bool = False
 
     def in_window(self, day: int) -> bool:
+        """Whether an order placed on ``day`` falls in the disruption window.
+
+        Duration 0 means "from the start day to the horizon end" (the whole horizon if start = 0).
+        """
+        if day < self.disruption_start_day:
+            return False
         if self.disruption_duration_days == 0:
             return True
         end = self.disruption_start_day + self.disruption_duration_days
