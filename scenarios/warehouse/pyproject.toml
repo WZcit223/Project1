@@ -1,0 +1,13 @@
+[project]
+name = "industrial-ai-warehouse"
+version = "0.1.0.dev0"
+description = "Warehouse scenario pack for the Industrial AI framework: inventory demand forecasting and replenishment simulation."
+requires-python = ">=3.11"
+dependencies = ["industrial-ai"]
+
+[tool.uv.sources]
+industrial-ai = { workspace = true }
+
+[build-system]
+requires = ["uv_build>=0.8.17,<0.9.0"]
+build-backend = "uv_build"

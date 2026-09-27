@@ -6,6 +6,12 @@ resolution-markers = [
     "python_full_version < '3.15'",
 ]
 
+[manifest]
+members = [
+    "industrial-ai",
+    "industrial-ai-warehouse",
+]
+
 [[package]]
 name = "ast-serialize"
 version = "0.11.2"
@@ -86,6 +92,7 @@ source = { editable = "." }
 
 [package.dev-dependencies]
 dev = [
+    { name = "industrial-ai-warehouse" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "ruff" },
@@ -95,10 +102,22 @@ dev = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "industrial-ai-warehouse", editable = "scenarios/warehouse" },
     { name = "mypy", specifier = ">=2.3.1" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "ruff", specifier = ">=0.16.9" },
 ]
+
+[[package]]
+name = "industrial-ai-warehouse"
+version = "0.1.0.dev0"
+source = { editable = "scenarios/warehouse" }
+dependencies = [
+    { name = "industrial-ai" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "industrial-ai", editable = "." }]
 
 [[package]]
 name = "iniconfig"
