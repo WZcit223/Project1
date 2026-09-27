@@ -97,7 +97,8 @@ src/industrial_ai/                   # FRAMEWORK CORE — domain-neutral
 │                  generators/{rule_based, statistical, time_series}, constraints
 ├── simulation/    SimulationPlugin protocol, SimulationRegistry, SimulationEngine,
 │                  forecasting/{baseline, lightgbm}, results, metrics helpers
-├── scenario/      ScenarioSpec, ScenarioParameterSchema, ScenarioRegistry (generic)
+├── scenario/      ScenarioSpec, ScenarioRegistry (validates against a pack's parameter model),
+│                  YAML loading (generic)
 ├── application/   ScenarioPack protocol, workflow runner, run store, reporting, intent [P1]
 └── api/           FastAPI app, routers, request/response models (Application API)
 
@@ -106,11 +107,11 @@ scenarios/warehouse/                 # WAREHOUSE SCENARIO PACK — separate pack
     ├── adapters/m5/     M5 raw → canonical retail-demand dataset (ADR-003)
     ├── schemas/         canonical demand + synthetic operational schemas
     ├── generators/      generator configurations for inventory, supplier, lead time, PO …
-    ├── simulation/      InventorySimulationPlugin
+    ├── simulation/      InventorySimulationPlugin, KPI definitions (data-model.md §6)
     ├── strategies/      ReorderPoint, SafetyStock, DynamicReplenishment
-    ├── scenarios/       baseline / high_demand / demand_shock / supply_disruption (YAML)
-    ├── metrics.py       KPI definitions (data-model.md §6)
-    └── pack.py          WarehouseScenarioPack: registers everything with the framework
+    ├── scenarios/       WarehouseScenarioParameters + definitions/{baseline, high_demand,
+    │                    demand_shock, supply_disruption}.yaml
+    └── pack.py          WarehouseScenarioPack: registers everything with the framework (planned, Phase 12)
 
 ui/                    Jinja2 templates + static (HTMX); served by a thin UI router
 scripts/               make_m5_subset.py, make_m5_fixture.py, run_demo.py

@@ -23,9 +23,26 @@ parameters: {...}                 # validated by the pack's scenario_parameter_m
 tags: [demand]
 ```
 
-场景文件位于 `scenarios/warehouse/src/industrial_ai_warehouse/scenarios/*.yaml`。
-用户自定义场景（场景构建器，Scenario Builder）以相同结构存储在 SQLite 中，并标记
-`source: user`。规格一旦被某次运行使用即不可变；编辑会创建新版本。
+**已实现（Phase 10）。** `industrial_ai.scenario` 提供：
+
+```python
+registry = ScenarioRegistry(pack="warehouse", parameter_model=WarehouseScenarioParameters)
+register_directory(registry, path)       # load_scenario / load_scenarios: YAML via safe_load
+registry.get("high_demand")              # latest version; registry.get(id, "1.0.0") for a pinned one
+registry.validate_parameters(spec)       # effective parameters: the spec's values + model defaults
+```
+
+每个规格在注册时即被校验：pack 必须正确，且参数须被该 pack 的 Pydantic
+参数模型接受（已知名称、类型、范围；未知名称会被拒绝）——拼写错误的参数会立即报错，而不是被静默忽略。
+格式错误的文件会抛出 `ScenarioValidationError`。
+场景层仅是配置：它不导入任何生成器、仿真或策略代码
+（由测试强制保证），因此任何场景都可以与任何兼容的策略组合。
+
+Warehouse 场景文件位于
+`scenarios/warehouse/src/industrial_ai_warehouse/scenarios/definitions/*.yaml`；由 `builtin_scenarios()`
+加载。用户自定义场景（场景构建器，Scenario Builder，存储在 SQLite 中并标记 `source: user`）
+**尚未实现**（Phase 12–13）。规格一旦被某次运行使用即不可变；编辑会创建新
+版本。
 
 ## 3. 仓储场景参数
 
@@ -48,12 +65,13 @@ tags: [demand]
 | scenario_id | 参数（非默认值） | 预期行为（已测试） |
 |---|---|---|
 | `baseline` | — | 基准行为 |
-| `high_demand` | demand_multiplier 1.30, seasonality_multiplier 1.20, lead_time_delta 0 | 总需求相比 baseline ↑ 约 30%（相同种子） |
+| `high_demand` | demand_multiplier 1.30, seasonality_multiplier 1.20 | 总期望需求相比 baseline ↑ 约 30%（相同种子） |
 | `demand_shock` | shock_multiplier 2.50, shock_start_day 28, shock_duration_days 14 | 需求仅在窗口内 ↑ |
 | `supply_disruption` | lead_time_delta +7, disruption_start_day 28, disruption_duration_days 42, supply_capacity_factor 0.50 | 窗口内实际提前期变长 / 部分到货；静态策略的缺货 ↑ |
 
 以上数值为 v0.1 的建议默认值，可在首次 Golden Path 运行后调整；任何改动都须
-提升场景版本。
+提升场景版本。需求参数由合成需求生成器应用，供应参数由库存仿真应用；每个参数仅由
+一个插件应用（已测试）。
 
 ## 5. 库存仿真模型
 

@@ -46,7 +46,7 @@ Production Validation（演示 · 原型 · 合成数据验证 · 真实数据�
 
 | 检查项 | 判定标准 |
 |---|---|
-| High Demand（高需求） | 总需求 / 基线总需求 ∈ [1.25, 1.35] |
+| High Demand（高需求） | 总**期望**需求（noise_scale = 0）/ 基线 ∈ [1.25, 1.35]；抽样总需求明显更高（> 1.15）。在较短的预测期内，更强的季节性也会改变窗口均值（fixture：期望值 1.345，抽样值 1.24，原因是小计数上的 Poisson 噪声） |
 | Demand Shock（需求冲击） | 窗口内平均需求 / 窗口内基线 ≈ shock_multiplier（±10%）；窗口外 ≈ 基线（±5%） |
 | Supply Disruption（供应中断） | 窗口内下达的采购订单（PO）的平均实际提前期 ≥ 基线 + 5 天；窗口内收货数量 ≤ 订购数量 |
 | 仿真有响应 | 对静态策略 `reorder_point`，High Demand 或 Supply Disruption 下的缺货日比率 ≥ 基线 |
