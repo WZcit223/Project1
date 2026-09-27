@@ -103,7 +103,8 @@ Structure changes need a strong engineering reason and must be documented (ADR i
 - **Branch per major round (stacked, no merge to `main` while work is in progress):**
   - Each major round (a phase, or a significant feature / function) gets a **new branch created from
     the latest working branch**, not from `main`. The previous branch stays untouched as a snapshot.
-  - Phase branches: `phase<N>` (e.g. `phase1`, `phase2`). Feature / function rounds inside a phase:
+  - Phase branches: `phase<N>`, where N is the phase number in `docs/task-backlog.md`
+    (Phase 0 → `phase0`, Phase 1 → `phase1`, …). Feature / function rounds inside a phase:
     `feature/<name>`; fixes `fix/<name>`; docs-only `docs/<name>`; refactors `refactor/<name>`.
   - The branch lineage is recorded in each `docs/development-log.md` entry ("Branch" + "Based on").
   - If the execution environment assigns its own branch name (e.g. `claude/...`), rename it to the

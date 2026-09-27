@@ -8,29 +8,30 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 ## 2026-09-27 — Branch policy update
 
 ### Branch
-`phase1` (renamed from `claude/focused-lamport-421rvy`)
+`phase0` (renamed from `claude/focused-lamport-421rvy`, then from `phase1` so that branch numbers match backlog phase numbers)
 
 ### Objective
 Adopt the owner's branching policy: one new branch per major round (phase / feature / function),
 created from the latest working branch; no merges to `main` while work is in progress.
 
 ### Changes
-- CLAUDE.md §7 rewritten (stacked `phase<N>` / `feature/<name>` branches, `main` updated only at
+- CLAUDE.md §7 rewritten (stacked `phase<N>` / `feature/<name>` branches, N = backlog phase number,
+  so Phase 0 → `phase0`, Phase 1 → `phase1`; `main` updated only at
   owner-chosen milestones, lineage recorded in this log).
-- Task backlog (EN + ZH) references updated; TASK-ARCH-001 branch is `phase1`.
+- Task backlog (EN + ZH) references updated; TASK-ARCH-001 branch is `phase0`.
 
 ### Tests / checks
 Docs-only change; ruff, mypy, pytest and link check re-run — pass.
 
 ### Next
-Gate 0 review, then TASK-CORE-001 on a new branch created from `phase1`.
+Gate 0 review, then Phase 1 (TASK-CORE-001 …) on branch `phase1` created from `phase0`.
 
 ---
 
 ## 2026-09-27 — TASK-ARCH-001 Architecture baseline
 
 ### Branch
-`phase1` (based on `main` @ `c3a62bc`; originally pushed as the session branch `claude/focused-lamport-421rvy`, renamed to `phase1`)
+`phase0` (based on `main` @ `c3a62bc`; originally pushed as the session branch `claude/focused-lamport-421rvy`, renamed to `phase0`)
 
 ### Objective
 Establish the architecture baseline (Phase 0) for review at Gate 0: project environment, working
@@ -77,4 +78,4 @@ docs(adr) 3fc3e04, docs(plan) 0060334, docs(zh) ×2, docs(log) (this entry).
 - Network policy of the cloud environment blocks kaggle.com; M5 subset must be supplied by the user.
 
 ### Next
-Gate 0 review → new branch from `phase1` for TASK-CORE-001 (workspace & package skeleton). No merge to `main` during work in progress.
+Gate 0 review → branch `phase1` created from `phase0` for TASK-CORE-001 (workspace & package skeleton). No merge to `main` during work in progress.
