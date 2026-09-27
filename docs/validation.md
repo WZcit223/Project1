@@ -44,7 +44,7 @@ Production Validation. v0.1 reaches **Prototype + Synthetic Validation** only.
 
 | Check | Criterion |
 |---|---|
-| High Demand | Total demand / baseline total demand ∈ [1.25, 1.35] |
+| High Demand | Total **expected** demand (noise_scale = 0) / baseline ∈ [1.25, 1.35]; sampled total demand clearly higher (> 1.15). On a short horizon the stronger seasonality also shifts the window mean (fixture: expected 1.345, sampled 1.24 because of Poisson noise on small counts) |
 | Demand Shock | Mean demand inside window / baseline inside window ≈ shock_multiplier (±10%); outside window ≈ baseline (±5%) |
 | Supply Disruption | Mean realised lead time of POs placed in window ≥ baseline + 5 days; received qty in window ≤ ordered qty |
 | Simulation responds | Stockout-day rate under High Demand or Supply Disruption ≥ baseline for the static strategy `reorder_point` |

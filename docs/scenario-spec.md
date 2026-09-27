@@ -21,9 +21,26 @@ parameters: {...}                 # validated by the pack's scenario_parameter_m
 tags: [demand]
 ```
 
-Scenario files live in `scenarios/warehouse/src/industrial_ai_warehouse/scenarios/*.yaml`.
-User-defined scenarios (Scenario Builder) are stored in SQLite with the same structure and
-`source: user`. Specs are immutable once used by a run; edits create a new version.
+**Implemented (Phase 10).** `industrial_ai.scenario` provides:
+
+```python
+registry = ScenarioRegistry(pack="warehouse", parameter_model=WarehouseScenarioParameters)
+register_directory(registry, path)       # load_scenario / load_scenarios: YAML via safe_load
+registry.get("high_demand")              # latest version; registry.get(id, "1.0.0") for a pinned one
+registry.validate_parameters(spec)       # effective parameters: the spec's values + model defaults
+```
+
+Every spec is validated when registered: correct pack, and parameters accepted by the pack's Pydantic
+parameter model (known names, types, ranges; unknown names rejected) — a misspelt parameter fails
+immediately instead of being silently ignored. Malformed files raise `ScenarioValidationError`.
+The scenario layer is configuration only: it imports no generator, simulation or strategy code
+(enforced by tests), so any scenario can be combined with any compatible strategy.
+
+Warehouse scenario files live in
+`scenarios/warehouse/src/industrial_ai_warehouse/scenarios/definitions/*.yaml`; `builtin_scenarios()`
+loads them. User-defined scenarios (Scenario Builder, stored in SQLite with `source: user`) are
+**not implemented yet** (Phase 12–13). Specs are immutable once used by a run; edits create a new
+version.
 
 ## 3. Warehouse scenario parameters
 
@@ -46,12 +63,13 @@ User-defined scenarios (Scenario Builder) are stored in SQLite with the same str
 | scenario_id | Parameters (non-default) | Expected behaviour (tested) |
 |---|---|---|
 | `baseline` | — | Reference behaviour |
-| `high_demand` | demand_multiplier 1.30, seasonality_multiplier 1.20, lead_time_delta 0 | Total demand ↑ ≈ 30% vs baseline (same seed) |
+| `high_demand` | demand_multiplier 1.30, seasonality_multiplier 1.20 | Total expected demand ↑ ≈ 30% vs baseline (same seed) |
 | `demand_shock` | shock_multiplier 2.50, shock_start_day 28, shock_duration_days 14 | Demand ↑ only inside the window |
 | `supply_disruption` | lead_time_delta +7, disruption_start_day 28, disruption_duration_days 42, supply_capacity_factor 0.50 | Longer realised lead times / partial receipts in window; stockouts ↑ for static strategies |
 
 Numeric values are proposed defaults for v0.1, tunable after the first Golden Path run; any change
-bumps the scenario version.
+bumps the scenario version. Demand parameters are applied by the synthetic demand generator, supply
+parameters by the inventory simulation; each parameter by exactly one plugin (tested).
 
 ## 5. Inventory simulation model
 
