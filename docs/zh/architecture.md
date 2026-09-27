@@ -59,12 +59,26 @@ Run / Experiment metadata · Provenance · Validation
 | 规则 | 执行方式 |
 |---|---|
 | R1 `industrial_ai` 从不导入任何场景包 (Scenario Pack) | 独立的包 (ADR-004) + 自 Phase 1 起的架构测试 |
-| R2 各层只能向下依赖：`api → application → simulation → foundation → core`；`synthetic` 属于 foundation | 架构测试（导入图检查） |
+| R2 各层只能向下依赖，具体见下表 | 架构测试 `tests/unit/test_architecture.py`（静态导入图检查） |
 | R3 UI（templates/static）仅通过 HTTP 与应用 API (Application API) 通信 | UI 中不包含对框架模块的 Python 导入；UI 路由调用 API 客户端 / HTTP |
 | R4 插件依赖框架接口，从不依赖彼此的内部实现 | 代码评审 + 测试 |
 | R5 除 M5 适配器外，任何模块都不读取原始 M5 文件 | 代码评审 |
 
 `core` 被所有层共享，且不依赖项目内的任何其他部分。
+
+框架内部允许的依赖关系（R2，由 `tests/unit/test_architecture.py` 强制检查）：
+
+| 层 | 可导入 |
+|---|---|
+| `core` | — |
+| `foundation`（含 datasets、catalog、validation、provenance） | `core` |
+| `scenario` | `core`、`foundation` |
+| `synthetic` | `core`、`foundation`、`scenario` |
+| `simulation` | `core`、`foundation`、`scenario` |
+| `application` | `core`、`foundation`、`scenario`、`synthetic`、`simulation` |
+| `api` | `core`、`application` |
+
+任何模块都可以导入包根 `industrial_ai`（仅包含 `__version__`）以及第三方库。修改此表需同步更新该测试；若改变架构，还需新增 ADR。
 
 ## 3. 包 / 模块结构
 

@@ -57,12 +57,27 @@ Scenario plugins sit **beside** the framework and use it only through its public
 | Rule | Enforcement |
 |---|---|
 | R1 `industrial_ai` never imports any scenario pack | Separate package (ADR-004) + architecture test from Phase 1 |
-| R2 Layers depend only downward: `api → application → simulation → foundation → core`; `synthetic` is part of foundation | Architecture test (import graph check) |
+| R2 Layers depend only downward, as listed in the table below | Architecture test `tests/unit/test_architecture.py` (static import-graph check) |
 | R3 UI (templates/static) only talks to the Application API over HTTP | UI contains no Python imports of framework modules; UI routes call API client / HTTP |
 | R4 Plugins depend on framework interfaces, never on each other's internals | Code review + tests |
 | R5 No module reads raw M5 files except the M5 adapter | Code review |
 
 `core` is shared by all layers and depends on nothing inside the project.
+
+Allowed framework-internal dependencies (R2, enforced by `tests/unit/test_architecture.py`):
+
+| Layer | May import |
+|---|---|
+| `core` | — |
+| `foundation` (incl. datasets, catalog, validation, provenance) | `core` |
+| `scenario` | `core`, `foundation` |
+| `synthetic` | `core`, `foundation`, `scenario` |
+| `simulation` | `core`, `foundation`, `scenario` |
+| `application` | `core`, `foundation`, `scenario`, `synthetic`, `simulation` |
+| `api` | `core`, `application` |
+
+Any module may import the package root `industrial_ai` (it only holds `__version__`) and third-party
+libraries. Changing this table requires updating the test and, if it changes the architecture, an ADR.
 
 ## 3. Package / module structure
 
