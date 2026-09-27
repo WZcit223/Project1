@@ -10,6 +10,16 @@ from industrial_ai.synthetic.generators.time_series import (
     TimeSeriesGenerator,
     TimeSeriesParameters,
 )
+from industrial_ai.synthetic.registry import GeneratorRegistry, new_generator_registry
+
+
+def builtin_registry() -> GeneratorRegistry:
+    """A new registry containing the three built-in generators."""
+    registry = new_generator_registry()
+    for generator in (RuleBasedGenerator(), StatisticalGenerator(), TimeSeriesGenerator()):
+        registry.register(generator)
+    return registry
+
 
 __all__ = [
     "RuleBasedGenerator",
@@ -19,4 +29,5 @@ __all__ = [
     "StatisticalParameters",
     "TimeSeriesGenerator",
     "TimeSeriesParameters",
+    "builtin_registry",
 ]

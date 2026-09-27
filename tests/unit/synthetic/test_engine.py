@@ -132,3 +132,13 @@ def test_register_and_reference_via_catalog(tmp_path: Path) -> None:
     assert second.provenance.inputs[0].content_hash == first.metadata.content_hash
     with pytest.raises(GeneratorParameterError, match="catalog"):
         engine().generate(request(), register=True)
+
+
+def test_builtin_registry_contains_exactly_the_three_generators() -> None:
+    from industrial_ai.synthetic.generators import builtin_registry
+
+    assert builtin_registry().keys() == [
+        ("rule_based", "1.0.0"),
+        ("statistical", "1.0.0"),
+        ("time_series", "1.0.0"),
+    ]
