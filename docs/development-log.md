@@ -5,6 +5,20 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Gate 2 approved
+
+### Branch
+`phase2`
+
+### Changes
+- Owner approved Gate 2 and the five Phase 2 decisions (hash semantics, provenance `component`,
+  `skipped` checks, strict CSV conversion, free-form dataset versions). M2 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 3 (M5 adapter) on branch `phase3` created from `phase2`.
+
+---
+
 ## 2026-09-27 — Phase 2: Dataset foundation (TASK-DATA-001 … 005)
 
 ### Branch

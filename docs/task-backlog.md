@@ -15,7 +15,7 @@ Branch name suggestion in brackets.
 |---|---|---|---|---|
 | M0 Architecture spec | 0 | G0 Architecture documented & approved | — | ✅ approved 2026-09-27 |
 | M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ approved 2026-09-27 |
-| M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ✅ 2026-09-27 (awaiting owner review) |
+| M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ✅ approved 2026-09-27 |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ⬜ |
 | M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ⬜ |
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ⬜ |
