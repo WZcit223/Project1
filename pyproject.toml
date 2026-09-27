@@ -5,8 +5,10 @@ description = "Industrial AI Application Framework Prototype: synthetic data, si
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "fastapi>=0.115",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
+    "uvicorn>=0.30",
 ]
 
 [build-system]
@@ -45,6 +47,7 @@ addopts = "-ra"
 
 [dependency-groups]
 dev = [
+    "httpx2>=2.13.1",
     "industrial-ai-warehouse",
     "mypy>=2.3.1",
     "pytest>=9.1.1",

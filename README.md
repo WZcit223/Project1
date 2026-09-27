@@ -45,6 +45,7 @@ uv run pytest                # tests
 uv run ruff check .          # lint
 uv run ruff format --check . # formatting
 uv run mypy                  # type check
+uv run python -m industrial_ai.api   # start the Application API (http://127.0.0.1:8000/health, docs at /api/docs)
 ```
 
 ## Data
