@@ -17,7 +17,7 @@ Branch name suggestion in brackets.
 | M1 Framework skeleton | 1 | G1 Project starts, tests run | M0 | ✅ approved 2026-09-27 |
 | M2 Dataset foundation | 2 | G2 Dataset can be loaded & validated | M1 | ✅ approved 2026-09-27 |
 | M3 M5 adapter | 3 | G3 M5 → canonical | M2 | ✅ approved 2026-09-27 |
-| M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ⬜ |
+| M4 Synthetic engine | 4 | G4 Reproducible synthetic data | M2 | ✅ 2026-09-27 (awaiting owner review) |
 | M5 Synthetic warehouse data | 5 | G5 Operational data generated | M3, M4 | ⬜ |
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ⬜ |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ⬜ |
@@ -116,15 +116,15 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 4 — Synthetic Data Engine
 
-### TASK-SYN-001 — Generator protocol, SyntheticDataset, registry  [`feature/synthetic-engine`]
+### TASK-SYN-001 — Generator protocol, SyntheticDataset, registry  [`phase4`] ✅
 - Per [synthetic-data-api.md §1–4](synthetic-data-api.md). Acceptance: dummy generator registers and runs; seed recorded; provenance generated.
 
-### TASK-SYN-002 — SyntheticEngine orchestration  [`feature/synthetic-engine`]
+### TASK-SYN-002 — SyntheticEngine orchestration  [`phase4`] ✅
 - Parameter validation → generate → constraint validation → hash → provenance → catalog registration.
 
-### TASK-SYN-003 — Rule-based generator  [`feature/rule-based-generator`]
-### TASK-SYN-004 — Statistical generator  [`feature/statistical-generator`]
-### TASK-SYN-005 — Time-series generator (+ calibration)  [`feature/time-series-generator`]
+### TASK-SYN-003 — Rule-based generator  [`phase4`] ✅
+### TASK-SYN-004 — Statistical generator  [`phase4`] ✅
+### TASK-SYN-005 — Time-series generator (+ calibration)  [`phase4`] ✅
 - Each: contract tests (registration, params, determinism, schema conformance). **Gate 4** after SYN-005.
 - Non-goals: GAN/VAE/diffusion/LLM generators.
 

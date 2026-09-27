@@ -19,7 +19,7 @@
 | M1 框架骨架 | 1 | G1 项目可启动、测试可运行 | M0 | ✅ 已批准 2026-09-27 |
 | M2 数据集基础 | 2 | G2 数据集可加载并验证 | M1 | ✅ 已批准 2026-09-27 |
 | M3 M5 适配器 | 3 | G3 M5 → 规范模型（canonical） | M2 | ✅ 已批准 2026-09-27 |
-| M4 合成数据引擎 | 4 | G4 可复现的合成数据 | M2 | ⬜ |
+| M4 合成数据引擎 | 4 | G4 可复现的合成数据 | M2 | ✅ 2026-09-27（待负责人评审） |
 | M5 合成仓储数据 | 5 | G5 运营数据已生成 | M3, M4 | ⬜ |
 | M6 仿真引擎 | 6 | G6 仿真引擎可执行 | M2 | ⬜ |
 | M7 预测插件 | 7 | （G6/G7 的一部分） | M6 | ⬜ |
@@ -118,15 +118,15 @@
 
 ## Phase 4 — 合成数据引擎
 
-### TASK-SYN-001 — 生成器协议、SyntheticDataset、注册表  [`feature/synthetic-engine`]
+### TASK-SYN-001 — 生成器协议、SyntheticDataset、注册表  [`phase4`] ✅
 - 按照 [synthetic-data-api.md §1–4](synthetic-data-api.md)。验收：示例（dummy）生成器可注册并运行；记录 seed；生成溯源信息。
 
-### TASK-SYN-002 — SyntheticEngine 编排  [`feature/synthetic-engine`]
+### TASK-SYN-002 — SyntheticEngine 编排  [`phase4`] ✅
 - 参数校验 → 生成 → 约束校验 → 哈希 → 溯源 → 目录注册。
 
-### TASK-SYN-003 — 基于规则的生成器  [`feature/rule-based-generator`]
-### TASK-SYN-004 — 统计生成器  [`feature/statistical-generator`]
-### TASK-SYN-005 — 时间序列生成器（+ 校准）  [`feature/time-series-generator`]
+### TASK-SYN-003 — 基于规则的生成器  [`phase4`] ✅
+### TASK-SYN-004 — 统计生成器  [`phase4`] ✅
+### TASK-SYN-005 — 时间序列生成器（+ 校准）  [`phase4`] ✅
 - 每项：契约测试（注册、参数、确定性、schema 一致性）。SYN-005 之后为 **Gate 4**。
 - 非目标：GAN/VAE/扩散模型/LLM 生成器。
 

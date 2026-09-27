@@ -135,32 +135,48 @@ Every generated dataset stores a `ProvenanceRecord`:
 transformations → generated dataset*. A run can be re-executed from its provenance record alone
 (given the same source data), and reproduction is verified by comparing `content_hash`.
 
-## 6. Initial generators (v0.1 — exactly three)
+## 6. Initial generators (v0.1 — exactly three, in `industrial_ai.synthetic.generators`)
 
 ### 6.1 `rule_based` v1.0.0
-Deterministic or rule-driven tables: entity lists, attribute rules (`unit_cost = price × cost_ratio`),
-per-row expressions from a small whitelisted rule vocabulary (constant, choice, linear, lookup, derived).
-Used for: warehouse, supplier attributes, product-supplier mapping, initial inventory, policies.
-No `eval` of arbitrary code.
+Tables built column by column from a whitelisted rule vocabulary (no code or expressions are
+evaluated): `constant`, `sequence` (ids such as `SUP001`), `choice` (optional weights), `uniform`
+(int or float), `linear` (`source × scale + offset`), `lookup` (mapping with default) and
+`reference_column` (one output row per reference row). Rules may use earlier columns and reference
+columns. Used for: warehouse, supplier attributes, product–supplier mapping, initial inventory, policies.
 
 ### 6.2 `statistical` v1.0.0
-Sampling from parametric distributions (normal, lognormal, gamma, Poisson, negative binomial,
-uniform, categorical) with optional Gaussian-copula correlation between numeric columns.
-Used for: lead-time parameters, cost ratios, reliability, case packs.
+Samples columns from `normal`, `lognormal`, `gamma`, `poisson`, `negative_binomial` (mean,
+dispersion), `uniform` and `categorical`; `copy_from_reference` copies id columns row-wise. Optional
+**rank correlation** between numeric columns via the Iman–Conover method (marginals preserved exactly,
+target correlation achieved approximately; matrix validated as a correlation matrix). Clipping
+(`clip_min`/`clip_max`), rounding and integer output are explicit parameters; clipped counts are
+recorded in provenance. Used for: lead-time parameters, cost ratios, reliability, case packs.
 
 ### 6.3 `time_series` v1.0.0
-Count time-series per entity:
+Daily count series per entity:
 
 ```
-λ_t = level · trend_t · weekly[dow_t] · yearly[doy_t] · event_t · scenario_t
-y_t ~ NegativeBinomial(mean = λ_t, dispersion = φ)       (Poisson if φ → ∞)
+rate_t   = level · season_t · event_t · level_multiplier · shock_t
+season_t = max(0, 1 + seasonality_multiplier · (weekly[dow_t] · monthly[month_t] − 1))
+y_t ~ NegativeBinomial(mean = rate_t, dispersion = φ / noise_scale²)   or Poisson(rate_t)
+noise_scale = 0 → y_t = round(rate_t)
 ```
 
-- **Calibration** (optional, from `reference`): per series estimate level, weekly profile, yearly
-  profile, event uplift and dispersion from the reference demand; recorded as a transformation.
-- **Scenario effects**: `demand_multiplier`, `seasonality_multiplier` (scales seasonal amplitude
-  around 1), shock window (`shock_multiplier` over `[shock_start, shock_start + duration)`), noise scale.
-- Output conforms to `retail.sales` + `scenario_id` (`ops.synthetic_demand`).
+- **Profiles**: explicit `profiles` (level, weekly ×7, monthly ×12, dispersion) or **per-series
+  calibration** on a reference history (last `history_window_days`, default 730): level = mean,
+  weekly/monthly factors normalised to mean 1, dispersion by method of moments (≈ Poisson when there is
+  no over-dispersion). Each series' **leading zeros before its first sale are excluded**. v1 has no
+  trend term and no calibrated event uplift (events: explicit `event_dates` × `event_multiplier`).
+- **Scenario effects** (generic names): `level_multiplier`, `seasonality_multiplier`, `noise_scale`,
+  `shock_multiplier`, `shock_start_day`, `shock_duration_days` (days from the horizon start).
+  `scenario_mapping` maps them to a scenario's names, e.g. `{"level_multiplier": "demand_multiplier"}`;
+  only effects present in the scenario are applied and reported.
+- One independent random stream per series (`SeedSequence(seed).spawn`), rows sorted by time then
+  entity. Output: time, entity, value columns plus optional `constant_columns` and
+  `scenario_id_column` (e.g. `ops.synthetic_demand`).
+- **Known limitation** (observed on the real M5 subset, descriptive only): weekday pattern and scenario
+  ratios are reproduced, but runs of zero-sales days in the real data (likely stockouts) are not, so
+  synthetic data has fewer zero days.
 
 Explicitly **not** in v0.1: GAN, VAE, diffusion, agent-based, LLM-generated data.
 

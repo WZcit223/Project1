@@ -5,6 +5,68 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-27 — Phase 4: Synthetic Data Engine (TASK-SYN-001 … 005)
+
+### Branch
+`phase4` — based on `phase3` @ `93b8062`
+
+### Objective
+Gate 4: synthetic data can be generated reproducibly, with full provenance and validation, from a
+pluggable engine with exactly three generators.
+
+### Changes
+- **SYN-001** `industrial_ai.scenario.ScenarioSpec` (minimal, generic; registry/YAML in Phase 10);
+  `synthetic.base`: `SyntheticDataGenerator` protocol, `GenerationSize`, `GeneratedData`,
+  `GenerationConfig`, `SyntheticDataset`; generator registry + `describe()`.
+- **SYN-002** `SyntheticEngine` + `GenerationRequest`: parameter validation, reference from argument or
+  catalog, provenance (inputs pinned by hash, component, parameters, scenario, seed, steps, warnings),
+  schema/constraint validation (`ConstraintViolationError` on failure), optional catalog registration.
+- **SYN-003** `rule_based` 1.0.0: whitelisted rules (constant, sequence, choice, uniform, linear,
+  lookup, reference_column).
+- **SYN-004** `statistical` 1.0.0: seven distributions, Iman–Conover rank correlation (no SciPy),
+  explicit clipping recorded in provenance.
+- **SYN-005** `time_series` 1.0.0: per-series calibration (leading zeros excluded), weekly/monthly
+  seasonality, events, negative binomial / Poisson noise, generic scenario effects with
+  `scenario_mapping`; one seed stream per series.
+- Refactor: generators report `applied_scenario_parameters`; the engine warns about the rest.
+- Gate 4 integration test: fixture → adapter → catalog → three generators → registered datasets;
+  two independent runs give identical hashes.
+- synthetic-data-api.md §1, 2, 4, 6 describe the implemented interfaces (EN + ZH).
+
+### Decisions / assumptions
+- Generators return `GeneratedData`; only the engine writes provenance and validation (plugins cannot
+  fabricate them). Spec sketch previously had `generate()` return a `SyntheticDataset`.
+- Unused scenario parameters are warnings (in the result and in provenance), never silent.
+- Time-series scenario effects have generic names; the warehouse pack will map
+  `demand_multiplier → level_multiplier` (keeps the core domain-neutral).
+- v1 time series: no trend term, no calibrated event uplift (explicit event dates only).
+- Rank correlation via Iman–Conover instead of a Gaussian copula with inverse CDFs (avoids SciPy;
+  marginals exact, correlation approximate).
+
+### Local check on the real M5 subset (descriptive, not committed)
+Calibrated on 50 CA_1 / FOODS_3 series, 182-day horizon: weekday profile real
+[0.94, 0.84, 0.82, 0.81, 0.99, 1.25, 1.35] vs synthetic [0.94, 0.85, 0.83, 0.80, 0.98, 1.24, 1.35];
+High Demand / baseline total = 1.33 (demand ×1.3 with seasonality ×1.2); mean per item-day 17.4
+(synthetic horizon) vs 15.8 (real, last 730 days); share of zero days 3.8 % vs 15.4 % — runs of zeros
+in the real data (likely stockouts) are not reproduced. Generation takes about 0.3 s. No
+statistical-equivalence claim (Level 4 is out of scope).
+
+### Tests / checks
+ruff, mypy strict, pytest: 213 passed locally (incl. `m5_local` on the real subset); in CI the `m5_local` test is skipped.
+
+### Commits
+964f511 protocol/registry/engine, 42f8b8a rule_based, 296a919 statistical, c0dee66 applied
+scenario parameters, ddea970 time_series, 9e58448 Gate 4 test, + docs commits.
+
+### Known issues
+- Zero-run (stockout / intermittency) structure of real demand not modelled; candidate for a later
+  generator version or intermittent-demand option (recorded in the roadmap).
+
+### Next
+Owner review of Gate 4 → Phase 5 (synthetic warehouse operational data) on `phase5` from `phase4`.
+
+---
+
 ## 2026-09-27 — Real M5 subset check · Gate 3 approved
 
 ### Branch

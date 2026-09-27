@@ -14,6 +14,7 @@ Priority: **P1** after v0.1 Golden Path · **P2** next phase · **P3** long-term
 | Run report export | Share results with management | `application.reporting` | P1 | Golden Path |
 | Experiment tracking UI | Compare many runs over time | Uses existing run store | P1 | Run store |
 | LLM-assisted generator config | Faster creation of schemas/configs from requirements | Proposal → validator path; provenance `proposal_source` | P2 | Synthetic API |
+| Intermittent-demand / zero-run option for `time_series` | Real M5 demand has runs of zero-sales days (often stockouts) that the v1 negative-binomial model does not reproduce (15 % vs 4 % zero days on the real subset) | New generator version or parameter (e.g. zero-inflation, on/off regime); no engine change | P1 | Phase 4 generator, real-subset comparison |
 | Advanced generators (Copula+, GAN, VAE, diffusion, agent-based) | Higher-fidelity synthetic data | New generator plugins only | P2 | Real-data validation method |
 | Synthetic-vs-real fidelity metrics (Level 4) | Quantify realism, downstream-model utility, privacy | New validation module | P2 | Real / partner data |
 | Optimization plugin | Optimal reorder parameters under constraints | `SimulationPlugin kind=optimization` | P2 | Strategy comparison |
