@@ -6,8 +6,11 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",
+    "pandas>=2.2",
+    "pyarrow>=16",
     "pydantic>=2.7",
     "pydantic-settings>=2.3",
+    "sqlmodel>=0.0.22",
     "uvicorn>=0.30",
 ]
 
@@ -50,6 +53,7 @@ dev = [
     "httpx2>=2.13.1",
     "industrial-ai-warehouse",
     "mypy>=2.3.1",
+    "pandas-stubs>=3.0.5.260914",
     "pytest>=9.1.1",
     "ruff>=0.16.9",
 ]
