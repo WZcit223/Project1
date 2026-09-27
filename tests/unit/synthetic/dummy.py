@@ -52,7 +52,9 @@ class DummyGenerator:
         assert isinstance(parameters, DummyParams)
         rows = size.rows if size.rows is not None else 10
         multiplier = 1.0
-        if scenario is not None:
+        applied: frozenset[str] = frozenset()
+        if scenario is not None and "scale_multiplier" in scenario.parameters:
+            applied = frozenset({"scale_multiplier"})
             raw = scenario.parameters.get("scale_multiplier", 1.0)
             assert isinstance(raw, int | float)
             multiplier = float(raw)
@@ -62,4 +64,5 @@ class DummyGenerator:
         return GeneratedData(
             data=pd.DataFrame({"row_id": np.arange(rows, dtype="int64"), "value": values}),
             transformations=(TransformationStep(step="sample_uniform", details={"rows": rows}),),
+            applied_scenario_parameters=applied,
         )

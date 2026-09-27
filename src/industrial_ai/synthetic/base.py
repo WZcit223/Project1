@@ -45,6 +45,8 @@ class GeneratedData:
     data: pd.DataFrame
     transformations: tuple[TransformationStep, ...] = ()
     warnings: tuple[str, ...] = ()
+    applied_scenario_parameters: frozenset[str] = frozenset()
+    """Scenario parameter names actually applied; the engine warns about all others."""
 
 
 @runtime_checkable
@@ -56,7 +58,8 @@ class SyntheticDataGenerator(Protocol):
     description: str
     parameter_model: type[BaseModel]
     scenario_parameters: frozenset[str]
-    """Scenario parameter names this generator can apply; others are reported as unused."""
+    """Scenario effects this generator supports (for documentation and UIs). What was actually
+    applied in a run is reported in :attr:`GeneratedData.applied_scenario_parameters`."""
 
     def generate(
         self,

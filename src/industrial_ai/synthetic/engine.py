@@ -32,6 +32,7 @@ from industrial_ai.foundation.provenance import (
 from industrial_ai.foundation.validation import ConstraintSet, ValidationReport, validate_dataset
 from industrial_ai.scenario import ScenarioSpec
 from industrial_ai.synthetic.base import (
+    GeneratedData,
     GenerationConfig,
     GenerationSize,
     SyntheticDataGenerator,
@@ -95,7 +96,10 @@ class SyntheticEngine:
             params,
             reference,
         )
-        warnings = [*output.warnings, *_unused_scenario_parameters(generator, request.scenario)]
+        warnings = [
+            *output.warnings,
+            *_unused_scenario_parameters(generator, request.scenario, output),
+        ]
         config = GenerationConfig(
             generator_id=generator.generator_id,
             generator_version=generator.generator_version,
@@ -191,11 +195,11 @@ def _validated_parameters(
 
 
 def _unused_scenario_parameters(
-    generator: SyntheticDataGenerator, scenario: ScenarioSpec | None
+    generator: SyntheticDataGenerator, scenario: ScenarioSpec | None, output: GeneratedData
 ) -> list[str]:
     if scenario is None:
         return []
-    unused = sorted(set(scenario.parameters) - generator.scenario_parameters)
+    unused = sorted(set(scenario.parameters) - output.applied_scenario_parameters)
     if not unused:
         return []
     return [
