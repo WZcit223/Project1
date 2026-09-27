@@ -22,7 +22,7 @@ Branch name suggestion in brackets.
 | M6 Simulation engine | 6 | G6 Simulation engine executes | M2 | ✅ approved 2026-09-27 |
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ✅ approved 2026-09-27 |
 | M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ✅ approved 2026-09-27 |
-| M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ⬜ |
+| M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | 🟡 awaiting owner review |
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ⬜ |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ⬜ |
@@ -152,9 +152,9 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 ### TASK-INV-002 — Metrics  [`phase8`] ✅
 - All metrics in [data-model.md §6](data-model.md#6-metrics-definitions); tests recompute from ledger.
 
-### TASK-STR-001 — Strategy protocol + Reorder Point  [`phase9`] (protocol delivered early in `phase8`)
-### TASK-STR-002 — Safety Stock strategy
-### TASK-STR-003 — Dynamic replenishment strategy
+### TASK-STR-001 — Strategy protocol + Reorder Point  [`phase9`] ✅ (protocol delivered early in `phase8`)
+### TASK-STR-002 — Safety Stock strategy  [`phase9`] ✅
+### TASK-STR-003 — Dynamic replenishment strategy  [`phase9`] ✅
 - Acceptance: three strategies compared on identical demand via `engine.compare`.  **Gate 8.**
 
 ## Phase 10 — Scenario engine
