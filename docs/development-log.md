@@ -5,6 +5,21 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Gate 9 / M11 approved
+
+### Branch
+`phase11` (CI green on `4aa94b1`)
+
+### Changes
+- Owner approved Gate 9 (Golden Path works) and the Phase 11 decisions (simplified ScenarioPack
+  interface, generic RunRequest with pack options, configured reference ids at the API, explicit
+  override recording, reference-demand replay not implemented). M11 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 12 (Application API) on branch `phase12` created from `phase11`.
+
+---
+
 ## 2026-09-28 — Phase 11: Golden Path (TASK-GP-001, TASK-GP-002)
 
 ### Branch
