@@ -40,9 +40,10 @@ registry.validate_parameters(spec)       # effective parameters: the spec's valu
 
 Warehouse 场景文件位于
 `scenarios/warehouse/src/industrial_ai_warehouse/scenarios/definitions/*.yaml`；由 `builtin_scenarios()`
-加载。用户自定义场景（场景构建器，Scenario Builder，存储在 SQLite 中并标记 `source: user`）
-**尚未实现**（Phase 12–13）。规格一旦被某次运行使用即不可变；编辑会创建新
-版本。
+加载。用户自定义场景通过 `POST /api/scenarios` 创建（Phase 12）：按场景包的参数模型校验，存储在 SQLite
+中并标记 `source: user`，在列表和运行中与场景包的场景合并。规格不可变：已存在的 `(scenario_id, version)`
+——无论属于场景包还是用户——都不能被替换（409）；修改需要新版本。场景构建器（Scenario Builder）UI 在
+Phase 13 提供。
 
 ## 3. 仓储场景参数
 
