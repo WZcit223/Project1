@@ -30,6 +30,7 @@ Warehouse is a *scenario plugin*, not the framework itself.
 | Scenario spec | [docs/scenario-spec.md](docs/scenario-spec.md) | [docs/zh/scenario-spec.md](docs/zh/scenario-spec.md) |
 | UI spec | [docs/ui-spec.md](docs/ui-spec.md) | [docs/zh/ui-spec.md](docs/zh/ui-spec.md) |
 | Validation | [docs/validation.md](docs/validation.md) | [docs/zh/validation.md](docs/zh/validation.md) |
+| Validation report (generated) | [docs/validation-report.md](docs/validation-report.md) | — |
 | Task backlog | [docs/task-backlog.md](docs/task-backlog.md) | [docs/zh/task-backlog.md](docs/zh/task-backlog.md) |
 | Future roadmap | [docs/future-roadmap.md](docs/future-roadmap.md) | [docs/zh/future-roadmap.md](docs/zh/future-roadmap.md) |
 | Development log | [docs/development-log.md](docs/development-log.md) | — |
@@ -49,6 +50,7 @@ uv run ruff format --check . # formatting
 uv run mypy                  # type check
 uv run python -m industrial_ai.api   # start the Application API (http://127.0.0.1:8000/health, docs at /api/docs)
 uv run python scripts/serve.py       # demo: API + UI in one process, open http://127.0.0.1:8000/ui/
+uv run python scripts/validation_report.py   # regenerate docs/validation-report.md (V1–V3; V4 not performed)
 ```
 
 The demo UI (`ui/`, package `industrial_ai_ui`) uses only the Application API; runs select reference data by
