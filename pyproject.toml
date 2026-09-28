@@ -51,7 +51,7 @@ mypy_path = ["src", "scenarios/warehouse/src", "ui/src"]
 testpaths = ["tests"]
 addopts = "-ra"
 markers = [
-    "m5_local: needs the owner's real M5 subset in data/raw/m5_subset (skipped otherwise)",
+    "m5_local: uses the committed real M5 reference subset in data/reference/m5_subset (skipped if absent)",
 ]
 
 [dependency-groups]
