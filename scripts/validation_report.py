@@ -365,8 +365,10 @@ def render(suites: list[SuiteResult], ref: ReferenceResult, gp: GoldenPathResult
         "(known gap: runs of zero-sales days in the reference data are not reproduced);",
         "- that any replenishment strategy is economically or operationally better in reality — "
         "strategy results compare strategies under identical simulated conditions only;",
-        "- that M5 sales equal demand: sales are censored by stockouts; M5 serves as a reference "
-        "demand/sales environment, not as true demand and not as warehouse operational data.",
+        "- that M5 sales equal demand: M5 records observed sales and has no inventory data; zero "
+        "observed sales may reflect true zero demand, stockouts or other demand censoring, which "
+        "the reference cannot distinguish. M5 serves as a reference demand/sales environment, not "
+        "as true demand and not as warehouse operational data.",
         "",
         "Needed for V4: real SKU-level demand with stockout flags, inventory snapshots, "
         "purchase-order history with actual lead times, cost data, and a backtest or pilot against "
@@ -421,14 +423,17 @@ def render_reference(ref: ReferenceResult, gp: GoldenPathResult) -> list[str]:
         + " |",
         f"| Correlation of per-item mean units | — | {fmt(ref.item_mean_correlation)} |",
         "",
-        f"Reading: synthetic mean demand is {level_gap:+.0%} versus the reference mean, "
-        "consistent with the reference containing runs of zero sales "
-        f"({fmt(r.zero_share, 'pct')} of series-days; often stockouts) that the generator does "
-        f"not model ({fmt(s.zero_share, 'pct')}); on selling days the means are close "
-        f"({fmt(r.mean_per_selling_day)} vs. {fmt(s.mean_per_selling_day)}). Per-item levels are "
-        "strongly correlated and the weekday pattern is reproduced. The synthetic horizon (after "
-        "the reference data) and the reference year also cover different seasons. Zero-run "
-        "modelling is on the roadmap (P1).",
+        f"Reading: synthetic mean demand is {level_gap:+.0%} versus the reference mean. The "
+        f"reference has {fmt(r.zero_share, 'pct')} zero-sales series-days, the synthetic data "
+        f"{fmt(s.zero_share, 'pct')}; on days with sales the means are close "
+        f"({fmt(r.mean_per_selling_day)} vs. {fmt(s.mean_per_selling_day)}), so the gap comes "
+        "mostly from zero observed sales that the generator does not reproduce. Zero observed "
+        "sales in the M5 reference may reflect true zero demand, stockouts or other forms of "
+        "demand censoring; the reference dataset does not provide sufficient inventory "
+        "information to distinguish these causes directly (zero observed sales ≠ confirmed "
+        "stockout). Per-item levels are strongly correlated and the weekday pattern is "
+        "reproduced. The synthetic horizon (after the reference data) and the reference year "
+        "cover different seasons. Zero-run modelling is on the roadmap (P1).",
         "",
         f"**Forecast backtest on reference sales** (weekly origins {ref.forecast_window[0]} … "
         f"{ref.forecast_window[1]}, 28-day horizon, history strictly before each origin):",
