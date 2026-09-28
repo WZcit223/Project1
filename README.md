@@ -63,19 +63,22 @@ id (`IAI_REFERENCE_DIRS`, default `m5_subset` → `data/reference/m5_subset/`).
 
 ## Data
 
-Raw external data (M5) is **never committed**. Source:
-<https://www.kaggle.com/competitions/m5-forecasting-accuracy/data> (Kaggle competition rules apply).
-Tests use a small synthetic, M5-shaped fixture (`tests/fixtures/m5_like/`) instead.
+M5 (<https://www.kaggle.com/competitions/m5-forecasting-accuracy/data>, Kaggle competition rules
+apply) is store-level retail **sales** — observed sales, not demand, and not warehouse operational
+data. It serves as the reference demand/sales environment; all operational data (inventory, suppliers,
+lead times, costs, purchase orders) is synthetic.
 
-To use real M5 data, download the Kaggle files and extract a small subset locally:
+- **Committed:** only the small owner-approved subset (CA_1 / FOODS_3 / top 50) in
+  `data/reference/m5_subset/` (see its README; do not redistribute). Any other raw M5 data stays local
+  in git-ignored `data/raw/` and is never committed.
+- **Tests:** V1/V2 tests use a small synthetic, M5-shaped fixture (`tests/fixtures/m5_like/`); V3
+  reference-data tests (`uv run pytest -m m5_local`) use the committed subset.
+
+To extract a different subset from the full Kaggle files (written to git-ignored `data/raw/m5_subset/`):
 
 ```bash
 uv run python scripts/make_m5_subset.py --input <folder with the Kaggle CSVs> --download-date YYYY-MM-DD
-uv run pytest -m m5_local      # converts and validates data/reference/m5_subset/
 ```
-
-A small real subset (CA_1 / FOODS_3 / top 50) is committed in `data/reference/m5_subset/` by
-owner decision (see its README; Kaggle rules apply, do not redistribute).
 
 Without a checkout of this repository, use the standalone copy (needs only Python ≥ 3.10 and pandas):
 `python3 scripts/m5_subset_standalone.py --input <Kaggle folder> --output m5_subset --download-date YYYY-MM-DD`.

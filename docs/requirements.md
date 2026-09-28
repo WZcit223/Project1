@@ -137,5 +137,5 @@ results → change a what-if parameter and re-run.
 | A2 | Unmet demand is **lost sales** (not back-ordered), matching retail behaviour. |
 | A3 | Demo subset: one store × one category × top-N items (default CA_1 × FOODS_3, N = 50); configurable. |
 | A4 | Metrics as defined in [data-model.md §6](data-model.md#6-metrics-definitions). |
-| A5 | Raw M5 data is never committed; the user extracts a subset locally with a provided script. Tests use a synthetic M5-shaped fixture. |
+| A5 | Raw M5 data is not committed, except the small owner-approved subset in `data/reference/m5_subset/` (2026-09-27, CLAUDE.md §13); other subsets are extracted locally with a provided script. V1/V2 tests use a synthetic M5-shaped fixture; V3 reference-data tests use the committed subset. |
 | A6 | English documentation is authoritative (v1); a Chinese mirror is maintained in `docs/zh/` (v2). |
