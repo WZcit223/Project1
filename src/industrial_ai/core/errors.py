@@ -91,3 +91,11 @@ class RunRequestError(ApplicationError, ValueError):
 
 class RunNotFoundError(ApplicationError, LookupError):
     """No stored run with the given id."""
+
+
+class RunFailedError(ApplicationError):
+    """A run's pipeline raised; the run is stored as ``failed`` and the cause is chained."""
+
+    def __init__(self, run_id: str, message: str) -> None:
+        super().__init__(f"run {run_id} failed: {message}")
+        self.run_id = run_id

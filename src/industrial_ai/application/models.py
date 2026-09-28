@@ -23,6 +23,9 @@ class RunRequest(BaseModel):
     """Per-run parameter changes, validated against the pack's scenario parameter model."""
     seed: int
     horizon_days: int = Field(ge=1)
+    reference: str | None = None
+    """Location of the pack's reference data (e.g. an M5-format directory). The HTTP API never
+    accepts it from clients: it resolves a configured reference id to this value."""
     options: dict[str, JsonValue] = Field(default_factory=dict)
     """Pack-specific options (e.g. reference data, forecast model, strategies)."""
 

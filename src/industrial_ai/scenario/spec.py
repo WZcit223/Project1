@@ -6,6 +6,8 @@ is registered (:mod:`industrial_ai.scenario.registry`); files are read by
 :mod:`industrial_ai.scenario.loading`.
 """
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator
 
 from industrial_ai.core.versioning import parse_version
@@ -21,6 +23,8 @@ class ScenarioSpec(BaseModel):
     description: str = ""
     parameters: dict[str, JsonValue] = Field(default_factory=dict)
     tags: tuple[str, ...] = ()
+    source: Literal["pack", "user"] = "pack"
+    """``pack`` = shipped with the scenario pack; ``user`` = created through the API."""
 
     @field_validator("version")
     @classmethod

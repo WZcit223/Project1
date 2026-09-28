@@ -22,7 +22,13 @@ from industrial_ai.application.models import (
 )
 from industrial_ai.application.pack import PackRegistry, PackRunOutput, ScenarioPack
 from industrial_ai.application.store import RunStore
-from industrial_ai.core.errors import PluginNotFoundError, RunRequestError, ScenarioValidationError
+from industrial_ai.core.errors import (
+    PluginNotFoundError,
+    RunFailedError,
+    RunRequestError,
+    ScenarioValidationError,
+)
+from industrial_ai.scenario import ScenarioRegistry
 from industrial_ai.simulation import SimulationResult
 
 logger = logging.getLogger(__name__)
@@ -39,10 +45,14 @@ class WorkflowRunner:
         packs: PackRegistry,
         store: RunStore,
         run_id_factory: Callable[[], str] = new_run_id,
+        scenarios: Callable[[ScenarioPack], ScenarioRegistry] | None = None,
     ) -> None:
+        """``scenarios`` returns the scenarios a run may use for a pack; default: the pack's own
+        (the application service adds user-defined scenarios)."""
         self._packs = packs
         self._store = store
         self._new_run_id = run_id_factory
+        self._scenarios = scenarios or (lambda pack: pack.scenarios())
 
     @property
     def packs(self) -> PackRegistry:
@@ -60,14 +70,17 @@ class WorkflowRunner:
         """
         try:
             pack = self._packs.get(request.pack)
-            spec = pack.scenarios().get(request.scenario_id, request.scenario_version)
+            scenarios = self._scenarios(pack)
+            spec = scenarios.get(request.scenario_id, request.scenario_version)
         except PluginNotFoundError as exc:
             raise RunRequestError(str(exc)) from exc
+        if pack.requires_reference and request.reference is None:
+            raise RunRequestError(f"pack {pack.pack_id!r} needs reference data (request.reference)")
         effective = spec.model_copy(
             update={"parameters": {**spec.parameters, **request.scenario_overrides}}
         )
         try:
-            pack.scenarios().validate_parameters(effective)
+            scenarios.validate_parameters(effective)
             options = pack.run_options_model.model_validate(request.options)
         except (ScenarioValidationError, ValidationError) as exc:
             raise RunRequestError(f"invalid run request: {exc}") from exc
@@ -77,7 +90,12 @@ class WorkflowRunner:
         return pack, resolved
 
     def run(self, request: RunRequest) -> RunRecord:
-        """Execute and persist one run; returns the stored record."""
+        """Execute and persist one run; returns the stored record.
+
+        Raises:
+            RunRequestError: the request is invalid (nothing is stored).
+            RunFailedError: the pipeline raised; a ``failed`` record is stored, cause chained.
+        """
         pack, resolved = self.resolve(request)
         started = datetime.now(UTC)
         logger.info("run_id=%s pack=%s scenario=%s start", resolved.run_id, pack.pack_id,
@@ -87,7 +105,7 @@ class WorkflowRunner:
         except Exception as exc:
             self._store.save(self._record(pack, resolved, started, RunStatus.FAILED, error=exc))
             logger.error("run_id=%s failed: %s", resolved.run_id, exc)
-            raise
+            raise RunFailedError(resolved.run_id, f"{type(exc).__name__}: {exc}") from exc
         record = self._record(pack, resolved, started, RunStatus.SUCCEEDED, output=output)
         self._store.save(record)
         logger.info("run_id=%s succeeded", resolved.run_id)

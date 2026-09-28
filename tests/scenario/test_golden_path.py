@@ -9,7 +9,6 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-from pydantic import JsonValue
 
 from industrial_ai.application import (
     RunRecord,
@@ -19,7 +18,7 @@ from industrial_ai.application import (
     WorkflowRunner,
     discover_packs,
 )
-from industrial_ai.core.errors import RunNotFoundError, RunRequestError
+from industrial_ai.core.errors import RunFailedError, RunNotFoundError, RunRequestError
 from industrial_ai.foundation.catalog import DatasetCatalog
 from industrial_ai_warehouse.scenarios import BUILTIN_SCENARIO_IDS
 
@@ -29,13 +28,12 @@ SEED = 20260927
 
 
 def request(scenario: str, **changes: object) -> RunRequest:
-    options: dict[str, JsonValue] = {"reference_dir": str(FIXTURE)}
     fields: dict[str, object] = {
         "pack": "warehouse",
         "scenario_id": scenario,
         "seed": SEED,
         "horizon_days": 84,
-        "options": options,
+        "reference": str(FIXTURE),
     }
     fields.update(changes)
     return RunRequest.model_validate(fields)
@@ -137,9 +135,10 @@ def test_scenario_overrides_are_applied_and_recorded(
         {"scenario_id": "unknown"},
         {"scenario_overrides": {"demand_multiplier": 99}},
         {"scenario_overrides": {"demand_multiplyer": 1.2}},
-        {"options": {"reference_dir": str(FIXTURE), "strategies": ["magic"]}},
-        {"options": {"reference_dir": str(FIXTURE), "forecast_model": "prophet"}},
-        {"options": {}},
+        {"options": {"strategies": ["magic"]}},
+        {"options": {"forecast_model": "prophet"}},
+        {"options": {"reference_dir": "/tmp"}},
+        {"reference": None},
     ],
 )
 def test_invalid_requests_are_rejected_before_running(
@@ -154,9 +153,10 @@ def test_invalid_requests_are_rejected_before_running(
 def test_failing_pipeline_is_recorded_as_failed_and_raises(
     runner: WorkflowRunner, tmp_path: Path
 ) -> None:
-    with pytest.raises(Exception, match="missing|not found|No such"):
-        runner.run(request("baseline", options={"reference_dir": str(tmp_path / "missing")}))
+    with pytest.raises(RunFailedError) as caught:
+        runner.run(request("baseline", reference=str(tmp_path / "missing")))
     failed = runner.store.list()[0]
+    assert failed.run_id == caught.value.run_id
     assert failed.status is RunStatus.FAILED
     assert failed.error and not failed.variant_metrics and not failed.outputs
     with pytest.raises(RunNotFoundError):

@@ -8,6 +8,7 @@ import pytest
 from pydantic import BaseModel, ConfigDict, Field, JsonValue
 
 from industrial_ai.application import (
+    ComponentInfo,
     PackRunOutput,
     ResolvedRun,
     RunRequest,
@@ -22,6 +23,7 @@ from industrial_ai.application import pack as pack_module
 from industrial_ai.core.errors import (
     DatasetAlreadyRegisteredError,
     RegistryError,
+    RunFailedError,
     RunRequestError,
 )
 from industrial_ai.foundation.catalog import DatasetCatalog
@@ -50,6 +52,18 @@ class DummyPack:
     title = "Dummy"
     description = "Framework test pack."
     run_options_model: type[BaseModel] = Options
+    requires_reference = False
+
+    def components(self) -> list[ComponentInfo]:
+        return [
+            ComponentInfo(
+                kind="simulation",
+                component_id="stock_sim",
+                version="1.0.0",
+                description="Dummy",
+                parameter_schema={},
+            )
+        ]
 
     def scenarios(self) -> ScenarioRegistry:
         registry = ScenarioRegistry("dummy", Params)
@@ -173,9 +187,11 @@ def test_invalid_requests_raise_and_store_nothing(tmp_path: Path, bad: dict[str,
 
 def test_failed_pipeline_is_stored_as_failed(tmp_path: Path) -> None:
     runner = make_runner(tmp_path)
-    with pytest.raises(RuntimeError, match="exploded"):
+    with pytest.raises(RunFailedError, match="exploded") as caught:
         runner.run(request(options={"fail": True}))
+    assert isinstance(caught.value.__cause__, RuntimeError)
     (record,) = runner.store.list()
+    assert caught.value.run_id == record.run_id
     assert record.status is RunStatus.FAILED
     assert record.error == "RuntimeError: pipeline exploded"
     assert record.variant_metrics == {} and record.outputs == {}

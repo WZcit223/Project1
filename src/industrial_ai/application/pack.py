@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from importlib.metadata import entry_points
 from typing import Protocol, runtime_checkable
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, JsonValue
 
 from industrial_ai.application.models import ResolvedRun
 from industrial_ai.core.errors import RegistryError
@@ -34,6 +34,18 @@ class PackRunOutput:
     labels: tuple[str, ...] = ()
 
 
+class ComponentInfo(BaseModel):
+    """A pluggable component a pack offers (strategy, forecast model, simulation model, …)."""
+
+    model_config = ConfigDict(frozen=True)
+
+    kind: str
+    component_id: str
+    version: str
+    description: str
+    parameter_schema: dict[str, JsonValue]
+
+
 @runtime_checkable
 class ScenarioPack(Protocol):
     pack_id: str
@@ -42,9 +54,15 @@ class ScenarioPack(Protocol):
     description: str
     run_options_model: type[BaseModel]
     """Validates ``RunRequest.options``."""
+    requires_reference: bool
+    """Whether ``RunRequest.reference`` (reference data location) is required."""
 
     def scenarios(self) -> ScenarioRegistry:
         """The pack's registered scenarios (validated against its parameter model)."""
+        ...
+
+    def components(self) -> list[ComponentInfo]:
+        """Selectable components (e.g. kinds ``strategy``, ``forecast``, ``simulation``)."""
         ...
 
     def run(self, resolved: ResolvedRun) -> PackRunOutput:

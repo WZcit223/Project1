@@ -14,15 +14,21 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, JsonValue, field_validator
 
-from industrial_ai.application import PackRunOutput, ResolvedRun
+from industrial_ai.application import ComponentInfo, PackRunOutput, ResolvedRun, ScenarioPack
 from industrial_ai.foundation.datasets import DatasetBundle
 from industrial_ai.scenario import ScenarioRegistry
-from industrial_ai.simulation import RunContext, SimulationEngine, new_simulation_registry
+from industrial_ai.simulation import (
+    RunContext,
+    SimulationEngine,
+    SimulationRegistry,
+    new_simulation_registry,
+)
 from industrial_ai.simulation.forecasting import (
     LightGBMForecast,
     MovingAverageForecast,
     SeasonalNaiveForecast,
 )
+from industrial_ai.simulation.registry import describe
 from industrial_ai_warehouse import __version__
 from industrial_ai_warehouse.adapters.m5 import M5Adapter
 from industrial_ai_warehouse.generators import (
@@ -45,8 +51,6 @@ class WarehouseRunOptions(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    reference_dir: str
-    """Directory with M5-format files (calendar, sales, prices, SOURCE.json)."""
     forecast_model: ForecastModel = "seasonal_naive"
     strategies: tuple[str, ...] = STRATEGY_IDS
     warm_up_days: int = Field(default=56, ge=14)
@@ -74,22 +78,45 @@ class WarehousePack:
         "forecast plugins and replenishment strategies compared under scenarios."
     )
     run_options_model: type[BaseModel] = WarehouseRunOptions
+    requires_reference = True
+    """``RunRequest.reference``: directory with M5-format files (calendar, sales, prices,
+    SOURCE.json)."""
 
     def scenarios(self) -> ScenarioRegistry:
         return builtin_scenarios()
 
+    def components(self) -> list[ComponentInfo]:
+        models = [
+            ComponentInfo(
+                kind=info.kind.value,
+                component_id=info.plugin_id,
+                version=info.plugin_version,
+                description=info.description,
+                parameter_schema=info.parameter_schema,
+            )
+            for info in map(describe, simulation_registry().list())
+        ]
+        strategies = [
+            ComponentInfo(
+                kind="strategy",
+                component_id=s.strategy_id,
+                version=s.strategy_version,
+                description=s.description,
+                parameter_schema=s.parameter_model.model_json_schema(),
+            )
+            for s in builtin_strategies().list()
+        ]
+        return models + strategies
+
     def engine(self) -> SimulationEngine:
-        registry = new_simulation_registry()
-        for plugin in (SeasonalNaiveForecast(), MovingAverageForecast(), LightGBMForecast()):
-            registry.register(plugin)
-        registry.register(InventorySimulationPlugin(builtin_strategies()))
-        return SimulationEngine(registry)
+        return SimulationEngine(simulation_registry())
 
     def run(self, resolved: ResolvedRun) -> PackRunOutput:
         options = resolved.options
         assert isinstance(options, WarehouseRunOptions)
         request, scenario, seed = resolved.request, resolved.scenario, resolved.request.seed
-        retail = M5Adapter().load(Path(options.reference_dir))
+        assert request.reference is not None  # requires_reference: checked by the runner
+        retail = M5Adapter().load(Path(request.reference))
         start = retail.table("sales").data["date"].max().date() + timedelta(days=1)
         end = start + timedelta(days=request.horizon_days - 1)
         operations = generate_operations(retail, seed)
@@ -144,5 +171,14 @@ class WarehousePack:
         )
 
 
-pack = WarehousePack()
+def simulation_registry() -> SimulationRegistry:
+    """Forecast plugins (framework) and the inventory simulation with the built-in strategies."""
+    registry = new_simulation_registry()
+    for plugin in (SeasonalNaiveForecast(), MovingAverageForecast(), LightGBMForecast()):
+        registry.register(plugin)
+    registry.register(InventorySimulationPlugin(builtin_strategies()))
+    return registry
+
+
+pack: ScenarioPack = WarehousePack()
 """The instance exposed through the ``industrial_ai.scenario_packs`` entry point."""

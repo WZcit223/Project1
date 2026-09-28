@@ -9,6 +9,7 @@ from industrial_ai.application.models import (
 )
 from industrial_ai.application.pack import (
     ENTRY_POINT_GROUP,
+    ComponentInfo,
     PackRegistry,
     PackRunOutput,
     ScenarioPack,
@@ -19,6 +20,7 @@ from industrial_ai.application.runner import WorkflowRunner, new_run_id
 from industrial_ai.application.store import RunStore
 
 __all__ = [
+    "ComponentInfo",
     "ENTRY_POINT_GROUP",
     "DatasetLink",
     "PackRegistry",
