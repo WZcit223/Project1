@@ -19,15 +19,19 @@ data. Keep three things apart:
 It is not a warehouse product and has not been shown to improve any real operation; results compare
 strategies under identical, controlled simulated conditions.
 
-> Status: **v0.1.0.dev0 — Phases 0–15 implemented** (framework, warehouse pack, Golden Path, Application
-> API, demo UI, validation report, demo guide); Phase 16 (v0.1.0 release readiness) in progress, see
-> [docs/task-backlog.md](docs/task-backlog.md). What is and is not validated:
-> [docs/validation.md](docs/validation.md), [docs/validation-report.md](docs/validation-report.md).
+> Status: **v0.1.0 release candidate** — all phases implemented (framework, warehouse pack, Golden
+> Path, Application API, demo UI, validation report, demo guide); merge to `main` and tag `v0.1.0`
+> await the project owner's approval. Start with the [technical report](docs/technical-report.md);
+> changes: [CHANGELOG.md](CHANGELOG.md); what is and is not validated:
+> [docs/validation-report.md](docs/validation-report.md).
 
 ## Documentation
 
 | Topic | English (authoritative, v1) | 中文 (v2) |
 |---|---|---|
+| **Technical report** (what this is, what was tested, limitations) | [docs/technical-report.md](docs/technical-report.md) | [docs/zh/technical-report.md](docs/zh/technical-report.md) |
+| Release checklist (v0.1.0) | [docs/release-checklist.md](docs/release-checklist.md) | — |
+| Changelog | [CHANGELOG.md](CHANGELOG.md) | — |
 | Requirements | [docs/requirements.md](docs/requirements.md) | [docs/zh/requirements.md](docs/zh/requirements.md) |
 | Scope & non-goals | [docs/scope.md](docs/scope.md) | [docs/zh/scope.md](docs/zh/scope.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) | [docs/zh/architecture.md](docs/zh/architecture.md) |
