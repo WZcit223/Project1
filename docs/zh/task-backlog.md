@@ -29,7 +29,7 @@
 | M11 Golden Path | 11 | G9 Golden Path 可工作 | M5–M10 | ✅ 已批准 2026-09-28 |
 | M12 Application API | 12 | G10 API 可独立于 UI 工作 | M11 | ✅ 已批准 2026-09-28 |
 | M13 UI | 13 | G11 UI 可执行 Golden Path | M12 | ✅ 已批准 2026-09-28（条件已关闭） |
-| M14 验证 | 14 | G12 验证通过 | M11–M13 | ⬜ |
+| M14 验证 | 14 | G12 验证通过 | M11–M13 | 🟡 待负责人审阅 |
 | M15 演示 | 15 | G13 演示稳定 | M14 | ⬜ |
 | M16 文档与发布 | 16 | G14 v0.1.0 发布候选版 | M14 | ⬜ |
 
@@ -198,7 +198,7 @@
 
 ## Phase 14–16 — 验证、演示、发布
 
-### TASK-VAL-001 — 验证套件与 `docs/validation-report.md`  [`feature/validation`]  **Gate 12**
+### TASK-VAL-001 — 验证套件与 `docs/validation-report.md`  [`phase14`] ✅  **Gate 12**
 ### TASK-DEMO-001 — 演示脚本、种子数据、演示指南（`docs/demo-guide.md`）  **Gate 13**
 ### TASK-DOC-001 — 技术报告、文档更新（EN + ZH）、CHANGELOG、打标签 `v0.1.0`  **Gate 14**
 

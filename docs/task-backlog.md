@@ -27,7 +27,7 @@ Branch name suggestion in brackets.
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ✅ approved 2026-09-28 |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ✅ approved 2026-09-28 |
 | M13 UI | 13 | G11 UI executes Golden Path | M12 | ✅ approved 2026-09-28 (conditions closed) |
-| M14 Validation | 14 | G12 Validation passes | M11–M13 | ⬜ |
+| M14 Validation | 14 | G12 Validation passes | M11–M13 | 🟡 awaiting owner review |
 | M15 Demo | 15 | G13 Demo stable | M14 | ⬜ |
 | M16 Docs & release | 16 | G14 v0.1.0 release candidate | M14 | ⬜ |
 
@@ -201,7 +201,7 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 14–16 — Validation, demo, release
 
-### TASK-VAL-001 — Validation suite & `docs/validation-report.md`  [`feature/validation`]  **Gate 12**
+### TASK-VAL-001 — Validation suite & `docs/validation-report.md`  [`phase14`] ✅  **Gate 12**
 ### TASK-DEMO-001 — Demo script, seed data, demo guide (`docs/demo-guide.md`)  **Gate 13**
 ### TASK-DOC-001 — Technical report, doc refresh (EN + ZH), CHANGELOG, tag `v0.1.0`  **Gate 14**
 
