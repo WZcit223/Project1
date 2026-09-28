@@ -5,6 +5,75 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Phase 13: UI (TASK-UI-001 … 003)
+
+### Branch
+`phase13` — based on `phase12` @ `557198b`
+
+### Objective
+Browser UI for the Operations Manager / Management demo that executes the Golden Path and uses only the
+Application API (Gate 11).
+
+### Changes
+- New workspace package `ui/` → `industrial_ai_ui` (ADR-005): Jinja2 + HTMX pages, `ApiClient` (httpx2)
+  as the only data source, server-side SVG charts, label catalog `messages.py`, vendored htmx 2.0.4
+  (0BSD, SHA-256 recorded). Depends on FastAPI / Jinja2 / httpx2 / uvicorn, not on the framework.
+- Pages: Overview, Data (+ dataset provenance and preview), Synthetic data (JSON request), Scenario
+  builder (form from the parameter schema), Simulation (HTMX progress), Results (KPI table, demand /
+  on-hand / unfulfilled-demand charts, what-if re-run), cross-run comparison (scenarios as columns).
+- `scripts/serve.py`: API + UI in one process (UI at `/ui`, in-process ASGI transport);
+  `python -m industrial_ai_ui` runs the UI alone against an API URL.
+- `RunRequest.reference_id` recorded so the UI can re-run a run without server paths.
+- Tests `tests/ui/test_ui.py`: AST check "UI imports no framework module", all pages render, Golden Path
+  from browser form posts (4 scenarios), HTMX redirect header, what-if, scenario builder (201 / 409 /
+  422), errors and failed runs shown, synthetic generation page.
+- Docs: ADR-005, ui-spec §1 + §6, architecture layout, CLAUDE.md layout line, README (status + demo
+  command), roadmap row (EN + ZH).
+
+### Decisions / assumptions (for review)
+- **UI as a separate package** (ADR-005, *Proposed*): makes "UI imports no framework module"
+  enforceable; changes the `ui/` layout line in CLAUDE.md and architecture.md.
+- **Charts are server-side SVG** instead of a vendored chart library (spec said "one small chart
+  library"): no JavaScript chart code, nothing else to vendor.
+- **Synthetic data page takes a JSON request**; forms rendered from each generator's schema are FUTURE
+  (roadmap). Scenario runs generate their demand themselves, so the demo does not need this page.
+- **Scenario builder** starts from the pack defaults (no Normal / High / Shock / Disruption preset
+  buttons); existing scenarios are listed and selectable on the Simulation page.
+- htmx obtained from the npm registry (the CDN is blocked in this environment); version and checksum
+  recorded.
+
+### Visual check (descriptive)
+Demo server on the committed M5 subset driven by headless Chromium (Playwright): Simulation → run
+(high_demand, LightGBM) → run page with KPI table and three charts; baseline run; comparison of both
+runs; Overview. Pages render as intended; values equal the API results (e.g. baseline fill rate 0.847 /
+0.878 / 0.936 for reorder point / safety stock / dynamic).
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 368 passed.
+
+### Commits
+- 5045b7b feat(application): record the reference id a run was started with
+- b5dae08 build(ui): add the UI workspace package with vendored htmx
+- bb6f55e feat(ui): add dashboard pages over the Application API
+- 0e927ff feat(scripts): add a single-process demo server for API and UI
+- eb8ec9b test(ui): run the Golden Path from the browser UI (Gate 11)
+- 7136a19 docs(adr): add ADR-005 for the UI as a separate API-only package
+- 61e4fb9 docs(spec): document the implemented UI and the ui/ package layout
+- 8377459 fix(ui): label the overview tile percentage as stockout-day rate
+- c377050 docs(zh): mirror UI spec and layout updates
+- e75cbbc docs(plan): mark TASK-UI-001..003 done, M13 awaiting review
+- docs(log): record Phase 13 UI round (this entry)
+
+### Known issues
+- Chart legends can overlap the lines on narrow charts (cosmetic).
+- Each page makes several sequential API calls (fine for a single-user demo).
+- English UI only (catalog ready for a Chinese version).
+
+### Next
+Gate 11 / M13 review → Phase 14 (validation report) on branch `phase14` from `phase13`.
+
+---
+
 ## 2026-09-28 — Gate 10 / M12 approved
 
 ### Branch
