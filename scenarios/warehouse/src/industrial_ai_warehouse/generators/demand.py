@@ -42,14 +42,19 @@ def generate_synthetic_demand(
     scenario: ScenarioSpec | None = None,
     engine: SyntheticEngine | None = None,
     created_at: datetime | None = None,
+    dataset_id: str | None = None,
 ) -> SyntheticDataset:
-    """Calibrate on ``retail.sales``; generate daily demand for the horizon under ``scenario``."""
+    """Calibrate on ``retail.sales``; generate daily demand for the horizon under ``scenario``.
+
+    ``dataset_id`` defaults to ``<bundle>.demand.<scenario>.s<seed>``; pass a run-scoped id when the
+    same scenario id may carry different parameters (e.g. per-run overrides).
+    """
     engine = engine or SyntheticEngine(builtin_registry())
     scenario_id = scenario.scenario_id if scenario else "none"
     return engine.generate(
         GenerationRequest(
             generator_id="time_series",
-            dataset_id=f"{retail.bundle_id}.demand.{scenario_id}.s{seed}",
+            dataset_id=dataset_id or f"{retail.bundle_id}.demand.{scenario_id}.s{seed}",
             output_schema=SYNTHETIC_DEMAND,
             scenario=scenario,
             # Same random stream for every scenario (common random numbers): differences between

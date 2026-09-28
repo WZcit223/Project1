@@ -11,3 +11,6 @@ industrial-ai = { workspace = true }
 [build-system]
 requires = ["uv_build>=0.8.17,<0.9.0"]
 build-backend = "uv_build"
+
+[project.entry-points."industrial_ai.scenario_packs"]
+warehouse = "industrial_ai_warehouse.pack:pack"
