@@ -10,7 +10,7 @@
     <div class="tile">
       <h3>{{ messages.STRATEGY_LABELS.get(v, v) }}</h3>
       <p><span class="big">{{ metrics['fill_rate'] | metric('fill_rate') }}</span> fill rate</p>
-      <p>{{ metrics['stockout_day_rate'] | metric('stockout_day_rate') }} stockout days · {{ metrics['total_cost'] | metric('total_cost') }} total cost</p>
+      <p>{{ metrics['stockout_day_rate'] | metric('stockout_day_rate') }} stockout-day rate · {{ metrics['total_cost'] | metric('total_cost') }} total cost</p>
       <p class="muted">on-hand value {{ metrics['avg_on_hand_value'] | metric('avg_on_hand_value') }} · turnover {{ metrics['inventory_turnover'] | metric('inventory_turnover') }}</p>
     </div>
     {% endfor %}
