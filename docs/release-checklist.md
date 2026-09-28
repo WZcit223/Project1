@@ -17,7 +17,7 @@ action needed · ⏳ pending.
 | Clean working tree | ✅ | `git status` empty after each commit; fresh clone stays clean after demo and browser runs |
 | Tests green | ✅ | `uv run pytest`: 379 passed |
 | Type check / lint / format green | ✅ | `mypy` (164 files), `ruff check`, `ruff format --check` clean |
-| CI green | ⏳ | GitHub Actions on the final `phase16` commit — recorded in the development log when it reports |
+| CI green | ✅ | GitHub Actions run 59 green on `9a994ae` (Phase 16 content complete; later commits only record this result) |
 | Fresh clone works; `uv sync` works | ✅ | Clone of `origin/phase16` at `ae8b89d`: `uv sync` OK, packages report version 0.1.0 |
 | Demo works | ✅ | `scripts/demo.py` in the fresh clone: exit 0; output identical to the pre-release run |
 | Browser Golden Path works | ✅ | `scripts/serve.py` in the fresh clone, scripted browser walk (default form → results → high_demand → compare → what-if → data → synthetic): 0 JS errors, no failed requests; `/health` reports 0.1.0 |

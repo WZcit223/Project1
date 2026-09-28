@@ -36,8 +36,8 @@ validation-report,development-log}.md`, `docs/zh/` mirrors, `CHANGELOG.md`, `REA
 `pyproject.toml` × 3, `__init__.py` × 3, `uv.lock`.
 
 ### Tests
-ruff format / check, mypy clean; pytest 379 passed; link check 0 broken. CI on the final commit is
-recorded when it reports.
+ruff format / check, mypy clean; pytest 379 passed; link check 0 broken. CI: run 59 green on
+`9a994ae` (run 58 on `ae8b89d` was cancelled, superseded by the next push).
 
 ### Commit
 `988ba94` docs(spec), `59bf7cd` build (0.1.0), `47221e4` CHANGELOG, `fea1458` validation report,
