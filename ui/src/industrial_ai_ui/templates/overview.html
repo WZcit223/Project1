@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<h1>Overview</h1>
+{% if view %}
+  {% set results = view.results %}
+  <p class="muted">Latest run <a href="{{ url_for('run', run_id=view.results.run_id) }}"><code>{{ view.results.run_id }}</code></a></p>
+  <div class="tiles">
+    {% for v, metrics in view.results.variants.items() %}
+    <div class="tile">
+      <h3>{{ messages.STRATEGY_LABELS.get(v, v) }}</h3>
+      <p><span class="big">{{ metrics['fill_rate'] | metric('fill_rate') }}</span> fill rate</p>
+      <p>{{ metrics['stockout_day_rate'] | metric('stockout_day_rate') }} stockout days · {{ metrics['total_cost'] | metric('total_cost') }} total cost</p>
+      <p class="muted">on-hand value {{ metrics['avg_on_hand_value'] | metric('avg_on_hand_value') }} · turnover {{ metrics['inventory_turnover'] | metric('inventory_turnover') }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% include "partials/run_summary.html" with context %}
+{% else %}
+  <p>No runs yet. Start one on the <a href="{{ url_for('simulate') }}">Simulation</a> page.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Run {{ view.results.run_id }}{% endblock %}
+{% block content %}
+<h1>Run <code>{{ view.results.run_id }}</code> <span class="status-{{ view.results.status }}">{{ view.results.status }}</span></h1>
+{% set results = view.results %}
+{% include "partials/run_summary.html" with context %}
+<h2>What-if</h2>
+<p class="muted">Re-run the same request (same seed and demand stream) with one scenario parameter changed.</p>
+<form method="post" action="{{ url_for('what_if', run_id=view.results.run_id) }}" hx-post="{{ url_for('what_if', run_id=view.results.run_id) }}" hx-indicator="#rerun" class="grid">
+  <label>Parameter <select name="parameter">{% for p in what_if_parameters %}<option {% if p == 'lead_time_delta' %}selected{% endif %}>{{ p }}</option>{% endfor %}</select></label>
+  <label>Value <input type="number" name="value" step="any" value="3" required></label>
+  <button type="submit">Re-run</button>
+  <span id="rerun" class="htmx-indicator">Running…</span>
+</form>
+<details><summary>Details (datasets and provenance)</summary>
+  <ul>{% for name, link in view.record.outputs.items() %}<li>{{ name }}: <a href="{{ url_for('dataset', dataset_id=link.dataset_id) }}"><code>{{ link.dataset_id }}</code></a></li>{% endfor %}
+  {% for name, link in view.record.inputs.items() %}<li>input {{ name }}: <a href="{{ url_for('dataset', dataset_id=link.dataset_id) }}"><code>{{ link.dataset_id }}</code></a></li>{% endfor %}</ul>
+</details>
+{% endblock %}

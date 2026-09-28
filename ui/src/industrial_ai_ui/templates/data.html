@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Data{% endblock %}
+{% block content %}
+<h1>Data</h1>
+<p>
+  Filter:
+  <a href="{{ url_for('data') }}">all</a> ·
+  {% for t in ['reference', 'fixture', 'synthetic', 'derived'] %}<a href="{{ url_for('data') }}?source_type={{ t }}">{{ t }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+</p>
+<table>
+  <thead><tr><th>Dataset</th><th>Version</th><th>Type</th><th>Schema</th><th class="num">Rows</th><th>Created</th></tr></thead>
+  <tbody>
+  {% for d in datasets %}
+    <tr>
+      <td><a href="{{ url_for('dataset', dataset_id=d.dataset_id) }}">{{ d.dataset_id }}</a></td>
+      <td>{{ d.version }}</td>
+      <td><span class="source source-{{ d.source_type }}">{{ d.source_type }}</span></td>
+      <td><code>{{ d.schema_id }}</code></td>
+      <td class="num">{{ '{:,}'.format(d.row_count) }}</td>
+      <td class="muted">{{ d.created_at[:19] }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No datasets{% if source_type %} of type {{ source_type }}{% endif %} yet — datasets appear when runs or generations register them.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

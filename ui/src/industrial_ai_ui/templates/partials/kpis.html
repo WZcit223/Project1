@@ -1,0 +1,16 @@
+{# KPI comparison: strategies (columns) × management KPIs (rows) #}
+<table class="kpis">
+  <thead>
+    <tr><th>KPI</th>{% for v in results.variants %}<th>{{ messages.STRATEGY_LABELS.get(v, v) }}</th>{% endfor %}</tr>
+  </thead>
+  <tbody>
+    {% for metric_id in messages.METRIC_LABELS %}
+      {% if metric_id in results.metric_ids %}
+      <tr>
+        <td>{{ metric_label(metric_id) }}</td>
+        {% for v, metrics in results.variants.items() %}<td class="num">{{ metrics[metric_id] | metric(metric_id) }}</td>{% endfor %}
+      </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
