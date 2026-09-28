@@ -251,7 +251,12 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
                 key=lambda s: strategy_rank(s["component_id"]),
             ),
             "error": error,
-            "values": values or {"horizon_days": 91, "seed": DEFAULT_SEED},
+            "values": values
+            or {
+                "horizon_days": 91,
+                "seed": DEFAULT_SEED,
+                "forecast_model": messages.DEFAULT_FORECAST_MODEL,
+            },
         }
 
     @app.get("/simulate", response_class=HTMLResponse, name="ui_simulate")
@@ -268,7 +273,7 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             "seed": int(first(form, "seed", str(DEFAULT_SEED))),
             "horizon_days": int(first(form, "horizon_days", "91")),
             "options": {
-                "forecast_model": first(form, "forecast_model", "seasonal_naive"),
+                "forecast_model": first(form, "forecast_model", messages.DEFAULT_FORECAST_MODEL),
                 "strategies": form.get("strategies", []),
             },
         }

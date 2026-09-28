@@ -38,6 +38,10 @@ STRATEGY_LABELS: dict[str, str] = {
     "dynamic": "Dynamic",
 }
 
+DEFAULT_FORECAST_MODEL = "seasonal_naive"
+"""Preselected on the Simulation page: the model the demo guide, scripts/demo.py and the validation
+report use, so a first run with the default form reproduces the documented numbers."""
+
 HONESTY_BADGE = "Prototype · Synthetic data"
 HONESTY_NOTE = (
     "Results come from simulated operations on synthetic demand calibrated to reference data. "

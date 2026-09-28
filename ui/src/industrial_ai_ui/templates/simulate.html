@@ -12,7 +12,7 @@
     <select name="scenario_id">{% for s in scenarios %}<option value="{{ s.scenario_id }}" {% if values.scenario_id == s.scenario_id %}selected{% endif %}>{{ s.title }} ({{ s.scenario_id }} {{ s.version }})</option>{% endfor %}</select>
   </label>
   <label>Forecast model
-    <select name="forecast_model">{% for m in models %}<option value="{{ m.component_id }}">{{ m.component_id }}</option>{% endfor %}</select>
+    <select name="forecast_model">{% for m in models %}<option value="{{ m.component_id }}" {% if m.component_id == values.get('forecast_model', messages.DEFAULT_FORECAST_MODEL) %}selected{% endif %}>{{ m.component_id }}</option>{% endfor %}</select>
   </label>
   <fieldset><legend>Strategies</legend>
     {% for s in strategies %}<label class="inline"><input type="checkbox" name="strategies" value="{{ s.component_id }}" checked> {{ messages.STRATEGY_LABELS.get(s.component_id, s.component_id) }}</label>{% endfor %}

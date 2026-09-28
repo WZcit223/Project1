@@ -220,3 +220,12 @@ def test_forms_work_when_submitted_to_their_rendered_action(browser: TestClient)
     ]
     response = post_form(browser, action.group(1).replace("http://testserver", ""), fields)
     assert response.status_code == 201 and "Saved" in response.text
+
+
+def test_default_simulation_form_matches_the_documented_demo(browser: TestClient) -> None:
+    """First-run reproducibility: an untouched form uses the demo's model, horizon and seed."""
+    page = browser.get("/ui/simulate").text
+    selected = re.search(r'<option value="([a-z_]+)"\s+selected>', page)
+    assert selected is not None and selected.group(1) == "seasonal_naive"
+    assert 'name="horizon_days" min="7" max="366" value="91"' in page
+    assert 'name="seed" value="20260927"' in page
