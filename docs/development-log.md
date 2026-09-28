@@ -5,6 +5,58 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Phase 15: Demo, communication, quick start (TASK-DEMO-001)
+
+### Branch
+`phase15` — based on `phase14` @ `75cca60`
+
+### Objective
+Answer: *can another person understand the framework, run the Golden Path, reproduce the result, and
+understand what has and has not been validated?* No new algorithms or product features.
+
+### Changes
+- `docs/demo-guide.md` (+ `docs/zh/demo-guide.md`): quick start; reference vs. synthetic vs. fixture vs.
+  (absent) real operational data, with "zero observed sales ≠ confirmed stockout"; 9-step browser demo;
+  Golden Path walkthrough; demo scenario and expected outputs; V1–V4 reading; reproduction
+  instructions; known limitations.
+- `scripts/demo.py`: scripted Golden Path through the Application API only (in-process or `--api URL`):
+  baseline, `high_demand`, what-if `lead_time_delta` +5 with pinned scenario version.
+- `tests/integration/test_demo.py`: CLI reproducible on the fixture; on the M5 subset the demo reproduces
+  the Golden Path rows of the committed validation report, and the guide's expected-output table must
+  equal the report (prevents hand-copied drift).
+- README: status (Phases 0–14 implemented), pointer to the guide, demo command.
+
+### Decisions / assumptions (for review)
+- "Seed data" for the demo = the committed M5 reference subset + seed 20260927; no extra dataset.
+- Expected outputs are the validation report's numbers (seasonal-naive forecast, 91 days); the guide
+  does not repeat test counts (they change with every test) and points to the report instead.
+- The UI's forecast dropdown lists LightGBM first; the guide tells users to pick `seasonal_naive` to
+  match the expected outputs (no UI change in this phase).
+
+### Checks (descriptive)
+Headless-browser walkthrough of the guide on the M5 subset: all 9 steps work; UI numbers equal the
+guide (baseline fill rate 84.7 / 86.2 / 93.8 %; high_demand total cost $70,030 / $62,865 / $39,865);
+~20 s of runs; no JS errors; no 4xx/5xx in the server log. `scripts/demo.py` on the subset ≈ 20 s.
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 378 passed; links checked.
+
+### Commits
+- 7f9d609 feat(scripts): add the scripted Golden Path demo
+- 3c05b2d docs(demo): add the demo guide (EN + ZH)
+- 7004388 docs(readme): point newcomers to the demo guide and demo script
+- 6a2e9ae docs(plan): mark TASK-DEMO-001 done, M15 awaiting review
+- docs(log): record Phase 15 demo round (this entry)
+
+### Known issues
+- Forecast dropdown default (LightGBM) differs from the demo's seasonal naive (documented; 🟡 P2).
+- Chart-legend overlap (🟡 P2, backlog). CLAUDE.md §11 wording vs. m5_local tests (🟡 P2, owner).
+
+### Next
+Gate 13 / M15 review → Phase 16 (docs refresh, CHANGELOG, v0.1.0) on `phase16` from `phase15`.
+
+---
+
 ## 2026-09-28 — Gate 12 APPROVED
 
 ### Branch
