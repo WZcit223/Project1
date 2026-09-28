@@ -164,8 +164,9 @@ Algorithm sophistication.
 Tests are mandatory: `tests/unit/`, `tests/integration/`, `tests/scenario/`. Reproducibility tests
 (same seed → same output) are required for every generator and simulation. The **Golden Path test**
 (M5-shaped data → canonical dataset → synthetic data → forecast → inventory simulation → strategy →
-scenario → result) is the most important integration test. Tests use a committed, small,
-**synthetic M5-shaped fixture**, never real M5 data.
+scenario → result) is the most important integration test. V1/V2 tests use the committed, small,
+**synthetic M5-shaped fixture**. V3 reference-data tests (`m5_local`) may use only the owner-approved
+subset in `data/reference/m5_subset/`; no other real M5 data is used in tests (see `docs/validation.md`).
 
 ## 12. Honesty rules
 
