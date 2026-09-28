@@ -5,6 +5,26 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Gate 13 APPROVED
+
+### Branch
+`phase15` (CI green on `2fc7e49`, GitHub Actions run 51)
+
+### Changes
+Gate 13 decision under the owner's review criteria (2026-09-28), all met: Phase 15 CI green; quick start,
+`scripts/demo.py` and the browser Golden Path run from a fresh clone; the default UI run, the demo and
+the guide reproduce the committed validation report exactly; reference / synthetic / real data semantics
+consistent (M5 = store-level observed retail sales, not warehouse operations; zero observed sales ≠
+confirmed stockout); V4 not performed; reproducibility information complete (reference id, scenario and
+version, forecast model, seed, commit); no P0/P1 open; development log and backlog updated (M15 ✅).
+P2 backlog: TASK-P2-LEGEND, TASK-P2-GENFORMS.
+
+### Next
+Phase 16 (documentation refresh, CHANGELOG, v0.1.0 release readiness) on `phase16` from `phase15` —
+scope proposed to the owner; no new product features.
+
+---
+
 ## 2026-09-28 — Gate 13 review items (Phase 15 follow-up)
 
 ### Branch
