@@ -58,7 +58,15 @@
 ```
 
 `demand_source`：`synthetic`（基于参考数据校准的时间序列生成器，并应用场景）或
-`reference`（回放参考需求，并以确定性方式应用场景乘数）。
+`reference`（回放参考需求，并以确定性方式应用场景乘数——v0.1 中 **NOT IMPLEMENTED**（未实现）；仅有
+`synthetic`）。
+
+**已实现的内部请求（Phase 11）。** 应用层的 `RunRequest` 是通用的——
+`pack`、`scenario_id`、`scenario_version`、`scenario_overrides`、`seed`、`horizon_days`——外加由场景包校验的
+场景包专属 `options`。对于 `warehouse`：`reference_dir`（M5 格式目录）、
+`forecast_model`（`seasonal_naive` | `moving_average` | `lightgbm`）、`strategies`、`warm_up_days`（56）、
+`forecast_horizon_days`（56）。预测区间从最后一个观测销售日的次日开始。Phase 12 将上述 HTTP 请求映射到该内部请求；
+`reference_dataset_id` 将解析为一个已配置的参考数据目录（客户端从不发送文件路径）。
 
 ## 4. `POST /api/runs` — 响应（节选）
 

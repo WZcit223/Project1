@@ -38,17 +38,36 @@
 场景包是一个独立的 Python 包，对外暴露一个 `ScenarioPack` 对象：
 
 ```python
-class ScenarioPack(Protocol):
+class ScenarioPack(Protocol):                     # industrial_ai.application (implemented, Phase 11)
     pack_id: str                      # "warehouse"
     pack_version: str
     title: str                        # "Inventory Demand Forecasting & Replenishment Simulation"
-    scenario_parameter_model: type[BaseModel]
+    description: str
+    run_options_model: type[BaseModel]  # validates RunRequest.options (pack-specific)
 
-    def register(self, registries: FrameworkRegistries) -> None: ...
-        # registers schemas, adapters, generator configs, simulation plugins, strategies, scenarios, metrics
-    def build_pipeline(self, request: RunRequest) -> Pipeline: ...
-        # declarative list of steps the application workflow runner executes
+    def scenarios(self) -> ScenarioRegistry: ...   # validated against the pack's parameter model
+    def run(self, resolved: ResolvedRun) -> PackRunOutput: ...
+        # executes the pack's pipeline; raises on failure
+
+@dataclass(frozen=True)
+class PackRunOutput:
+    comparison: ComparisonResult                 # compared variants (e.g. strategies)
+    supporting: dict[str, SimulationResult]      # upstream runs (e.g. "forecast")
+    inputs: dict[str, Dataset]                   # datasets generated or loaded by the run
+    labels: tuple[str, ...]                      # maturity labels, e.g. ("prototype", "synthetic-data")
 ```
+
+Gate 0 阶段的草案（`register(registries)` + 声明式的 `build_pipeline`）已被简化：场景包通过公开的引擎 API
+自行执行其流水线，并返回运行器需要持久化的全部内容；框架的 `WorkflowRunner` 负责请求校验（场景包、场景、
+覆盖参数、选项）、运行 id、日志、运行存储（run store）以及失败记录。对于单个场景包而言，无需通用的步骤 / DAG
+语言，因此未予构建（若第二个场景包需要，则列入路线图）。
+
+`WorkflowRunner.run(RunRequest) → RunRecord`：解析场景包（未知时抛出 `RunRequestError`）和场景（最新版本或
+固定版本），并将 `scenario_overrides` 合并到其参数中；以场景包的参数模型校验这些参数，以 `run_options_model`
+校验 `options`；调用 `pack.run`，然后存储一条 `RunRecord`（状态、生效场景、覆盖参数、各变体及辅助运行的总体
+指标、指向每个输入与输出数据集的 `(dataset_id, version, content_hash)` 链接、标签）。数据集存入数据集目录
+（dataset catalog）：内容相同则复用，相同 id 但内容不同则拒绝。流水线异常会被存储为 `failed` 运行并重新抛出——
+绝不报告为成功。
 
 发现机制（discovery）：使用 Python 入口点（entry point）组 **`industrial_ai.scenario_packs`**，在场景包的
 `pyproject.toml` 中声明：
