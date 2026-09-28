@@ -175,8 +175,9 @@ noise_scale = 0 → y_t = round(rate_t)
   entity. Output: time, entity, value columns plus optional `constant_columns` and
   `scenario_id_column` (e.g. `ops.synthetic_demand`).
 - **Known limitation** (observed on the real M5 subset, descriptive only): weekday pattern and scenario
-  ratios are reproduced, but runs of zero-sales days in the real data (likely stockouts) are not, so
-  synthetic data has fewer zero days.
+  ratios are reproduced, but runs of zero observed sales in the reference data are not, so synthetic
+  data has fewer zero days. Zero observed sales may reflect true zero demand, stockouts or other
+  demand censoring; M5 has no inventory data to tell them apart.
 
 Explicitly **not** in v0.1: GAN, VAE, diffusion, agent-based, LLM-generated data.
 

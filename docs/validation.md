@@ -21,8 +21,11 @@ v0.1 keeps four categories strictly apart. Each result is reported under exactly
 committed subset: store CA_1, department FOODS_3, top 50 items) with calendar and prices. In this
 framework it is the **reference demand/sales environment**: synthetic demand is calibrated on it and
 forecasts are backtested on it. Everything operational — warehouses, suppliers, lead times, costs,
-initial inventory, purchase orders — is **synthetic** (the Hybrid Validation Environment). Sales are
-also censored by stockouts, so M5 is a proxy for demand, not true demand.
+initial inventory, purchase orders — is **synthetic** (the Hybrid Validation Environment). M5 records
+**observed sales**, not demand, and has no inventory / on-hand information: zero observed sales may
+reflect true zero demand, stockouts or other forms of demand censoring, and the reference data does
+not allow these causes to be distinguished. **Zero observed sales ≠ confirmed stockout.** M5 is
+therefore a proxy for demand, not true demand.
 
 Earlier drafts used levels 1–4 (Engineering, Synthetic data structural, Scenario, Real-world): Level 1
 and 2 map to V1 (engineering checks that exercise the whole pipeline are reported under V2), Level 3 to
