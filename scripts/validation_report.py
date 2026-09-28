@@ -56,6 +56,10 @@ GOLDEN_PATH_FORECAST = "seasonal_naive"
 """Explicit, and identical to scripts/demo.py and the UI default (docs/demo-guide.md)."""
 WEEKDAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
+V3_MARKERS = "m5_local or scenario_checks"
+"""V3 = every test marked m5_local (committed M5 subset) or scenario_checks (scenario behaviour)."""
+NOT_V3 = f"not ({V3_MARKERS})"
+
 SUITES: dict[str, tuple[str, str, list[str]]] = {
     "V1": (
         "Software / framework correctness",
@@ -63,7 +67,7 @@ SUITES: dict[str, tuple[str, str, list[str]]] = {
         "imports packs, layer dependencies, the UI imports no framework module); synthetic-data "
         "structure (schema, constraints, relationships, reproducibility, provenance); metric "
         "definitions; failure modes.",
-        ["tests/unit", "-m", "not m5_local"],
+        ["tests/unit", "-m", NOT_V3],
     ),
     "V2": (
         "Framework integration / Golden Path",
@@ -76,7 +80,7 @@ SUITES: dict[str, tuple[str, str, list[str]]] = {
             "tests/scenario/test_golden_path.py",
             "tests/ui",
             "-m",
-            "not m5_local",
+            NOT_V3,
         ],
     ),
     "V3": (
@@ -84,7 +88,7 @@ SUITES: dict[str, tuple[str, str, list[str]]] = {
         "Scenario behaviour checks (docs/validation.md §4) on the fixture, and tests on the "
         "committed "
         "M5 reference subset; descriptive reference-data results follow in §3.2.",
-        ["tests/scenario/test_warehouse_scenarios.py", "tests/integration/test_m5_local.py"],
+        ["tests", "-m", V3_MARKERS],
     ),
 }
 
@@ -124,6 +128,23 @@ def run_suite(key: str, workdir: Path) -> SuiteResult:
     return summarise_junit(key, title, scope, "uv run pytest " + " ".join(
         f'"{a}"' if " " in a else a for a in selection
     ), xml_path)  # fmt: skip
+
+
+def partitioned(suites: list[SuiteResult], collected: int) -> bool:
+    return sum(s.tests for s in suites) == collected
+
+
+def collected_tests() -> int:
+    """Number of tests pytest collects for the whole suite (to prove V1-V3 partition it)."""
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider"],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    last = [line for line in result.stdout.splitlines() if "collected" in line][-1]
+    return int(last.split()[0])
 
 
 def summarise_junit(key: str, title: str, scope: str, command: str, path: Path) -> SuiteResult:
@@ -308,7 +329,15 @@ def git(*args: str) -> str:
     return result.stdout.strip()
 
 
-def render(suites: list[SuiteResult], ref: ReferenceResult, gp: GoldenPathResult) -> str:
+def render(
+    suites: list[SuiteResult], collected: int, ref: ReferenceResult, gp: GoldenPathResult
+) -> str:
+    categorised = sum(s.tests for s in suites)
+    coverage_note = (
+        "every test is reported under exactly one category."
+        if partitioned(suites, collected)
+        else "**MISMATCH: some tests are in no category or in several.**"
+    )
     commit = git("rev-parse", "--short", "HEAD")
     dirty = " (plus uncommitted changes)" if git("status", "--porcelain", "-uno") else ""
     lines = [
@@ -344,6 +373,9 @@ def render(suites: list[SuiteResult], ref: ReferenceResult, gp: GoldenPathResult
         f"{'✅ checks pass' if not ref.adapter.failed + ref.hybrid.failed else '❌ FAIL'}; "
         "comparisons descriptive |",
         "| **V4** Real operational validation | — | ⛔ not performed (future) |",
+        "",
+        f"Coverage: V1 + V2 + V3 = {categorised} of {collected} tests collected by pytest — "
+        + coverage_note,
         "",
     ]
     for number, s in enumerate(suites, start=1):
@@ -480,13 +512,15 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         workdir = Path(tmp)
         suites = [run_suite(key, workdir) for key in SUITES]
+        collected = collected_tests()
         reference = reference_checks()
         golden = golden_path_on_reference(workdir)
-    args.output.write_text(render(suites, reference, golden), encoding="utf-8")
+    args.output.write_text(render(suites, collected, reference, golden), encoding="utf-8")
     print(f"wrote {args.output}")
     for s in suites:
         print(f"{s.key}: {s.tests} tests, {s.failures + s.errors} failed, {s.skipped} skipped")
-    ok = all(s.ok for s in suites) and golden.reproducible
+    print(f"collected: {collected}; categorised: {sum(s.tests for s in suites)}")
+    ok = all(s.ok for s in suites) and golden.reproducible and partitioned(suites, collected)
     return 0 if ok and not (reference.adapter.failed or reference.hybrid.failed) else 1
 
 

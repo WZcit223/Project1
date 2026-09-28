@@ -17,6 +17,8 @@ from industrial_ai_warehouse.scenarios import BUILTIN_SCENARIO_IDS, builtin_scen
 
 from ..integration.strategy_support import STRATEGIES, demand, environment, run_strategies
 
+pytestmark = pytest.mark.scenario_checks  # V3 in the validation report
+
 SCENARIOS = builtin_scenarios()
 
 
