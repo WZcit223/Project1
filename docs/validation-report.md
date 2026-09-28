@@ -1,6 +1,6 @@
 # Validation Report — v0.1
 
-Generated 2026-09-28 09:54 UTC by `scripts/validation_report.py` from commit `864bb0b` on branch `phase15`. Python 3.11.15, pandas 3.0.6, numpy 2.4.6, lightgbm 4.7.0; seed 20260927. Categories as defined in [validation.md §1](validation.md#1-validation-categories).
+Generated 2026-09-28 11:12 UTC by `scripts/validation_report.py` from commit `47221e4` on branch `phase16`. Python 3.11.15, pandas 3.0.6, numpy 2.4.6, lightgbm 4.7.0; seed 20260927. Categories as defined in [validation.md §1](validation.md#1-validation-categories).
 
 > **Claim.** *The framework validates synthetic data generation and scenario execution at
 > the prototype level.* No claim is made that synthetic data, forecasts or strategy
@@ -23,7 +23,7 @@ Coverage: V1 + V2 + V3 = 379 of 379 tests collected by pytest — every test is 
 
 Unit and contract tests of every layer; architecture import rules (the framework never imports packs, layer dependencies, the UI imports no framework module); synthetic-data structure (schema, constraints, relationships, reproducibility, provenance); metric definitions; failure modes.
 
-`uv run pytest tests/unit -m "not (m5_local or scenario_checks)"` — 21 s
+`uv run pytest tests/unit -m "not (m5_local or scenario_checks)"` — 22 s
 
 | Test module | Tests |
 |---|---|
@@ -65,7 +65,7 @@ Unit and contract tests of every layer; architecture import rules (the framework
 
 End to end on the M5-shaped test fixture: canonical data → synthetic data → forecast → inventory × strategies × scenarios → metrics, through the workflow runner, the HTTP Application API and the browser UI; persisted datasets with verified hashes; provenance; reproducibility; no look-ahead; error handling.
 
-`uv run pytest tests/integration tests/scenario/test_golden_path.py tests/ui -m "not (m5_local or scenario_checks)"` — 114 s
+`uv run pytest tests/integration tests/scenario/test_golden_path.py tests/ui -m "not (m5_local or scenario_checks)"` — 113 s
 
 | Test module | Tests |
 |---|---|
