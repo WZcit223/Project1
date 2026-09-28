@@ -5,6 +5,68 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Phase 11: Golden Path (TASK-GP-001, TASK-GP-002)
+
+### Branch
+`phase11` — based on `phase10` @ `5b49c7d`
+
+### Objective
+Framework application layer (scenario pack protocol, pack discovery, workflow runner, run store) and the
+Golden Path test: fixture → canonical → synthetic → forecast → inventory × 3 strategies × 4 scenarios →
+metrics, persisted and reproducible (Gate 9).
+
+### Changes
+- `industrial_ai.application`: `RunRequest` (generic fields + pack `options`), `ResolvedRun`,
+  `RunRecord` / `RunStatus` / `DatasetLink`; `ScenarioPack` protocol + `PackRunOutput`;
+  `discover_packs()` via entry point group `industrial_ai.scenario_packs`; `WorkflowRunner`
+  (validation → `pack.run` → persistence; failures stored as `failed` and re-raised); `RunStore`
+  (SQLite run records, datasets in the catalog, identical content reused, conflicting content refused).
+  Errors `RunRequestError`, `RunNotFoundError`.
+- Foundation: `DatasetCatalog.summary()`, public `create_database_engine`.
+- Warehouse pack `pack.py` (`WarehousePack`, `WarehouseRunOptions`) registered through the entry point
+  in `scenarios/warehouse/pyproject.toml`; synthetic demand gets a run-scoped dataset id.
+- Tests: framework runner / store / discovery with a dummy pack (no warehouse code); Golden Path in
+  `tests/scenario/test_golden_path.py` (all 4 scenarios × 3 strategies, persisted datasets re-verified,
+  provenance from ledger back to scenario demand, reproducible metrics and output hashes, overrides,
+  invalid requests rejected before running, failed runs recorded).
+- Specs: plugin-spec §3, application-api §3, roadmap (EN + ZH).
+
+### Decisions / assumptions (for review)
+- **ScenarioPack interface simplified** from the Gate 0 sketch (`register(registries)` +
+  declarative `build_pipeline`) to `scenarios()` + `run(resolved) → PackRunOutput`; the pack runs its
+  pipeline through public engine APIs, the framework runner owns validation, ids, logging and
+  persistence. A generic step language is deferred to the roadmap (needs a second pack).
+- `RunRequest` is generic; domain choices (reference, forecast model, strategies, warm-up) are pack
+  `options` validated by the pack. Phase 12 maps the HTTP request of application-api §3 onto it.
+- Warehouse reference data is given as `reference_dir` internally; the API will only accept configured
+  reference ids (no client file paths). The horizon starts the day after the last observed sale.
+- Scenario overrides keep the scenario id/version and are recorded explicitly (`scenario_overrides` +
+  effective parameters in the record and in dataset provenance).
+- Run ids are timestamp + random suffix; reproducibility is judged on metrics and content hashes.
+
+### Real-subset check (descriptive / smoke-test evidence only; CA_1 / FOODS_3 / top 50, 91 days, one seed)
+Through the workflow runner: seasonal-naive results equal the Phase 10 figures exactly (e.g. baseline fill
+rate 0.847 / 0.862 / 0.938). With LightGBM: forecast WAPE 0.443–0.499 (warm-up + horizon, on synthetic
+horizon demand), baseline fill rate 0.847 / 0.878 / 0.936, total cost 39,248 / 34,789 / 28,763 USD.
+≈ 6 s (seasonal naive) / 8 s (LightGBM) per scenario run.
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 352 passed.
+
+### Commits
+d831ac0 feat(foundation) · b8e71c5 feat(application) · 203501e feat(warehouse) pack · 0175786 test(scenario)
+Golden Path · 563b564 docs(spec) · docs(zh) / docs(plan) / docs(log) (this round).
+
+### Known issues
+- `demand_source = reference` (replay) is not implemented (marked in application-api).
+- Each run re-registers identical reference / operations tables by hash (reused, not duplicated) — fine
+  for the demo subset.
+
+### Next
+Gate 9 / M11 review → Phase 12 (Application API) on branch `phase12` from `phase11`.
+
+---
+
 ## 2026-09-28 — M10 approved
 
 ### Branch
