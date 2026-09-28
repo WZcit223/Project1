@@ -5,6 +5,56 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Phase 16: v0.1.0 release readiness (TASK-DOC-001)
+
+### Branch
+`phase16` · Based on: `phase15` at `f620a5e` (Gate 13 APPROVED)
+
+### Objective
+Turn the finished system into a credible v0.1.0 prototype release candidate: documentation refresh,
+CHANGELOG, technical report, version, regenerated validation report, release checklist. No new
+product capability (owner, 2026-09-28).
+
+### Changes
+- Spec refresh (EN + ZH): architecture (entry-point registration, real scripts, server-rendered SVG
+  charts, plugin ids), scope (BI deferred to P1, V1–V4 wording, three forecast models), requirements
+  NFR-8 (V4), demo-guide status.
+- Version 0.1.0 in the three workspace packages; `uv lock` (workspace entries only).
+- `CHANGELOG.md` (0.1.0, unreleased release candidate).
+- Validation report regenerated from clean `47221e4` (0.1.0): 379 of 379 tests categorised; every
+  measured value unchanged.
+- `docs/technical-report.md` + ZH mirror: what it is, architecture, framework vs scenario, V1–V4,
+  what is not demonstrated, limitations, next steps (separate from v0.1 scope).
+- `docs/release-checklist.md` with evidence; README status "v0.1.0 release candidate" and links.
+- Release checks: fresh clone of `origin/phase16` at `ae8b89d` — `uv sync`, `scripts/demo.py` (output
+  identical to the pre-release run) and the browser Golden Path (0 JS errors; baseline, high_demand and
+  what-if equal the documented numbers); clone stays clean. Secrets / data scan clean.
+
+### Files / Modules
+`docs/{architecture,scope,requirements,demo-guide,technical-report,release-checklist,task-backlog,
+validation-report,development-log}.md`, `docs/zh/` mirrors, `CHANGELOG.md`, `README.md`,
+`pyproject.toml` × 3, `__init__.py` × 3, `uv.lock`.
+
+### Tests
+ruff format / check, mypy clean; pytest 379 passed; link check 0 broken. CI on the final commit is
+recorded when it reports.
+
+### Commit
+`988ba94` docs(spec), `59bf7cd` build (0.1.0), `47221e4` CHANGELOG, `fea1458` validation report,
+`ae8b89d` technical report, `a2fb39d` release checklist, this entry.
+
+### Known Issues
+- **Blocking, owner action:** GitHub reports `WZcit223/Project1` as **public**; the committed M5 subset
+  was approved on the basis that the repository is private (CLAUDE.md §13; Kaggle: do not
+  redistribute). Make the repository private (or remove the subset from the repository and its history)
+  before release.
+- P2 (not blocking, by decision): TASK-P2-LEGEND, TASK-P2-GENFORMS.
+
+### Next
+Gate 14 review by the owner. PR `phase16` → `main`, merge and tag `v0.1.0` only on explicit approval.
+
+---
+
 ## 2026-09-28 — Gate 13 close-out: Gate 13 APPROVED
 
 ### Branch
