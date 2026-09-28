@@ -5,6 +5,21 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Gate 10 / M12 approved
+
+### Branch
+`phase12` (CI green on `ab3bb79`)
+
+### Changes
+- Owner approved Gate 10 (API works independently of the UI) and the Phase 12 contract decisions
+  (reference ids, `horizon_days`, pack `options`, generic time series, `/api/references`, 500
+  `RUN_FAILED` with run id). M12 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 13 (UI) on branch `phase13` created from `phase12`.
+
+---
+
 ## 2026-09-28 — Phase 12: Application API (TASK-API-001, TASK-API-002)
 
 ### Branch
