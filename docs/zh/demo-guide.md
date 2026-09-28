@@ -1,6 +1,6 @@
 # 演示指南（Demo Guide）— v0.1
 
-状态：**Phase 15（Gate 13 草案）** · English (authoritative): [../demo-guide.md](../demo-guide.md)
+状态：**已于 Gate 13 批准（2026-09-28）；v0.1.0** · English (authoritative): [../demo-guide.md](../demo-guide.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 

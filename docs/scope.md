@@ -1,6 +1,6 @@
 # Scope & Non-goals — v0.1
 
-Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/scope.md](zh/scope.md)
+Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline; refreshed for v0.1.0 (Phase 16)** · 中文: [zh/scope.md](zh/scope.md)
 
 > Architecture first, extensibility first, scenario validation second; productionization later.
 
@@ -14,12 +14,13 @@ replenishment strategies (Reorder Point, Safety Stock, Dynamic), scenario modeli
 strategy comparison.
 
 **Application:** dashboard, data explorer, synthetic data configuration, scenario builder, simulation
-execution, result visualisation, lightweight BI.
+execution, result visualisation. (Lightweight BI was deferred to P1 — not implemented in v0.1.0.)
 
 **Infrastructure (lightweight):** HTTP API, configuration, logging, versioning, plugin registry,
 experiment/run metadata (SQLite), validation.
 
-**Validation:** Levels 1–3 (engineering, synthetic-data structural, scenario behaviour). See
+**Validation:** categories V1–V3 (software correctness, integration / Golden Path, scenario and
+reference-data validation); V4 real operational validation is not performed. See
 [validation.md](validation.md).
 
 ## 2. Explicit non-goals (v0.1)
@@ -40,7 +41,7 @@ This phase does **not** require or implement:
 12. Large numbers of synthetic-data algorithms (exactly three in v0.1).
 13. State-of-the-art forecasting (not an M5 competition solution).
 14. React / Node build pipelines.
-15. Validation with real enterprise data (Level 4).
+15. Validation with real enterprise data (V4, formerly Level 4).
 
 Ideas outside scope go to [future-roadmap.md](future-roadmap.md), not into code.
 
@@ -53,7 +54,7 @@ Ideas outside scope go to [future-roadmap.md](future-roadmap.md), not into code.
 | Lost sales | Backorders, substitution |
 | Deterministic or stochastic lead time from synthetic data | Supplier selection / negotiation |
 | Holding, ordering costs; stockout penalty reported separately | Full P&L, pricing decisions |
-| 4 scenarios, 3 strategies, 2 forecast models | Optimizers, RL, causal effect estimation |
+| 4 scenarios, 3 strategies, 3 forecast models (seasonal naive and moving average baselines, LightGBM) | Optimizers, RL, causal effect estimation |
 | Demo subset (default CA_1 × FOODS_3, top 50 items) | All 30,490 M5 series |
 
 ## 4. Data scope

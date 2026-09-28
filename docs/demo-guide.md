@@ -1,6 +1,6 @@
 # Demo Guide — v0.1
 
-Status: **Phase 15 (draft for Gate 13)** · 中文: [zh/demo-guide.md](zh/demo-guide.md)
+Status: **Approved at Gate 13 (2026-09-28); v0.1.0** · 中文: [zh/demo-guide.md](zh/demo-guide.md)
 
 This guide answers one question: *can another person understand the framework, run the Golden Path,
 reproduce the result, and understand what has and has not been validated?*

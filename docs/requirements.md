@@ -110,7 +110,7 @@ IDs are referenced from tests and the task backlog. Priority: **P0** must, **P1*
 | NFR-5 Simplicity | Single-process Python app, SQLite, no distributed infrastructure |
 | NFR-6 Performance | Golden Path demo run (subset: ~1 store × 1 category × top-N items, ~5 years daily) completes in < 60 s on a laptop |
 | NFR-7 Testability | Unit, integration, scenario and golden-path tests run offline on a committed synthetic fixture |
-| NFR-8 Honesty | Outputs are labelled as prototype / synthetic; no Level-4 validation claims |
+| NFR-8 Honesty | Outputs are labelled as prototype / synthetic; no V4 (real operational, formerly Level 4) validation claims |
 | NFR-9 Security | No secrets or raw external data in Git; config via environment |
 
 ## 6. Demo success criterion

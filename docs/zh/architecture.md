@@ -1,6 +1,6 @@
 # 架构 (Architecture) — v0.1
 
-状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../architecture.md](../architecture.md)
+状态：**已于 Gate 0 批准（2026-09-27）；已在 v0.1.0 中实现（Phase 1–15）** · English (authoritative): [../architecture.md](../architecture.md)
 相关 ADR：[ADR-001](../adr/ADR-001-api-first.md)、[ADR-002](../adr/ADR-002-plugin-architecture.md)、
 [ADR-003](../adr/ADR-003-m5-canonical-adapter.md)、[ADR-004](../adr/ADR-004-scenario-pack-packaging.md)、[ADR-005](../adr/ADR-005-ui-package.md)
 
@@ -111,11 +111,11 @@ scenarios/warehouse/                 # WAREHOUSE SCENARIO PACK — separate pack
     ├── strategies/      ReorderPoint, SafetyStock, DynamicReplenishment
     ├── scenarios/       WarehouseScenarioParameters + definitions/{baseline, high_demand,
     │                    demand_shock, supply_disruption}.yaml
-    └── pack.py          WarehouseScenarioPack: registers everything with the framework (planned, Phase 12)
+    └── pack.py          WarehouseScenarioPack: registers everything with the framework (entry point `industrial_ai.scenario_packs`)
 
 ui/                    UI package industrial_ai_ui (Jinja2 + HTMX, SVG charts); calls the Application
                        API over HTTP only, imports no framework module (ADR-005)
-scripts/               make_m5_subset.py, make_m5_fixture.py, run_demo.py
+scripts/               make_m5_subset.py, make_m5_fixture.py, demo.py, serve.py, validation_report.py
 ```
 
 **为什么预测位于核心而库存位于场景包中：** 时间序列预测 (Time-series Forecasting) 与领域无关
@@ -153,13 +153,13 @@ User ──► UI ──► Application API  POST /api/runs
           ┌──────────┴───────────┐
           ▼                      ▼
    Reference demand       Synthetic Engine
-                           ├─ time_series_v1  → synthetic demand (scenario-adjusted)
-                           └─ rule_based_v1 / statistical_v1 → inventory, supplier, lead time, policy
+                           ├─ time_series 1.0.0 → synthetic demand (scenario-adjusted)
+                           └─ rule_based / statistical 1.0.0 → inventory, supplier, lead time, policy
           └──────────┬───────────┘
                      ▼
             Simulation API
-             ├─ forecast plugin (seasonal_naive_v1 | lightgbm_v1)
-             └─ inventory_simulation_v1 × strategies (reorder_point | safety_stock | dynamic)
+             ├─ forecast plugin (seasonal_naive | moving_average | lightgbm)
+             └─ inventory_simulation × strategies (reorder_point | safety_stock | dynamic)
                      ▼
             Metrics + ScenarioResult  ──► run store (SQLite + artifacts)
                      ▼
@@ -194,7 +194,7 @@ User ──► UI ──► Application API  POST /api/runs
 | 模型 / 校验 | Pydantic v2 |
 | 持久化 | 基于 SQLite 的 SQLModel |
 | API | FastAPI（+ uvicorn） |
-| UI | Jinja2 + HTMX，图表使用单一内置 (vendored) JS 图表库（在 Phase 13 中确定） |
+| UI | Jinja2 + HTMX（内置 htmx 2.0.4）；图表在服务端渲染为 SVG，不使用 JS 图表库（ADR-005） |
 | 机器学习 | LightGBM（仅 Phase 7） |
 | 开发 | pytest、ruff、mypy (strict) |
 

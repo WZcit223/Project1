@@ -1,6 +1,6 @@
 # Architecture — v0.1
 
-Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/architecture.md](zh/architecture.md)
+Status: **Approved at Gate 0 (2026-09-27); implemented in v0.1.0 (Phases 1–15)** · 中文: [zh/architecture.md](zh/architecture.md)
 Related ADRs: [ADR-001](adr/ADR-001-api-first.md), [ADR-002](adr/ADR-002-plugin-architecture.md),
 [ADR-003](adr/ADR-003-m5-canonical-adapter.md), [ADR-004](adr/ADR-004-scenario-pack-packaging.md), [ADR-005](adr/ADR-005-ui-package.md)
 
@@ -110,11 +110,11 @@ scenarios/warehouse/                 # WAREHOUSE SCENARIO PACK — separate pack
     ├── strategies/      ReorderPoint, SafetyStock, DynamicReplenishment
     ├── scenarios/       WarehouseScenarioParameters + definitions/{baseline, high_demand,
     │                    demand_shock, supply_disruption}.yaml
-    └── pack.py          WarehouseScenarioPack: registers everything with the framework (planned, Phase 12)
+    └── pack.py          WarehouseScenarioPack: registers everything with the framework (entry point `industrial_ai.scenario_packs`)
 
 ui/                    UI package industrial_ai_ui (Jinja2 + HTMX, SVG charts); calls the Application
                        API over HTTP only, imports no framework module (ADR-005)
-scripts/               make_m5_subset.py, make_m5_fixture.py, run_demo.py
+scripts/               make_m5_subset.py, make_m5_fixture.py, demo.py, serve.py, validation_report.py
 ```
 
 **Why forecasting is in the core but inventory is in the pack:** time-series forecasting is
@@ -153,13 +153,13 @@ User ──► UI ──► Application API  POST /api/runs
           ┌──────────┴───────────┐
           ▼                      ▼
    Reference demand       Synthetic Engine
-                           ├─ time_series_v1  → synthetic demand (scenario-adjusted)
-                           └─ rule_based_v1 / statistical_v1 → inventory, supplier, lead time, policy
+                           ├─ time_series 1.0.0 → synthetic demand (scenario-adjusted)
+                           └─ rule_based / statistical 1.0.0 → inventory, supplier, lead time, policy
           └──────────┬───────────┘
                      ▼
             Simulation API
-             ├─ forecast plugin (seasonal_naive_v1 | lightgbm_v1)
-             └─ inventory_simulation_v1 × strategies (reorder_point | safety_stock | dynamic)
+             ├─ forecast plugin (seasonal_naive | moving_average | lightgbm)
+             └─ inventory_simulation × strategies (reorder_point | safety_stock | dynamic)
                      ▼
             Metrics + ScenarioResult  ──► run store (SQLite + artifacts)
                      ▼
@@ -194,7 +194,7 @@ a provenance record linking it back to its inputs, generator/plugin versions, sc
 | Models / validation | Pydantic v2 |
 | Persistence | SQLModel on SQLite |
 | API | FastAPI (+ uvicorn) |
-| UI | Jinja2 + HTMX, charts via a single vendored JS chart library (decided in Phase 13) |
+| UI | Jinja2 + HTMX (vendored htmx 2.0.4); charts rendered server-side as SVG, no JS chart library (ADR-005) |
 | ML | LightGBM (Phase 7 only) |
 | Dev | pytest, ruff, mypy (strict) |
 

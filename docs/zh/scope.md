@@ -1,6 +1,6 @@
 # 范围与非目标 (Scope & Non-goals) — v0.1
 
-状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../scope.md](../scope.md)
+状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线；已为 v0.1.0 更新（Phase 16）** · English (authoritative): [../scope.md](../scope.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
@@ -16,13 +16,13 @@ M5 适配器 (M5 Adapter)、合成数据引擎 (Synthetic Data Engine)、数据�
 策略对比 (Strategy Comparison)。
 
 **应用 (Application)：** 仪表盘 (Dashboard)、数据浏览器 (Data Explorer)、合成数据配置、场景构建器 (Scenario Builder)、仿真
-执行、结果可视化、轻量级 BI。
+执行、结果可视化。（轻量级 BI 已推迟到 P1，v0.1.0 中未实现。）
 
 **基础设施（轻量级）(Infrastructure)：** HTTP API、配置、日志、版本管理、插件注册表 (Plugin Registry)、
 实验/运行元数据 (Experiment/Run Metadata)（SQLite）、验证 (Validation)。
 
-**验证 (Validation)：** 第 1–3 级（工程验证、合成数据结构验证、场景行为验证）。参见
-[validation.md](validation.md)。
+**验证 (Validation)：** V1–V3 类别（软件正确性、集成 / Golden Path、场景与参考数据验证）；V4 真实运营验证
+未进行。参见 [validation.md](validation.md)。
 
 ## 2. 明确的非目标 (v0.1)
 
@@ -42,7 +42,7 @@ M5 适配器 (M5 Adapter)、合成数据引擎 (Synthetic Data Engine)、数据�
 12. 大量合成数据算法（v0.1 中恰好三种）。
 13. 最先进 (State-of-the-art) 的预测能力（并非 M5 竞赛解决方案）。
 14. React / Node 构建流水线。
-15. 使用真实企业数据进行验证（第 4 级）。
+15. 使用真实企业数据进行验证（V4，原第 4 级）。
 
 范围之外的想法记录到 [future-roadmap.md](future-roadmap.md)，不进入代码。
 
@@ -55,7 +55,7 @@ M5 适配器 (M5 Adapter)、合成数据引擎 (Synthetic Data Engine)、数据�
 | 缺货损失销售 (Lost Sales) | 缺货延期交付 (Backorders)、替代 (Substitution) |
 | 来自合成数据的确定性或随机提前期 (Lead Time) | 供应商选择 / 谈判 |
 | 持有成本、订货成本；缺货惩罚单独报告 | 完整损益 (P&L)、定价决策 |
-| 4 个场景、3 种策略、2 个预测模型 | 优化器、强化学习 (RL)、因果效应估计 |
+| 4 个场景、3 种策略、3 个预测模型（季节性朴素与移动平均基线、LightGBM） | 优化器、强化学习 (RL)、因果效应估计 |
 | 演示子集（默认 CA_1 × FOODS_3，前 50 个商品） | 全部 30,490 条 M5 序列 |
 
 ## 4. 数据范围
