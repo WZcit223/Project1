@@ -1,6 +1,6 @@
 # Validation Report — v0.1
 
-Generated 2026-09-28 07:45 UTC by `scripts/validation_report.py` from commit `81680d9` on branch `phase14`. Python 3.11.15, pandas 3.0.6, numpy 2.4.6, lightgbm 4.7.0; seed 20260927. Categories as defined in [validation.md §1](validation.md#1-validation-categories).
+Generated 2026-09-28 09:16 UTC by `scripts/validation_report.py` from commit `dc940f7` on branch `phase14`. Python 3.11.15, pandas 3.0.6, numpy 2.4.6, lightgbm 4.7.0; seed 20260927. Categories as defined in [validation.md §1](validation.md#1-validation-categories).
 
 > **Claim.** *The framework validates synthetic data generation and scenario execution at
 > the prototype level.* No claim is made that synthetic data, forecasts or strategy
@@ -21,7 +21,7 @@ Generated 2026-09-28 07:45 UTC by `scripts/validation_report.py` from commit `81
 
 Unit and contract tests of every layer; architecture import rules (the framework never imports packs, layer dependencies, the UI imports no framework module); synthetic-data structure (schema, constraints, relationships, reproducibility, provenance); metric definitions; failure modes.
 
-`uv run pytest tests/unit -m "not m5_local"` — 21 s
+`uv run pytest tests/unit -m "not m5_local"` — 22 s
 
 | Test module | Tests |
 |---|---|
@@ -63,7 +63,7 @@ Unit and contract tests of every layer; architecture import rules (the framework
 
 End to end on the M5-shaped test fixture: canonical data → synthetic data → forecast → inventory × strategies × scenarios → metrics, through the workflow runner, the HTTP Application API and the browser UI; persisted datasets with verified hashes; provenance; reproducibility; no look-ahead; error handling.
 
-`uv run pytest tests/integration tests/scenario/test_golden_path.py tests/ui -m "not m5_local"` — 93 s
+`uv run pytest tests/integration tests/scenario/test_golden_path.py tests/ui -m "not m5_local"` — 97 s
 
 | Test module | Tests |
 |---|---|
@@ -114,7 +114,7 @@ Source: M5 Forecasting Accuracy subset (stores=CA_1; departments=FOODS_3; catego
 | Weekday index (daily mean ÷ overall mean) | Mon 0.942, Tue 0.854, Wed 0.818, Thu 0.824, Fri 0.961, Sat 1.256, Sun 1.337 | Mon 0.915, Tue 0.839, Wed 0.837, Thu 0.814, Fri 0.97, Sat 1.244, Sun 1.38 |
 | Correlation of per-item mean units | — | 0.905 |
 
-Reading: synthetic mean demand is +25% versus the reference mean, consistent with the reference containing runs of zero sales (16.3% of series-days; often stockouts) that the generator does not model (2.7%); on selling days the means are close (17.477 vs. 18.745). Per-item levels are strongly correlated and the weekday pattern is reproduced. The synthetic horizon (after the reference data) and the reference year also cover different seasons. Zero-run modelling is on the roadmap (P1).
+Reading: synthetic mean demand is +25% versus the reference mean. The reference has 16.3% zero-sales series-days, the synthetic data 2.7%; on days with sales the means are close (17.477 vs. 18.745), so the gap comes mostly from zero observed sales that the generator does not reproduce. Zero observed sales in the M5 reference may reflect true zero demand, stockouts or other forms of demand censoring; the reference dataset does not provide sufficient inventory information to distinguish these causes directly (zero observed sales ≠ confirmed stockout). Per-item levels are strongly correlated and the weekday pattern is reproduced. The synthetic horizon (after the reference data) and the reference year cover different seasons. Zero-run modelling is on the roadmap (P1).
 
 **Forecast backtest on reference sales** (weekly origins 2015-11-23 … 2016-05-22, 28-day horizon, history strictly before each origin):
 
@@ -148,6 +148,6 @@ Not validated in v0.1 and not claimed:
 - that the synthetic operational data (warehouses, suppliers, lead times, costs, initial inventory, purchase orders) resembles any real company's operations;
 - that synthetic demand reproduces real demand beyond the descriptive statistics in §3.2 (known gap: runs of zero-sales days in the reference data are not reproduced);
 - that any replenishment strategy is economically or operationally better in reality — strategy results compare strategies under identical simulated conditions only;
-- that M5 sales equal demand: sales are censored by stockouts; M5 serves as a reference demand/sales environment, not as true demand and not as warehouse operational data.
+- that M5 sales equal demand: M5 records observed sales and has no inventory data; zero observed sales may reflect true zero demand, stockouts or other demand censoring, which the reference cannot distinguish. M5 serves as a reference demand/sales environment, not as true demand and not as warehouse operational data.
 
 Needed for V4: real SKU-level demand with stockout flags, inventory snapshots, purchase-order history with actual lead times, cost data, and a backtest or pilot against current practice ([future-roadmap.md §2.1](future-roadmap.md)).
