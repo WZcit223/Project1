@@ -40,17 +40,38 @@ Errors: duplicate `(id, version)` → `DuplicatePluginError`; unknown id/version
 A scenario pack is a separate Python package exposing a `ScenarioPack` object:
 
 ```python
-class ScenarioPack(Protocol):
+class ScenarioPack(Protocol):                     # industrial_ai.application (implemented, Phase 11)
     pack_id: str                      # "warehouse"
     pack_version: str
     title: str                        # "Inventory Demand Forecasting & Replenishment Simulation"
-    scenario_parameter_model: type[BaseModel]
+    description: str
+    run_options_model: type[BaseModel]  # validates RunRequest.options (pack-specific)
 
-    def register(self, registries: FrameworkRegistries) -> None: ...
-        # registers schemas, adapters, generator configs, simulation plugins, strategies, scenarios, metrics
-    def build_pipeline(self, request: RunRequest) -> Pipeline: ...
-        # declarative list of steps the application workflow runner executes
+    def scenarios(self) -> ScenarioRegistry: ...   # validated against the pack's parameter model
+    def run(self, resolved: ResolvedRun) -> PackRunOutput: ...
+        # executes the pack's pipeline; raises on failure
+
+@dataclass(frozen=True)
+class PackRunOutput:
+    comparison: ComparisonResult                 # compared variants (e.g. strategies)
+    supporting: dict[str, SimulationResult]      # upstream runs (e.g. "forecast")
+    inputs: dict[str, Dataset]                   # datasets generated or loaded by the run
+    labels: tuple[str, ...]                      # maturity labels, e.g. ("prototype", "synthetic-data")
 ```
+
+The Gate 0 sketch (`register(registries)` + a declarative `build_pipeline`) was simplified: the pack
+runs its own pipeline through the public engine APIs and returns everything the runner persists; the
+framework's `WorkflowRunner` owns request validation (pack, scenario, overrides, options), run ids,
+logging, the run store and failure recording. A generic step/DAG language is not needed for one pack
+and is not built (roadmap if a second pack needs it).
+
+`WorkflowRunner.run(RunRequest) → RunRecord`: resolves the pack (`RunRequestError` if unknown), the
+scenario (latest or pinned version) and merges `scenario_overrides` into its parameters, validates them
+with the pack's parameter model and `options` with `run_options_model`, calls `pack.run`, then stores a
+`RunRecord` (status, effective scenario, overrides, per-variant and supporting total metrics, links
+`(dataset_id, version, content_hash)` to every input and output dataset, labels). Datasets go to the
+dataset catalog: identical content is reused, the same id with different content is refused. A pipeline
+exception is stored as a `failed` run and re-raised — never reported as success.
 
 Discovery: Python entry points group **`industrial_ai.scenario_packs`**, declared in the pack's
 `pyproject.toml`:

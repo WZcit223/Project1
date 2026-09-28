@@ -56,7 +56,16 @@ Endpoints are finalised in Phase 12; this is the target contract.
 ```
 
 `demand_source`: `synthetic` (time-series generator calibrated on the reference, scenario applied) or
-`reference` (replay of reference demand with scenario multipliers applied deterministically).
+`reference` (replay of reference demand with scenario multipliers applied deterministically —
+**NOT IMPLEMENTED** in v0.1; only `synthetic` exists).
+
+**Implemented internal request (Phase 11).** The application layer's `RunRequest` is generic —
+`pack`, `scenario_id`, `scenario_version`, `scenario_overrides`, `seed`, `horizon_days` — plus
+pack-specific `options` validated by the pack. For `warehouse`: `reference_dir` (M5-format directory),
+`forecast_model` (`seasonal_naive` | `moving_average` | `lightgbm`), `strategies`, `warm_up_days` (56),
+`forecast_horizon_days` (56). The horizon starts the day after the last observed sale. Phase 12 maps the
+HTTP request above onto it; `reference_dataset_id` will resolve to a configured reference directory
+(clients never send file paths).
 
 ## 4. `POST /api/runs` — response (abridged)
 

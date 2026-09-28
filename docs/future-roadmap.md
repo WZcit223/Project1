@@ -22,6 +22,7 @@ Priority: **P1** after v0.1 Golden Path · **P2** next phase · **P3** long-term
 | Causal modeling plugin | Intervention / what-if with causal effects | `SimulationPlugin kind=causal` | P2 | Causal graph knowledge, data |
 | Knowledge layer / entity graph | Organise domain knowledge across scenarios | Foundation sub-package behind Dataset API | P3 | Use cases |
 | Multimodal data (images, documents, sensor waveforms) | Industrial inspection, maintenance logs | Foundation extension | P3 | Scenario need |
+| Declarative pipeline steps for packs | Share step logging / partial re-runs across several scenario packs | `ScenarioPack.run` could return or be driven by a step list; runner change only | P2 | A second scenario pack |
 | Async job execution | Long runs, larger datasets | Runs already expose `status` | P2 | Scale needs |
 | React / mobile UI | Enterprise UX | Consumes Application API | P3 | Stable API |
 | Enterprise IAM, multi-tenant, cloud deploy | Production use | New cross-cutting services | P3 | Productionisation decision |
