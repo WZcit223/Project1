@@ -5,10 +5,56 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
-## 2026-09-28 — Gate 13 APPROVED
+## 2026-09-28 — Gate 13 close-out: Gate 13 APPROVED
 
 ### Branch
-`phase15` (CI green on `2fc7e49`, GitHub Actions run 51)
+`phase15` · `phase16` fast-forwarded to the same commit (no Phase 16 work yet)
+
+### Objective
+Close out Gate 13 under the owner's review (2026-09-28): confirm CI for `79b02db`, confirm the two
+P0/P1 fixes are closed with regression checks, confirm documentation consistency and the newcomer
+framing. No new review round.
+
+### Changes
+- CI for `79b02db`: green (GitHub Actions run 52 on `phase15`, run 53 on `phase16`).
+- First-run reproducibility re-checked: UI default, `scripts/demo.py`, validation report and demo guide
+  all use reference `m5_subset`, scenario `baseline` 1.0.0, `seasonal_naive`, seed 20260927, 91 days.
+  Found and fixed a latent gap: the UI took its scenario default from list order, so a saved user
+  scenario sorting before `baseline` became the default; the form now preselects `baseline`
+  (`8e11b0d`). The regression test covers scenario + version (after a user scenario exists), model,
+  horizon and seed; the config test pins the default reference.
+- Category completeness: `scripts/validation_report.py` checks V1 + V2 + V3 = all collected tests and
+  exits 1 otherwise (each test in exactly one category, by marker). No test was added in the close-out
+  (379 tests), so the committed report's counts still hold; it is regenerated at the release commit
+  in Phase 16.
+- Documentation: README, scope, requirements, CLAUDE.md, validation.md, demo guide and report agree —
+  `data/reference/m5_subset/` is the committed, owner-approved subset; M5 = store-level observed retail
+  sales, not warehouse operational data; zero observed sales ≠ confirmed stockout; V4 not performed.
+- Framing: README intro now states the owner's sentence and separates framework / scenario /
+  real-world validation (V4 not performed); demo guide §0 states the same (EN + ZH) (`011ec76`).
+
+### Tests
+ruff format / check, mypy (164 files) clean; pytest 379 passed. CI on `011ec76`: green (run 55 on
+`phase16`; run 54 on `phase15` is the same commit and was still running when this entry was written).
+
+### Commit
+`8e11b0d` fix(ui), `011ec76` docs(readme), this entry.
+
+### Known Issues
+P2 backlog unchanged: TASK-P2-LEGEND, TASK-P2-GENFORMS.
+
+### Next
+**Gate 13 = APPROVED.** Phase 16 — v0.1.0 Release Readiness on `phase16` (CHANGELOG, technical report,
+documentation refresh, version bump, validation report regeneration, release checklist). No new
+product capability; PR to `main`, merge and tag only on the owner's explicit approval.
+
+---
+
+## 2026-09-28 — Gate 13 Core Review APPROVED (final: CONDITIONAL — pending CI for `79b02db`)
+
+### Branch
+`phase15` (CI green on `2fc7e49`, GitHub Actions run 51; CI for the approval-record commit `79b02db`
+had not reported when this entry was written — status corrected in the close-out entry above)
 
 ### Changes
 Gate 13 decision under the owner's review criteria (2026-09-28), all met: Phase 15 CI green; quick start,
