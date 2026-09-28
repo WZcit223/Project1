@@ -253,6 +253,7 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             "error": error,
             "values": values
             or {
+                "scenario_id": messages.DEFAULT_SCENARIO,
                 "horizon_days": 91,
                 "seed": DEFAULT_SEED,
                 "forecast_model": messages.DEFAULT_FORECAST_MODEL,

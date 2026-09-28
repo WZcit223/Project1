@@ -38,6 +38,9 @@ STRATEGY_LABELS: dict[str, str] = {
     "dynamic": "Dynamic",
 }
 
+DEFAULT_SCENARIO = "baseline"
+"""Preselected on the Simulation page; scenarios are listed by id, so user ones may sort first."""
+
 DEFAULT_FORECAST_MODEL = "seasonal_naive"
 """Preselected on the Simulation page: the model the demo guide, scripts/demo.py and the validation
 report use, so a first run with the default form reproduces the documented numbers."""

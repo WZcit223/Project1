@@ -27,6 +27,8 @@ def test_defaults() -> None:
     assert settings.data_dir == Path("./data")
     assert settings.api_host == "127.0.0.1"
     assert settings.api_port == 8000
+    # the documented demo configuration uses the committed reference subset by default
+    assert settings.reference_dirs == {"m5_subset": Path("./data/reference/m5_subset")}
 
 
 def test_environment_variables_override_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
