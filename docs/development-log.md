@@ -5,6 +5,50 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Gate 13 review items (Phase 15 follow-up)
+
+### Branch
+`phase15` (CI green on `1342174`, run 50, before these changes)
+
+### Findings and fixes
+- 🔴→fixed **First-run reproducibility:** an untouched Simulation form used LightGBM (first option), so a
+  new user's first run differed from the guide (safety stock 87.8 % vs 86.2 % fill rate). The form now
+  preselects `seasonal_naive` (pack default, demo, report); `scripts/demo.py` and the report's Golden
+  Path send the model explicitly and the demo prints its configuration. Verified from a fresh clone:
+  default browser run = guide numbers exactly.
+- 🔴→fixed **Validation categories incomplete:** the new `m5_local` demo test fell into no category
+  (378 of 379 reported). V3 is now selected by marker (`m5_local` or new `scenario_checks`) and the report
+  proves V1 + V2 + V3 = collected tests (379 = 314 + 51 + 14), failing otherwise.
+- 🟡→fixed **Documentation contradictions:** README ("never committed" vs. committed subset), scope data
+  table and requirements A5 (M5 local only), CLAUDE.md §11 (owner instruction) — all now state the single
+  approved subset and which tests use it; demo guide gains "What this is" (framework vs. scenario pack,
+  why inventory, the prototype framing), run-from-root note, default-configuration note; the diagram's
+  "(validated)" (schema checks) relabelled to avoid confusion with V1–V4.
+- 🟡 kept as backlog: chart-legend overlap (TASK-P2-LEGEND), generator forms (TASK-P2-GENFORMS).
+- No architecture violations found: `scripts/demo.py` uses only HTTP `/api/...` (in-process app or
+  `--api URL`); UI import-boundary test passes; framework never imports the pack.
+
+### Checks
+Fresh clone: `uv sync`, `scripts/demo.py` (exit 0, clean tree), `scripts/serve.py` + default browser run.
+ruff format, ruff, mypy strict, pytest: 379 passed; links checked. Report regenerated from the clean
+tree at `864bb0b` (numbers unchanged).
+
+### Commits
+- acabf07 fix(ui): preselect the demo forecast model on the Simulation page
+- 68e4ae3 fix(scripts): state the forecast model explicitly in demo and report runs
+- 19f51c2 docs(agent): align the test-data rule with the approved V3 tests
+- 2feee94 docs(spec): remove contradictions about the committed M5 subset
+- a4ad7e8 docs(demo): explain framework vs scenario and the default configuration
+- 696b2db fix(scripts): make the V1-V3 categories cover every test exactly once
+- 864bb0b docs(spec): define validation category membership by marker (EN + ZH)
+- 108e221 docs(validation): regenerate the report with complete category coverage
+- docs(plan) / docs(log): backlog P2 items and this entry
+
+### Next
+CI green on the final `phase15` commit → Gate 13 decision → Phase 16.
+
+---
+
 ## 2026-09-28 — Phase 15: Demo, communication, quick start (TASK-DEMO-001)
 
 ### Branch
