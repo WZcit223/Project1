@@ -23,6 +23,8 @@ class RunRequest(BaseModel):
     """Per-run parameter changes, validated against the pack's scenario parameter model."""
     seed: int
     horizon_days: int = Field(ge=1)
+    reference_id: str | None = None
+    """Configured id the reference was selected by (API runs); lets clients re-run a run."""
     reference: str | None = None
     """Location of the pack's reference data (e.g. an M5-format directory). The HTTP API never
     accepts it from clients: it resolves a configured reference id to this value."""

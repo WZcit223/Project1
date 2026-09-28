@@ -194,6 +194,7 @@ class ApplicationService:
             scenario_overrides=body.scenario_overrides,
             seed=body.seed,
             horizon_days=body.horizon_days,
+            reference_id=body.reference_id,
             reference=reference,
             options=body.options,
         )

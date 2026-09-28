@@ -88,6 +88,7 @@ def test_golden_path_over_http(client: TestClient, runs: dict[str, dict[str, Any
     for scenario_id, record in runs.items():
         assert record["status"] == "succeeded"
         assert record["scenario"]["scenario_id"] == scenario_id
+        assert record["request"]["reference_id"] == "fixture"
         results = ok(client.get(f"/api/runs/{record['run_id']}/results"))
         assert list(results["variants"]) == STRATEGIES
         assert "fill_rate" in results["metric_ids"] and "total_cost" in results["metric_ids"]
