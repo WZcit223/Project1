@@ -10,8 +10,9 @@ The first validation scenario is **Warehouse / Inventory — Demand Forecasting 
 Simulation**, built on the M5 Forecasting Accuracy reference dataset plus synthetic operational data.
 Warehouse is a *scenario plugin*, not the framework itself.
 
-> Status: **v0.1.0.dev0 — Phases 0–13 implemented** (framework, warehouse pack, Golden Path, Application
-> API, demo UI); validation, demo and release follow (Phases 14–16, see [docs/task-backlog.md](docs/task-backlog.md)).
+> Status: **v0.1.0.dev0 — Phases 0–14 implemented** (framework, warehouse pack, Golden Path, Application
+> API, demo UI, validation report); demo guide (Phase 15) and release (Phase 16) follow, see
+> [docs/task-backlog.md](docs/task-backlog.md).
 > This is a prototype on synthetic data; see [docs/validation.md](docs/validation.md) for what is and is not
 > validated.
 
@@ -31,6 +32,7 @@ Warehouse is a *scenario plugin*, not the framework itself.
 | UI spec | [docs/ui-spec.md](docs/ui-spec.md) | [docs/zh/ui-spec.md](docs/zh/ui-spec.md) |
 | Validation | [docs/validation.md](docs/validation.md) | [docs/zh/validation.md](docs/zh/validation.md) |
 | Validation report (generated) | [docs/validation-report.md](docs/validation-report.md) | — |
+| **Demo guide** (quick start, demo flow, what is validated) | [docs/demo-guide.md](docs/demo-guide.md) | [docs/zh/demo-guide.md](docs/zh/demo-guide.md) |
 | Task backlog | [docs/task-backlog.md](docs/task-backlog.md) | [docs/zh/task-backlog.md](docs/zh/task-backlog.md) |
 | Future roadmap | [docs/future-roadmap.md](docs/future-roadmap.md) | [docs/zh/future-roadmap.md](docs/zh/future-roadmap.md) |
 | Development log | [docs/development-log.md](docs/development-log.md) | — |
@@ -40,7 +42,9 @@ Agent / contributor rules: [CLAUDE.md](CLAUDE.md).
 
 ## Quick start
 
-Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+.
+Requires [uv](https://docs.astral.sh/uv/) and Python 3.11+. New here? Start with the
+[demo guide](docs/demo-guide.md): quick start, 5–10 minute demo, Golden Path walkthrough and what has
+(and has not) been validated.
 
 ```bash
 uv sync                      # create the locked environment
@@ -49,6 +53,7 @@ uv run ruff check .          # lint
 uv run ruff format --check . # formatting
 uv run mypy                  # type check
 uv run python -m industrial_ai.api   # start the Application API (http://127.0.0.1:8000/health, docs at /api/docs)
+uv run python scripts/demo.py        # scripted Golden Path via the Application API (~20 s)
 uv run python scripts/serve.py       # demo: API + UI in one process, open http://127.0.0.1:8000/ui/
 uv run python scripts/validation_report.py   # regenerate docs/validation-report.md (V1–V3; V4 not performed)
 ```
