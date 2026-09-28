@@ -79,3 +79,15 @@ class ScenarioError(IndustrialAIError):
 
 class ScenarioValidationError(ScenarioError, ValueError):
     """A scenario file or specification is malformed, or its parameters fail the pack's model."""
+
+
+class ApplicationError(IndustrialAIError):
+    """Base class for application-layer (workflow, run store) errors."""
+
+
+class RunRequestError(ApplicationError, ValueError):
+    """A run request is invalid: unknown pack or scenario, bad overrides or options."""
+
+
+class RunNotFoundError(ApplicationError, LookupError):
+    """No stored run with the given id."""
