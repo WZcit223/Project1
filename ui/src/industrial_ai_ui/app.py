@@ -187,13 +187,21 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             error=None,
         )
 
+    async def parameter_schema(scenario_id: str, version: str | None = None) -> dict[str, Any]:
+        """The pack's scenario parameter JSON schema, as served by the Application API."""
+        params = {"pack": pack, **({"version": version} if version else {})}
+        detail = await api.get(f"/api/scenarios/{scenario_id}", params=params)
+        schema: dict[str, Any] = detail["parameter_schema"]
+        return schema
+
     async def scenario_context(error: str | None = None, saved: Any = None) -> dict[str, Any]:
         scenarios = await api.get("/api/scenarios", params={"pack": pack})
-        baseline = await api.get("/api/scenarios/baseline", params={"pack": pack})
+        schema = await parameter_schema(scenarios[0]["scenario_id"]) if scenarios else {}
+        properties = schema.get("properties", {})
         return {
             "scenarios": scenarios,
-            "schema": baseline["parameter_schema"],
-            "defaults": baseline["effective_parameters"],
+            "schema": {"properties": properties},
+            "defaults": {name: prop.get("default") for name, prop in properties.items()},
             "error": error,
             "saved": saved,
         }
@@ -281,34 +289,29 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
 
     @app.get("/runs/{run_id}", response_class=HTMLResponse, name="run")
     async def run(request: Request, run_id: str) -> HTMLResponse:
-        scenario_schema = await api.get("/api/scenarios/baseline", params={"pack": pack})
-        return page(
-            request,
-            "run.html",
-            view=await run_view(run_id),
-            what_if_parameters=list(scenario_schema["parameter_schema"]["properties"]),
-        )
+        view = await run_view(run_id)
+        scenario = view["results"]["scenario"]
+        schema = await parameter_schema(scenario["scenario_id"], scenario["version"])
+        return page(request, "run.html", view=view, what_if_parameters=list(schema["properties"]))
 
     @app.post("/runs/{run_id}/what-if", name="what_if")
     async def what_if(request: Request, run_id: str) -> Response:
-        """Re-run the same request with one scenario parameter changed."""
+        """Re-run the same request with one scenario parameter changed.
+
+        Same pack, reference id, scenario *version* (pinned to the one the original run used, even
+        if a newer version exists), seed, horizon and options; earlier overrides are kept.
+        """
         form = await form_data(request)
-        original = (await api.get(f"/api/runs/{run_id}"))["request"]
-        name, raw = first(form, "parameter"), first(form, "value")
-        overrides = {**original["scenario_overrides"], name: float(raw)}
+        record = await api.get(f"/api/runs/{run_id}")
+        original = record["request"]
+        name, number = first(form, "parameter"), float(first(form, "value"))
+        value: float | int = int(number) if number.is_integer() else number
         body = {
             key: original[key]
-            for key in (
-                "pack",
-                "reference_id",
-                "scenario_id",
-                "scenario_version",
-                "seed",
-                "horizon_days",
-                "options",
-            )
+            for key in ("pack", "reference_id", "scenario_id", "seed", "horizon_days", "options")
         }
-        body["scenario_overrides"] = overrides
+        body["scenario_version"] = record["scenario"]["version"]
+        body["scenario_overrides"] = {**original["scenario_overrides"], name: value}
         record = await api.post("/api/runs", body)
         return redirect(request, str(request.url_for("run", run_id=record["run_id"])))
 

@@ -137,7 +137,15 @@ def test_what_if_reruns_with_one_parameter_changed(browser: TestClient) -> None:
     )
     assert second.status_code == 303
     page = browser.get(second.headers["location"]).text
-    assert "lead_time_delta" in page and "5.0" in page
+    assert "lead_time_delta" in page and "5" in page
+    new_id = second.headers["location"].rstrip("/").rsplit("/", 1)[1]
+    before = browser.get(f"/api/runs/{run_id}").json()
+    after = browser.get(f"/api/runs/{new_id}").json()
+    assert after["scenario_overrides"] == {"lead_time_delta": 5}
+    assert after["scenario"]["version"] == before["scenario"]["version"]  # pinned
+    for key in ("reference_id", "scenario_id", "seed", "horizon_days", "options"):
+        assert after["request"][key] == before["request"][key], key
+    assert "reference" not in after["request"]
 
 
 def test_scenario_builder_saves_a_usable_scenario(browser: TestClient) -> None:
