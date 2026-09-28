@@ -2,7 +2,7 @@
 
 状态：**已于 Gate 0 批准（2026-09-27），v0.1 基线** · English (authoritative): [../architecture.md](../architecture.md)
 相关 ADR：[ADR-001](../adr/ADR-001-api-first.md)、[ADR-002](../adr/ADR-002-plugin-architecture.md)、
-[ADR-003](../adr/ADR-003-m5-canonical-adapter.md)、[ADR-004](../adr/ADR-004-scenario-pack-packaging.md)
+[ADR-003](../adr/ADR-003-m5-canonical-adapter.md)、[ADR-004](../adr/ADR-004-scenario-pack-packaging.md)、[ADR-005](../adr/ADR-005-ui-package.md)
 
 > 本文为英文版的中文镜像 (v2)；如有歧义以英文版为准。
 
@@ -113,7 +113,8 @@ scenarios/warehouse/                 # WAREHOUSE SCENARIO PACK — separate pack
     │                    demand_shock, supply_disruption}.yaml
     └── pack.py          WarehouseScenarioPack: registers everything with the framework (planned, Phase 12)
 
-ui/                    Jinja2 templates + static (HTMX); served by a thin UI router
+ui/                    UI package industrial_ai_ui (Jinja2 + HTMX, SVG charts); calls the Application
+                       API over HTTP only, imports no framework module (ADR-005)
 scripts/               make_m5_subset.py, make_m5_fixture.py, run_demo.py
 ```
 
