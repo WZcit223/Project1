@@ -109,3 +109,8 @@ Thresholds are initial proposals; if tuning is needed it is recorded in the deve
 it runs the V1, V2 and V3 test selections (pytest, JUnit counts per module), computes the V3
 reference-data results, and records the commit, versions and seed. It ends with an explicit
 "not validated" section (V4). Regenerate it for every release; do not edit it by hand.
+
+Category membership: **V3** = every test marked `m5_local` (committed M5 subset) or `scenario_checks`
+(scenario behaviour, §4); **V1** = the remaining tests in `tests/unit/`; **V2** = the remaining tests in
+`tests/integration/`, `tests/scenario/` and `tests/ui/`. The report checks that V1 + V2 + V3 equals the
+number of tests pytest collects, so no test is left out or counted twice.

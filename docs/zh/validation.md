@@ -103,3 +103,7 @@ Production Validation（演示 · 原型 · 合成数据验证 · 真实数据�
 [`validation-report.md`](../validation-report.md) 由 `uv run python scripts/validation_report.py` 生成：
 它运行 V1、V2 和 V3 的测试选集（pytest，按模块统计 JUnit 计数），计算 V3 参考数据结果，
 并记录 commit、版本和 seed。报告以明确的"未验证"章节（V4）结尾。每次发布时重新生成；不要手工编辑。
+
+类别归属：**V3** = 所有标记为 `m5_local`（已提交的 M5 子集）或 `scenario_checks`（场景行为，§4）的测试；
+**V1** = `tests/unit/` 中其余的测试；**V2** = `tests/integration/`、`tests/scenario/` 和 `tests/ui/` 中其余的测试。
+报告会检查 V1 + V2 + V3 是否等于 pytest 收集到的测试总数，确保没有测试被遗漏或重复计数。
