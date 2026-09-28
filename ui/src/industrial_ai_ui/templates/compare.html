@@ -3,11 +3,11 @@
 {% block content %}
 <h1>Compare runs</h1>
 <p class="muted"><em>If the environment changes, what happens under each strategy?</em> Same seed and demand stream across runs; only the scenario differs.</p>
-{% if not columns %}<p>Select runs on the <a href="{{ url_for('runs') }}">Results</a> page.</p>{% endif %}
+{% if not columns %}<p>Select runs on the <a href="{{ url_for('ui_runs') }}">Results</a> page.</p>{% endif %}
 {% for variant, by_run in table.items() %}
 <h2>{{ messages.STRATEGY_LABELS.get(variant, variant) }}</h2>
 <table class="kpis">
-  <thead><tr><th>KPI</th>{% for run_id, scenario_id in columns %}<th><a href="{{ url_for('run', run_id=run_id) }}">{{ scenario_id }}</a></th>{% endfor %}</tr></thead>
+  <thead><tr><th>KPI</th>{% for run_id, scenario_id in columns %}<th><a href="{{ url_for('ui_run', run_id=run_id) }}">{{ scenario_id }}</a></th>{% endfor %}</tr></thead>
   <tbody>
   {% for metric_id in messages.METRIC_LABELS %}
     <tr><td>{{ metric_label(metric_id) }}</td>{% for run_id, scenario_id in columns %}<td class="num">{{ by_run.get(run_id, {}).get(metric_id) | metric(metric_id) }}</td>{% endfor %}</tr>

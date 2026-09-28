@@ -122,25 +122,25 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
 
     # --- pages -------------------------------------------------------------------------------
 
-    @app.get("/", response_class=HTMLResponse, name="overview")
+    @app.get("/", response_class=HTMLResponse, name="ui_overview")
     async def overview(request: Request, run_id: str | None = None) -> HTMLResponse:
         run_id = run_id or await latest_succeeded()
         view = await run_view(run_id) if run_id else None
         return page(request, "overview.html", view=view)
 
-    @app.get("/data", response_class=HTMLResponse, name="data")
+    @app.get("/data", response_class=HTMLResponse, name="ui_data")
     async def data(request: Request, source_type: str | None = None) -> HTMLResponse:
         params = {"source_type": source_type} if source_type else None
         datasets = await api.get("/api/datasets", params=params)
         return page(request, "data.html", datasets=datasets, source_type=source_type)
 
-    @app.get("/data/{dataset_id}", response_class=HTMLResponse, name="dataset")
+    @app.get("/data/{dataset_id}", response_class=HTMLResponse, name="ui_dataset")
     async def dataset(request: Request, dataset_id: str) -> HTMLResponse:
         detail = await api.get(f"/api/datasets/{dataset_id}")
         preview = await api.get(f"/api/datasets/{dataset_id}/preview", params={"limit": 20})
         return page(request, "dataset.html", detail=detail, preview=preview)
 
-    @app.get("/synthetic", response_class=HTMLResponse, name="synthetic")
+    @app.get("/synthetic", response_class=HTMLResponse, name="ui_synthetic")
     async def synthetic(request: Request) -> HTMLResponse:
         return page(
             request,
@@ -151,7 +151,7 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             error=None,
         )
 
-    @app.post("/synthetic", response_class=HTMLResponse, name="generate")
+    @app.post("/synthetic", response_class=HTMLResponse, name="ui_generate")
     async def generate(request: Request) -> HTMLResponse:
         text = first(await form_data(request), "request_json")
         generators = await api.get("/api/synthetic/generators")
@@ -206,11 +206,11 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             "saved": saved,
         }
 
-    @app.get("/scenarios", response_class=HTMLResponse, name="scenarios")
+    @app.get("/scenarios", response_class=HTMLResponse, name="ui_scenarios")
     async def scenarios(request: Request) -> HTMLResponse:
         return page(request, "scenarios.html", **await scenario_context())
 
-    @app.post("/scenarios", response_class=HTMLResponse, name="create_scenario")
+    @app.post("/scenarios", response_class=HTMLResponse, name="ui_create_scenario")
     async def create_scenario(request: Request) -> HTMLResponse:
         form = await form_data(request)
         context = await scenario_context()
@@ -254,11 +254,11 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             "values": values or {"horizon_days": 91, "seed": DEFAULT_SEED},
         }
 
-    @app.get("/simulate", response_class=HTMLResponse, name="simulate")
+    @app.get("/simulate", response_class=HTMLResponse, name="ui_simulate")
     async def simulate(request: Request) -> HTMLResponse:
         return page(request, "simulate.html", **await simulate_context())
 
-    @app.post("/simulate", name="start_run")
+    @app.post("/simulate", name="ui_start_run")
     async def start_run(request: Request) -> Response:
         form = await form_data(request)
         body = {
@@ -281,20 +281,20 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
             return page(
                 request, "simulate.html", exc.status, **await simulate_context(message, body)
             )
-        return redirect(request, str(request.url_for("run", run_id=record["run_id"])))
+        return redirect(request, str(request.url_for("ui_run", run_id=record["run_id"])))
 
-    @app.get("/runs", response_class=HTMLResponse, name="runs")
+    @app.get("/runs", response_class=HTMLResponse, name="ui_runs")
     async def runs(request: Request) -> HTMLResponse:
         return page(request, "runs.html", runs=await api.get("/api/runs"))
 
-    @app.get("/runs/{run_id}", response_class=HTMLResponse, name="run")
+    @app.get("/runs/{run_id}", response_class=HTMLResponse, name="ui_run")
     async def run(request: Request, run_id: str) -> HTMLResponse:
         view = await run_view(run_id)
         scenario = view["results"]["scenario"]
         schema = await parameter_schema(scenario["scenario_id"], scenario["version"])
         return page(request, "run.html", view=view, what_if_parameters=list(schema["properties"]))
 
-    @app.post("/runs/{run_id}/what-if", name="what_if")
+    @app.post("/runs/{run_id}/what-if", name="ui_what_if")
     async def what_if(request: Request, run_id: str) -> Response:
         """Re-run the same request with one scenario parameter changed.
 
@@ -313,9 +313,9 @@ def create_ui_app(api: ApiClient, pack: str = "warehouse") -> FastAPI:
         body["scenario_version"] = record["scenario"]["version"]
         body["scenario_overrides"] = {**original["scenario_overrides"], name: value}
         record = await api.post("/api/runs", body)
-        return redirect(request, str(request.url_for("run", run_id=record["run_id"])))
+        return redirect(request, str(request.url_for("ui_run", run_id=record["run_id"])))
 
-    @app.get("/compare", response_class=HTMLResponse, name="compare")
+    @app.get("/compare", response_class=HTMLResponse, name="ui_compare")
     async def compare(request: Request) -> HTMLResponse:
         run_ids = request.query_params.getlist("run_ids")
         rows = (

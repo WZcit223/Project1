@@ -4,7 +4,7 @@
 <h1>Overview</h1>
 {% if view %}
   {% set results = view.results %}
-  <p class="muted">Latest run <a href="{{ url_for('run', run_id=view.results.run_id) }}"><code>{{ view.results.run_id }}</code></a></p>
+  <p class="muted">Latest run <a href="{{ url_for('ui_run', run_id=view.results.run_id) }}"><code>{{ view.results.run_id }}</code></a></p>
   <div class="tiles">
     {% for v, metrics in view.results.variants.items() %}
     <div class="tile">
@@ -17,6 +17,6 @@
   </div>
   {% include "partials/run_summary.html" with context %}
 {% else %}
-  <p>No runs yet. Start one on the <a href="{{ url_for('simulate') }}">Simulation</a> page.</p>
+  <p>No runs yet. Start one on the <a href="{{ url_for('ui_simulate') }}">Simulation</a> page.</p>
 {% endif %}
 {% endblock %}

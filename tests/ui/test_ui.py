@@ -6,6 +6,7 @@ form posts (what a browser sends), plus HTMX requests where the page uses them.
 
 import ast
 import html
+import re
 from collections.abc import Iterator
 from pathlib import Path
 from urllib.parse import urlencode
@@ -186,3 +187,36 @@ def test_synthetic_generation_page(browser: TestClient) -> None:
     assert created.status_code == 201 and "Registered" in created.text
     bad = post_form(browser, "/ui/synthetic", [("request_json", "{not json")])
     assert bad.status_code == 422 and "Not valid JSON" in bad.text
+
+
+def test_every_link_and_form_targets_the_ui(browser: TestClient) -> None:
+    """Regression: UI route names must not resolve to same-named API routes (browser smoke test)."""
+    record = post_form(browser, "/ui/simulate", run_form("baseline")).headers["location"]
+    pages = [
+        "/ui/",
+        "/ui/data",
+        "/ui/synthetic",
+        "/ui/scenarios",
+        "/ui/simulate",
+        "/ui/runs",
+        record,
+    ]
+    for path in pages:
+        text = browser.get(path).text
+        targets = re.findall(r'(?:href|action|hx-post)="(http://testserver[^"]*)"', text)
+        assert targets, path
+        for target in targets:
+            assert target.startswith("http://testserver/ui/"), (path, target)
+
+
+def test_forms_work_when_submitted_to_their_rendered_action(browser: TestClient) -> None:
+    page = browser.get("/ui/scenarios").text
+    action = re.search(r'<form method="post" action="([^"]+)"', page)
+    assert action is not None
+    fields = [
+        ("scenario_id", "action_check"),
+        ("version", "1.0.0"),
+        ("param_shock_multiplier", "1.5"),
+    ]
+    response = post_form(browser, action.group(1).replace("http://testserver", ""), fields)
+    assert response.status_code == 201 and "Saved" in response.text

@@ -4,15 +4,15 @@
 <h1>Data</h1>
 <p>
   Filter:
-  <a href="{{ url_for('data') }}">all</a> ·
-  {% for t in ['reference', 'fixture', 'synthetic', 'derived'] %}<a href="{{ url_for('data') }}?source_type={{ t }}">{{ t }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+  <a href="{{ url_for('ui_data') }}">all</a> ·
+  {% for t in ['reference', 'fixture', 'synthetic', 'derived'] %}<a href="{{ url_for('ui_data') }}?source_type={{ t }}">{{ t }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
 </p>
 <table>
   <thead><tr><th>Dataset</th><th>Version</th><th>Type</th><th>Schema</th><th class="num">Rows</th><th>Created</th></tr></thead>
   <tbody>
   {% for d in datasets %}
     <tr>
-      <td><a href="{{ url_for('dataset', dataset_id=d.dataset_id) }}">{{ d.dataset_id }}</a></td>
+      <td><a href="{{ url_for('ui_dataset', dataset_id=d.dataset_id) }}">{{ d.dataset_id }}</a></td>
       <td>{{ d.version }}</td>
       <td><span class="source source-{{ d.source_type }}">{{ d.source_type }}</span></td>
       <td><code>{{ d.schema_id }}</code></td>

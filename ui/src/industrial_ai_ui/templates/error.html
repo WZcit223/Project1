@@ -3,5 +3,5 @@
 {% block content %}
 <h1>Something went wrong</h1>
 <p class="error"><code>{{ error.code }}</code>: {{ error.message }}</p>
-{% if error.details.run_id %}<p>The run was stored as failed: <a href="{{ url_for('run', run_id=error.details.run_id) }}"><code>{{ error.details.run_id }}</code></a></p>{% endif %}
+{% if error.details.run_id %}<p>The run was stored as failed: <a href="{{ url_for('ui_run', run_id=error.details.run_id) }}"><code>{{ error.details.run_id }}</code></a></p>{% endif %}
 {% endblock %}

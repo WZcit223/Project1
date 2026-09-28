@@ -8,7 +8,7 @@
 <ul>
   <li>Produced by <code>{{ p.component.id if p.component else '–' }} {{ p.component.version if p.component else '' }}</code>{% if p.seed is not none %}, seed {{ p.seed }}{% endif %}</li>
   {% if p.scenario %}<li>Scenario <code>{{ p.scenario.scenario_id }}</code> {{ p.scenario.version }}</li>{% endif %}
-  <li>Inputs: {% for i in p.inputs %}<a href="{{ url_for('dataset', dataset_id=i.dataset_id) }}"><code>{{ i.dataset_id }}</code></a>{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}</li>
+  <li>Inputs: {% for i in p.inputs %}<a href="{{ url_for('ui_dataset', dataset_id=i.dataset_id) }}"><code>{{ i.dataset_id }}</code></a>{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}</li>
   {% for w in p.warnings %}<li class="warn">{{ w }}</li>{% endfor %}
 </ul>
 <details><summary>Fields</summary>

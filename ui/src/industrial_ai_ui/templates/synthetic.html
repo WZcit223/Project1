@@ -11,8 +11,8 @@
 {% endfor %}
 <h2>Generate</h2>
 {% if error %}<p class="error">{{ error }}</p>{% endif %}
-{% if created %}<p class="ok">Registered <a href="{{ url_for('dataset', dataset_id=created.dataset_id) }}"><code>{{ created.dataset_id }}</code></a> ({{ created.row_count }} rows, {{ created.source_type }}).</p>{% endif %}
-<form method="post" action="{{ url_for('generate') }}">
+{% if created %}<p class="ok">Registered <a href="{{ url_for('ui_dataset', dataset_id=created.dataset_id) }}"><code>{{ created.dataset_id }}</code></a> ({{ created.row_count }} rows, {{ created.source_type }}).</p>{% endif %}
+<form method="post" action="{{ url_for('ui_generate') }}">
   <textarea name="request_json" rows="22">{{ request_json }}</textarea>
   <button type="submit">Generate</button>
 </form>
