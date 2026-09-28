@@ -46,8 +46,11 @@ class ScenarioPack(Protocol):                     # industrial_ai.application (i
     title: str                        # "Inventory Demand Forecasting & Replenishment Simulation"
     description: str
     run_options_model: type[BaseModel]  # validates RunRequest.options (pack-specific)
+    requires_reference: bool          # RunRequest.reference (reference data location) required?
 
     def scenarios(self) -> ScenarioRegistry: ...   # validated against the pack's parameter model
+    def components(self) -> list[ComponentInfo]: ...
+        # selectable components with parameter schemas: kinds "strategy", "forecast", "simulation"
     def run(self, resolved: ResolvedRun) -> PackRunOutput: ...
         # executes the pack's pipeline; raises on failure
 
@@ -65,13 +68,15 @@ framework's `WorkflowRunner` owns request validation (pack, scenario, overrides,
 logging, the run store and failure recording. A generic step/DAG language is not needed for one pack
 and is not built (roadmap if a second pack needs it).
 
-`WorkflowRunner.run(RunRequest) → RunRecord`: resolves the pack (`RunRequestError` if unknown), the
-scenario (latest or pinned version) and merges `scenario_overrides` into its parameters, validates them
+`WorkflowRunner.run(RunRequest) → RunRecord`: resolves the pack (`RunRequestError` if unknown or if
+a required `reference` is missing), the scenario (latest or pinned version; the pack's own plus
+user-defined scenarios when run through the application service) and merges `scenario_overrides` into its parameters, validates them
 with the pack's parameter model and `options` with `run_options_model`, calls `pack.run`, then stores a
 `RunRecord` (status, effective scenario, overrides, per-variant and supporting total metrics, links
 `(dataset_id, version, content_hash)` to every input and output dataset, labels). Datasets go to the
 dataset catalog: identical content is reused, the same id with different content is refused. A pipeline
-exception is stored as a `failed` run and re-raised — never reported as success.
+exception is stored as a `failed` run and raised as `RunFailedError` (carrying the run id, cause
+chained) — never reported as success.
 
 Discovery: Python entry points group **`industrial_ai.scenario_packs`**, declared in the pack's
 `pyproject.toml`:

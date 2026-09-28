@@ -38,9 +38,11 @@ The scenario layer is configuration only: it imports no generator, simulation or
 
 Warehouse scenario files live in
 `scenarios/warehouse/src/industrial_ai_warehouse/scenarios/definitions/*.yaml`; `builtin_scenarios()`
-loads them. User-defined scenarios (Scenario Builder, stored in SQLite with `source: user`) are
-**not implemented yet** (Phase 12–13). Specs are immutable once used by a run; edits create a new
-version.
+loads them. User-defined scenarios are created with `POST /api/scenarios` (Phase 12): validated
+against the pack's parameter model, stored in SQLite with `source: user`, and merged with the pack's
+scenarios for listing and runs. Specs are immutable: an existing `(scenario_id, version)` — pack or
+user — cannot be replaced (409); a change needs a new version. The Scenario Builder UI follows in
+Phase 13.
 
 ## 3. Warehouse scenario parameters
 
