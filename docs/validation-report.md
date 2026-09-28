@@ -1,6 +1,6 @@
 # Validation Report — v0.1
 
-Generated 2026-09-28 09:16 UTC by `scripts/validation_report.py` from commit `dc940f7` on branch `phase14`. Python 3.11.15, pandas 3.0.6, numpy 2.4.6, lightgbm 4.7.0; seed 20260927. Categories as defined in [validation.md §1](validation.md#1-validation-categories).
+Generated 2026-09-28 09:54 UTC by `scripts/validation_report.py` from commit `864bb0b` on branch `phase15`. Python 3.11.15, pandas 3.0.6, numpy 2.4.6, lightgbm 4.7.0; seed 20260927. Categories as defined in [validation.md §1](validation.md#1-validation-categories).
 
 > **Claim.** *The framework validates synthetic data generation and scenario execution at
 > the prototype level.* No claim is made that synthetic data, forecasts or strategy
@@ -12,16 +12,18 @@ Generated 2026-09-28 09:16 UTC by `scripts/validation_report.py` from commit `dc
 | Category | Evidence | Result |
 |---|---|---|
 | **V1** Software / framework correctness | 314 tests: 314 passed, 0 failed, 0 skipped | ✅ pass |
-| **V2** Framework integration / Golden Path | 49 tests: 49 passed, 0 failed, 0 skipped | ✅ pass |
-| **V3** Scenario & reference-data validation | 13 tests: 13 passed, 0 failed, 0 skipped | ✅ pass |
+| **V2** Framework integration / Golden Path | 51 tests: 51 passed, 0 failed, 0 skipped | ✅ pass |
+| **V3** Scenario & reference-data validation | 14 tests: 14 passed, 0 failed, 0 skipped | ✅ pass |
 | **V3** reference data (descriptive) | M5 subset: data checks 279 passed / 0 failed; calibration comparison, forecast backtest, Golden Path smoke run (§3.2) | ✅ checks pass; comparisons descriptive |
 | **V4** Real operational validation | — | ⛔ not performed (future) |
+
+Coverage: V1 + V2 + V3 = 379 of 379 tests collected by pytest — every test is reported under exactly one category.
 
 ## 1. V1 — Software / framework correctness
 
 Unit and contract tests of every layer; architecture import rules (the framework never imports packs, layer dependencies, the UI imports no framework module); synthetic-data structure (schema, constraints, relationships, reproducibility, provenance); metric definitions; failure modes.
 
-`uv run pytest tests/unit -m "not m5_local"` — 22 s
+`uv run pytest tests/unit -m "not (m5_local or scenario_checks)"` — 21 s
 
 | Test module | Tests |
 |---|---|
@@ -63,19 +65,20 @@ Unit and contract tests of every layer; architecture import rules (the framework
 
 End to end on the M5-shaped test fixture: canonical data → synthetic data → forecast → inventory × strategies × scenarios → metrics, through the workflow runner, the HTTP Application API and the browser UI; persisted datasets with verified hashes; provenance; reproducibility; no look-ahead; error handling.
 
-`uv run pytest tests/integration tests/scenario/test_golden_path.py tests/ui -m "not m5_local"` — 97 s
+`uv run pytest tests/integration tests/scenario/test_golden_path.py tests/ui -m "not (m5_local or scenario_checks)"` — 114 s
 
 | Test module | Tests |
 |---|---|
 | `tests/integration/test_api_golden_path.py` | 9 |
 | `tests/integration/test_api_health.py` | 3 |
 | `tests/integration/test_dataset_foundation.py` | 1 |
+| `tests/integration/test_demo.py` | 1 |
 | `tests/integration/test_inventory_pipeline.py` | 2 |
 | `tests/integration/test_no_look_ahead.py` | 1 |
 | `tests/integration/test_strategy_comparison.py` | 3 |
 | `tests/integration/test_synthetic_engine.py` | 1 |
 | `tests/scenario/test_golden_path.py` | 18 |
-| `tests/ui/test_ui.py` | 10 |
+| `tests/ui/test_ui.py` | 11 |
 | `tests/ui/test_ui_stub_api.py` | 1 |
 
 ## 3. V3 — Scenario & reference-data validation
@@ -84,10 +87,11 @@ End to end on the M5-shaped test fixture: canonical data → synthetic data → 
 
 Scenario behaviour checks (docs/validation.md §4) on the fixture, and tests on the committed M5 reference subset; descriptive reference-data results follow in §3.2.
 
-`uv run pytest tests/scenario/test_warehouse_scenarios.py tests/integration/test_m5_local.py` — 18 s
+`uv run pytest tests -m "m5_local or scenario_checks"` — 38 s
 
 | Test module | Tests |
 |---|---|
+| `tests/integration/test_demo.py` | 1 |
 | `tests/integration/test_m5_local.py` | 3 |
 | `tests/scenario/test_warehouse_scenarios.py` | 10 |
 
