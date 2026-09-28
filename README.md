@@ -10,8 +10,10 @@ The first validation scenario is **Warehouse / Inventory — Demand Forecasting 
 Simulation**, built on the M5 Forecasting Accuracy reference dataset plus synthetic operational data.
 Warehouse is a *scenario plugin*, not the framework itself.
 
-> Status: **Phase 0 — Architecture Specification approved (Gate 0)** (v0.1.0.dev0). No application logic is implemented yet.
-> This is a prototype; see [docs/validation.md](docs/validation.md) for what is and is not validated.
+> Status: **v0.1.0.dev0 — Phases 0–13 implemented** (framework, warehouse pack, Golden Path, Application
+> API, demo UI); validation, demo and release follow (Phases 14–16, see [docs/task-backlog.md](docs/task-backlog.md)).
+> This is a prototype on synthetic data; see [docs/validation.md](docs/validation.md) for what is and is not
+> validated.
 
 ## Documentation
 
@@ -46,7 +48,11 @@ uv run ruff check .          # lint
 uv run ruff format --check . # formatting
 uv run mypy                  # type check
 uv run python -m industrial_ai.api   # start the Application API (http://127.0.0.1:8000/health, docs at /api/docs)
+uv run python scripts/serve.py       # demo: API + UI in one process, open http://127.0.0.1:8000/ui/
 ```
+
+The demo UI (`ui/`, package `industrial_ai_ui`) uses only the Application API; runs select reference data by
+id (`IAI_REFERENCE_DIRS`, default `m5_subset` → `data/reference/m5_subset/`).
 
 ## Data
 

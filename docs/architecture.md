@@ -2,7 +2,7 @@
 
 Status: **Approved at Gate 0 (2026-09-27), v0.1 baseline** · 中文: [zh/architecture.md](zh/architecture.md)
 Related ADRs: [ADR-001](adr/ADR-001-api-first.md), [ADR-002](adr/ADR-002-plugin-architecture.md),
-[ADR-003](adr/ADR-003-m5-canonical-adapter.md), [ADR-004](adr/ADR-004-scenario-pack-packaging.md)
+[ADR-003](adr/ADR-003-m5-canonical-adapter.md), [ADR-004](adr/ADR-004-scenario-pack-packaging.md), [ADR-005](adr/ADR-005-ui-package.md)
 
 ## 1. Layered architecture
 
@@ -112,7 +112,8 @@ scenarios/warehouse/                 # WAREHOUSE SCENARIO PACK — separate pack
     │                    demand_shock, supply_disruption}.yaml
     └── pack.py          WarehouseScenarioPack: registers everything with the framework (planned, Phase 12)
 
-ui/                    Jinja2 templates + static (HTMX); served by a thin UI router
+ui/                    UI package industrial_ai_ui (Jinja2 + HTMX, SVG charts); calls the Application
+                       API over HTTP only, imports no framework module (ADR-005)
 scripts/               make_m5_subset.py, make_m5_fixture.py, run_demo.py
 ```
 

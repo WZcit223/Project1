@@ -94,7 +94,7 @@ CLAUDE.md  README.md  pyproject.toml  uv.lock  .env.example
 docs/                  specs, ADRs (docs/adr/), dev log, roadmap, Chinese mirror (docs/zh/)
 src/industrial_ai/     framework core: core/ foundation/ synthetic/ simulation/ application/ api/
 scenarios/warehouse/   Warehouse scenario plugin (depends on the framework; never imported by it)
-ui/                    Jinja2 templates + static assets (talks to the Application API only)
+ui/                    UI package: Jinja2 templates + static assets (talks to the Application API only; ADR-005)
 tests/unit|integration|scenario/
 scripts/               CLI utilities (e.g. M5 subset extraction)
 data/raw|interim|processed/   local data, git-ignored
