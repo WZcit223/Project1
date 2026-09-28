@@ -26,7 +26,7 @@
 | M8 库存仿真 | 8 | G7 库存仿真可工作 | M6, M5 | ✅ 已批准 2026-09-27 |
 | M9 策略 | 9 | G8 策略可比较 | M8, M7 | ✅ 已批准 2026-09-27（附后续事项 TASK-STR-004） |
 | M10 场景引擎 | 10 | （G8/G9 的一部分） | M4, M6 | ✅ 已批准 2026-09-28 |
-| M11 Golden Path | 11 | G9 Golden Path 可工作 | M5–M10 | ⬜ |
+| M11 Golden Path | 11 | G9 Golden Path 可工作 | M5–M10 | 🟡 待负责人审阅 |
 | M12 Application API | 12 | G10 API 可独立于 UI 工作 | M11 | ⬜ |
 | M13 UI | 13 | G11 UI 可执行 Golden Path | M12 | ⬜ |
 | M14 验证 | 14 | G12 验证通过 | M11–M13 | ⬜ |
@@ -179,8 +179,8 @@
 
 ## Phase 11 — Golden Path
 
-### TASK-GP-001 — ScenarioPack 协议、场景包发现、工作流运行器、运行存储  [`feature/golden-path`]
-### TASK-GP-002 — Golden Path 测试  [`feature/golden-path`]
+### TASK-GP-001 — ScenarioPack 协议、场景包发现、工作流运行器、运行存储  [`phase11`] ✅
+### TASK-GP-002 — Golden Path 测试  [`phase11`] ✅
 - 夹具 → 规范模型 → 合成 → 预测 → 库存 × 3 种策略 → 4 个场景 → 指标；可复现。  **Gate 9。**
 
 ## Phase 12 — Application API

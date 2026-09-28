@@ -24,7 +24,7 @@ Branch name suggestion in brackets.
 | M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ✅ approved 2026-09-27 |
 | M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ✅ approved 2026-09-27 (with follow-ups TASK-STR-004) |
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ✅ approved 2026-09-28 |
-| M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |
+| M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | 🟡 awaiting owner review |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ⬜ |
 | M13 UI | 13 | G11 UI executes Golden Path | M12 | ⬜ |
 | M14 Validation | 14 | G12 Validation passes | M11–M13 | ⬜ |
@@ -182,8 +182,8 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 11 — Golden Path
 
-### TASK-GP-001 — ScenarioPack protocol, pack discovery, workflow runner, run store  [`feature/golden-path`]
-### TASK-GP-002 — Golden Path test  [`feature/golden-path`]
+### TASK-GP-001 — ScenarioPack protocol, pack discovery, workflow runner, run store  [`phase11`] ✅
+### TASK-GP-002 — Golden Path test  [`phase11`] ✅
 - Fixture → canonical → synthetic → forecast → inventory × 3 strategies → 4 scenarios → metrics; reproducible.  **Gate 9.**
 
 ## Phase 12 — Application API
