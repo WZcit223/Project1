@@ -5,6 +5,27 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Gate 11 / M13 approved
+
+### Branch
+`phase13` (CI green on `073b0ce`)
+
+### Changes
+- Owner: Gate 11 conditional PASS; the five conditions are closed (see the entry below) and CI is green
+  on the final Phase 13 commit, so Gate 11 is approved. Kept as decided: separate `industrial_ai_ui`
+  package, HTTP-only API access, Jinja2 + HTMX, server-side SVG charts, JSON synthetic-data request,
+  default-driven scenario builder, import-boundary test. Chart-legend overlap is P2 backlog.
+  M13 ✅ in the backlog (EN + ZH).
+- Owner guidance for Phase 14: keep four validation categories explicit — software/framework
+  correctness, framework integration / Golden Path, scenario/reference-data validation, future real
+  operational validation — and never present M5 as warehouse operational data (it is the reference
+  demand/sales environment used together with synthetic operational data).
+
+### Next
+Phase 14 (validation suite and report) on branch `phase14` created from `phase13`.
+
+---
+
 ## 2026-09-28 — Gate 11 conditions closed (Phase 13 follow-up)
 
 ### Branch

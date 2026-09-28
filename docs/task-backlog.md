@@ -26,7 +26,7 @@ Branch name suggestion in brackets.
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ✅ approved 2026-09-28 |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ✅ approved 2026-09-28 |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ✅ approved 2026-09-28 |
-| M13 UI | 13 | G11 UI executes Golden Path | M12 | 🟡 awaiting owner review |
+| M13 UI | 13 | G11 UI executes Golden Path | M12 | ✅ approved 2026-09-28 (conditions closed) |
 | M14 Validation | 14 | G12 Validation passes | M11–M13 | ⬜ |
 | M15 Demo | 15 | G13 Demo stable | M14 | ⬜ |
 | M16 Docs & release | 16 | G14 v0.1.0 release candidate | M14 | ⬜ |
