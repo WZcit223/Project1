@@ -7,12 +7,22 @@ response models. No algorithm or data logic lives in this package.
 from fastapi import FastAPI
 
 from industrial_ai import __version__
+from industrial_ai.api.catalog import router as catalog_router
+from industrial_ai.api.errors import install_error_handlers
 from industrial_ai.api.health import router as health_router
+from industrial_ai.api.runs import router as runs_router
+from industrial_ai.application import ApplicationService
 from industrial_ai.core.config import Settings, load_settings
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
-    """Build the API application. ``settings`` defaults to :func:`load_settings`."""
+def create_app(
+    settings: Settings | None = None, service: ApplicationService | None = None
+) -> FastAPI:
+    """Build the API application.
+
+    ``settings`` defaults to :func:`load_settings`; ``service`` (tests) defaults to an
+    :class:`ApplicationService` created from the settings on first request.
+    """
     app = FastAPI(
         title="Industrial AI Framework — Application API",
         version=__version__,
@@ -22,5 +32,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         redoc_url=None,
     )
     app.state.settings = settings if settings is not None else load_settings()
+    if service is not None:
+        app.state.service = service
+    install_error_handlers(app)
     app.include_router(health_router)
+    app.include_router(catalog_router)
+    app.include_router(runs_router)
     return app
