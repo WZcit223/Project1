@@ -43,7 +43,7 @@ class DatasetCatalog:
 
     def __init__(self, database_url: str, artifact_root: Path) -> None:
         self._artifact_root = artifact_root
-        self._engine = _create_engine(database_url)
+        self._engine = create_database_engine(database_url)
         SQLModel.metadata.create_all(self._engine, tables=CATALOG_TABLES)
 
     @classmethod
@@ -103,6 +103,15 @@ class DatasetCatalog:
             metadata=DatasetMetadata.model_validate_json(record.metadata_json),
             provenance=ProvenanceRecord.model_validate_json(record.provenance_json),
         )
+
+    def summary(self, dataset_id: str, version: str | None = None) -> DatasetSummary:
+        """Catalog entry without loading the data (latest version if ``version`` is omitted).
+
+        Raises:
+            DatasetNotFoundError: if it is not registered.
+        """
+        with self._session() as session:
+            return _summary(self._require(session, dataset_id, version))
 
     def contains(self, dataset_id: str, version: str | None = None) -> bool:
         with self._session() as session:
@@ -222,7 +231,8 @@ class DatasetCatalog:
         tmp.replace(path)
 
 
-def _create_engine(database_url: str) -> Engine:
+def create_database_engine(database_url: str) -> Engine:
+    """SQLAlchemy engine; creates the directory of a file-based SQLite database."""
     url = make_url(database_url)
     if url.get_backend_name() == "sqlite" and url.database not in (None, "", ":memory:"):
         Path(url.database).parent.mkdir(parents=True, exist_ok=True)
