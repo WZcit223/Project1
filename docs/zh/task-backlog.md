@@ -208,3 +208,8 @@
 - TASK-P1-INTENT：自然语言意图 → 经过校验的 RunRequest（LLM 提案 + 校验器），未经确认绝不执行。
 - TASK-P1-BI：基于结果表的轻量级 BI（透视、分组、筛选）。
 - TASK-P1-REPORT：可导出的运行报告（Markdown/HTML）。
+
+## P2（已知的打磨项；不阻塞 v0.1.0）
+
+- TASK-P2-LEGEND：在较窄的 SVG 图表中，图例可能与曲线重叠（UI，外观问题；Gate 11/13 审阅）。
+- TASK-P2-GENFORMS：根据参数 schema 渲染生成器表单，替代 JSON 请求（亦列于路线图）。

@@ -211,3 +211,9 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 - TASK-P1-INTENT: NL intent → validated RunRequest (LLM proposal + validator), never executed without confirmation.
 - TASK-P1-BI: lightweight BI (pivot, group, filter) on result tables.
 - TASK-P1-REPORT: exportable run report (Markdown/HTML).
+
+## P2 (known polish items; do not block v0.1.0)
+
+- TASK-P2-LEGEND: chart legends can overlap the lines on narrow SVG charts (UI, cosmetic; Gate 11/13 review).
+- TASK-P2-GENFORMS: generator forms rendered from parameter schemas instead of a JSON request
+  (also in the roadmap).
