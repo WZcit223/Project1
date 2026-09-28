@@ -157,6 +157,8 @@ class DemandStats:
     series: int
     days: int
     mean_per_series_day: float
+    mean_per_selling_day: float
+    """Mean over series-days with sales > 0."""
     cv_daily_total: float
     zero_share: float
     weekday_index: tuple[float, ...]
@@ -191,6 +193,7 @@ def demand_stats(frame: pd.DataFrame) -> DemandStats:
         series=int(frame.groupby(["product_id", "store_id"]).ngroups),
         days=int(frame["date"].nunique()),
         mean_per_series_day=float(frame["quantity"].mean()),
+        mean_per_selling_day=float(frame.loc[frame["quantity"] > 0, "quantity"].mean()),
         cv_daily_total=float(daily.std() / daily.mean()),
         zero_share=float((frame["quantity"] == 0).mean()),
         weekday_index=tuple(round(float(v / daily.mean()), 3) for v in by_weekday),
@@ -375,6 +378,7 @@ def render(suites: list[SuiteResult], ref: ReferenceResult, gp: GoldenPathResult
 
 def render_reference(ref: ReferenceResult, gp: GoldenPathResult) -> list[str]:
     r, s = ref.reference_stats, ref.synthetic_stats
+    level_gap = s.mean_per_series_day / r.mean_per_series_day - 1
     lines = [
         "### 3.2 Reference data: the committed M5 subset",
         "",
@@ -405,6 +409,8 @@ def render_reference(ref: ReferenceResult, gp: GoldenPathResult) -> list[str]:
         f"| Series | {r.series} | {s.series} |",
         f"| Mean units per series-day | {fmt(r.mean_per_series_day)} | "
         f"{fmt(s.mean_per_series_day)} |",
+        f"| Mean units per series-day with sales > 0 | {fmt(r.mean_per_selling_day)} | "
+        f"{fmt(s.mean_per_selling_day)} |",
         f"| Coefficient of variation of daily totals | {fmt(r.cv_daily_total)} | "
         f"{fmt(s.cv_daily_total)} |",
         f"| Share of zero series-days | {fmt(r.zero_share, 'pct')} | {fmt(s.zero_share, 'pct')} |",
@@ -415,10 +421,14 @@ def render_reference(ref: ReferenceResult, gp: GoldenPathResult) -> list[str]:
         + " |",
         f"| Correlation of per-item mean units | — | {fmt(ref.item_mean_correlation)} |",
         "",
-        "Reading: item levels and the weekly pattern carry over; the synthetic series has fewer "
-        "zero "
-        "days (runs of zero sales, often stockouts, are not modelled — roadmap P1). The synthetic "
-        "horizon (after the reference data) and the reference year cover different seasons.",
+        f"Reading: synthetic mean demand is {level_gap:+.0%} versus the reference mean, "
+        "consistent with the reference containing runs of zero sales "
+        f"({fmt(r.zero_share, 'pct')} of series-days; often stockouts) that the generator does "
+        f"not model ({fmt(s.zero_share, 'pct')}); on selling days the means are close "
+        f"({fmt(r.mean_per_selling_day)} vs. {fmt(s.mean_per_selling_day)}). Per-item levels are "
+        "strongly correlated and the weekday pattern is reproduced. The synthetic horizon (after "
+        "the reference data) and the reference year also cover different seasons. Zero-run "
+        "modelling is on the roadmap (P1).",
         "",
         f"**Forecast backtest on reference sales** (weekly origins {ref.forecast_window[0]} … "
         f"{ref.forecast_window[1]}, 28-day horizon, history strictly before each origin):",
