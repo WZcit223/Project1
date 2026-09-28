@@ -20,6 +20,8 @@ import httpx2
 
 SEED = 20260927
 HORIZON_DAYS = 91
+FORECAST_MODEL = "seasonal_naive"
+"""The demo and the validation report use the same explicit configuration."""
 KPIS = (
     ("fill_rate", "Fill rate", "pct"),
     ("stockout_day_rate", "Stockout-day rate", "pct"),
@@ -69,6 +71,7 @@ def run_demo(client: httpx2.Client, scenario: str, horizon_days: int) -> dict[st
         "reference_id": "m5_subset",
         "seed": SEED,
         "horizon_days": horizon_days,
+        "options": {"forecast_model": FORECAST_MODEL},
     }
     baseline = post_run(client, scenario_id="baseline", **base)
     stress = post_run(client, scenario_id=scenario, **base)
@@ -111,6 +114,10 @@ def main() -> int:
 
     with api_client(args.api, args.reference.resolve()) as client:
         print("Scenario packs:", [p["pack_id"] for p in client.get("/api/scenario-packs").json()])
+        print(
+            f"Configuration: reference m5_subset, seed {SEED}, horizon {args.horizon_days} days, "
+            f"forecast {FORECAST_MODEL}, strategies {', '.join(STRATEGIES)}"
+        )
         runs = run_demo(client, args.scenario, args.horizon_days)
         baseline, stress, what_if = runs["baseline"], runs[args.scenario], runs["what-if"]
         for record in (baseline, stress, what_if):

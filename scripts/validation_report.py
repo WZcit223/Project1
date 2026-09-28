@@ -52,6 +52,8 @@ SEED = 20260927
 HORIZON_DAYS = 91
 STRATEGIES = ("reorder_point", "safety_stock", "dynamic")
 FORECAST_MODELS = ("seasonal_naive", "moving_average", "lightgbm")
+GOLDEN_PATH_FORECAST = "seasonal_naive"
+"""Explicit, and identical to scripts/demo.py and the UI default (docs/demo-guide.md)."""
 WEEKDAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 SUITES: dict[str, tuple[str, str, list[str]]] = {
@@ -280,6 +282,7 @@ def golden_path_on_reference(workdir: Path) -> GoldenPathResult:
             horizon_days=HORIZON_DAYS,
             reference_id="m5_subset",
             reference=str(REFERENCE),
+            options={"forecast_model": GOLDEN_PATH_FORECAST},
         )
         return runner.run(request).variant_metrics
 

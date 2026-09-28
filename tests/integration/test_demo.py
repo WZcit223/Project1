@@ -57,6 +57,7 @@ def test_demo_cli_runs_the_golden_path_reproducibly() -> None:
     for strategy in ("[reorder_point]", "[safety_stock]", "[dynamic]"):
         assert strategy in first
     assert "overrides={'lead_time_delta': 5}" in first
+    assert "forecast seasonal_naive" in first and "seed 20260927" in first
     assert "not evidence of real-world performance" in first
 
     def stable(text: str) -> list[str]:
