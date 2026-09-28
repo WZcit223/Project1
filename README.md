@@ -6,15 +6,23 @@ A reusable **Industrial AI Application Framework Prototype**:
 Data → Synthetic Data → Prediction / Simulation → Scenario / Strategy → Application → Decision Support
 ```
 
-The first validation scenario is **Warehouse / Inventory — Demand Forecasting & Replenishment
-Simulation**, built on the M5 Forecasting Accuracy reference dataset plus synthetic operational data.
-Warehouse is a *scenario plugin*, not the framework itself.
+This prototype demonstrates an **Industrial AI Application Framework** through an **Inventory Demand
+Forecasting & Replenishment** scenario, using M5 as reference demand data and synthetic operational
+data. Keep three things apart:
 
-> Status: **v0.1.0.dev0 — Phases 0–14 implemented** (framework, warehouse pack, Golden Path, Application
-> API, demo UI, validation report); demo guide (Phase 15) and release (Phase 16) follow, see
-> [docs/task-backlog.md](docs/task-backlog.md).
-> This is a prototype on synthetic data; see [docs/validation.md](docs/validation.md) for what is and is not
-> validated.
+| | What it is | In this repository |
+|---|---|---|
+| **Framework** | Reusable, domain-neutral building blocks | `src/industrial_ai/` (never imports a scenario pack) |
+| **Scenario** | One inventory case built on the framework's public APIs | `scenarios/warehouse/` (a replaceable plugin) |
+| **Real-world validation** | Evidence that results hold for a real warehouse (V4) | **Not performed** |
+
+It is not a warehouse product and has not been shown to improve any real operation; results compare
+strategies under identical, controlled simulated conditions.
+
+> Status: **v0.1.0.dev0 — Phases 0–15 implemented** (framework, warehouse pack, Golden Path, Application
+> API, demo UI, validation report, demo guide); Phase 16 (v0.1.0 release readiness) in progress, see
+> [docs/task-backlog.md](docs/task-backlog.md). What is and is not validated:
+> [docs/validation.md](docs/validation.md), [docs/validation-report.md](docs/validation-report.md).
 
 ## Documentation
 

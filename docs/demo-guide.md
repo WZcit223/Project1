@@ -16,6 +16,8 @@ reproduce the result, and understand what has and has not been validated?*
 *This prototype demonstrates an **Industrial AI application framework** through an **inventory demand
 forecasting and replenishment** scenario, using M5 as reference demand data and synthetic operational
 data.* It is not a warehouse product, and it has not been shown to improve any real operation.
+**Framework ≠ scenario ≠ real-world validation:** the framework is reusable, the inventory scenario is one
+plugin built on it, and real operational validation (V4) has not been performed.
 
 | | Framework (`src/industrial_ai/`) | Scenario pack (`scenarios/warehouse/`) |
 |---|---|---|
