@@ -26,8 +26,14 @@ interactive docs at `/api/docs`. Start locally: `uv run python -m industrial_ai.
 
 - Provenance: a run lists `inputs` and `outputs` as `(dataset_id, version, content_hash)`;
   `GET /api/datasets/{dataset_id}` returns each dataset's full provenance record.
-- Reference data is selected by a configured **reference id** (`IAI_REFERENCE_DIRS`); clients never
-  send file paths.
+- Reference data is selected by a **reference dataset identifier** `reference_id` (e.g. `m5_subset`;
+  pattern `^[A-Za-z0-9][A-Za-z0-9_.-]*$`). It names a reference dataset configured on the server
+  (`IAI_REFERENCE_DIRS`); it is **not** a file path. Path-like values are rejected (422), and the
+  server-side location is never returned (run records show only `request.reference_id`).
+- **Re-run semantics:** a stored run is reproduced by posting its `pack`, `reference_id`, `scenario_id`,
+  `scenario.version` (pin it — omitting the version selects the latest), `seed`, `horizon_days`,
+  `options` and `scenario_overrides`; a what-if adds or changes one override. Same inputs → same
+  metrics (tested).
 - No authentication in v0.1 (non-goal); the API binds to localhost by default.
 
 ## 2. Endpoints (implemented)

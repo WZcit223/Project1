@@ -65,9 +65,9 @@ Package `ui/src/industrial_ai_ui` (ADR-005). Run the demo with `uv run python sc
 | Overview | `/ui/` | KPI tiles per strategy of the latest succeeded run, full KPI table, demand / on-hand / unfulfilled-demand charts |
 | Data | `/ui/data`, `/ui/data/{id}` | Catalog with source-type badges (reference, fixture, synthetic, derived); dataset page with provenance (producer, seed, scenario, linked inputs, warnings), fields and a 20-row preview |
 | Synthetic data | `/ui/synthetic` | Generators with parameter schemas; a **JSON** generation request (pre-filled example) sent to the API. Forms rendered from each generator's schema are FUTURE. Scenario runs generate their demand themselves |
-| Scenario builder | `/ui/scenarios` | Existing scenarios; form rendered from the pack's parameter JSON schema, pre-filled with the defaults, min/max from the schema; only changed values are saved; API validation errors are shown |
+| Scenario builder | `/ui/scenarios` | Existing scenarios; form rendered from the pack's parameter JSON schema served by `GET /api/scenarios/{id}` (names, defaults, min/max — nothing pack-specific in the UI code, tested with a stub API); only changed values are saved; API validation errors are shown |
 | Simulation | `/ui/simulate` | Reference id, scenario, forecast model, strategies, horizon, seed → run (HTMX progress, redirect to the run page) |
-| Results | `/ui/runs`, `/ui/runs/{id}`, `/ui/compare` | Run list with failures and errors; run page with KPI table, charts, what-if (one parameter changed, same seed) and dataset links; comparison of selected runs, one table per strategy with scenarios as columns (§3) |
+| Results | `/ui/runs`, `/ui/runs/{id}`, `/ui/compare` | Run list with failures and errors; run page with KPI table, charts, what-if (one parameter changed; same reference id, pinned scenario version, seed and options) and dataset links; comparison of selected runs, one table per strategy with scenarios as columns (§3) |
 
 Labels live in `industrial_ai_ui/messages.py` (one catalog; a Chinese catalog can be added). Every page shows
 the "Prototype · Synthetic data" badge and the honesty note. API errors are rendered with their code and

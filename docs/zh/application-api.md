@@ -27,7 +27,12 @@
 
 - 溯源（provenance）：一次运行以 `(dataset_id, version, content_hash)` 列出其 `inputs` 和 `outputs`；
   `GET /api/datasets/{dataset_id}` 返回每个数据集完整的溯源记录。
-- 参考数据通过已配置的**参考数据 id**（`IAI_REFERENCE_DIRS`）选择；客户端从不发送文件路径。
+- 参考数据通过**参考数据集标识符** `reference_id` 选择（例如 `m5_subset`；格式
+  `^[A-Za-z0-9][A-Za-z0-9_.-]*$`）。它指代服务器上已配置的参考数据集（`IAI_REFERENCE_DIRS`），**不是**文件路径。
+  类似路径的值会被拒绝（422），服务器端的存储位置也从不返回（运行记录中只显示 `request.reference_id`）。
+- **重新运行语义：** 复现一次已保存的运行，需提交其 `pack`、`reference_id`、`scenario_id`、`scenario.version`
+  （需固定版本——省略版本则选择最新版本）、`seed`、`horizon_days`、`options` 和 `scenario_overrides`；what-if
+  则增加或修改一个覆盖参数。相同输入 → 相同指标（已测试）。
 - v0.1 不提供身份认证（非目标）；API 默认绑定到 localhost。
 
 ## 2. 端点（已实现）

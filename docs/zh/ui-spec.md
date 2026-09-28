@@ -65,9 +65,9 @@ Overview → Scenario Builder（选择 High Demand）→ Synthetic Data（生成
 | Overview（概览） | `/ui/` | 最近一次成功运行中各策略的 KPI 卡片、完整 KPI 表、需求 / 在库库存 / 未满足需求图表 |
 | Data（数据） | `/ui/data`, `/ui/data/{id}` | 带来源类型徽标（reference、fixture、synthetic、derived）的数据目录；数据集页面展示溯源信息（生产者、种子、场景、关联输入、警告）、字段及 20 行预览 |
 | Synthetic Data（合成数据） | `/ui/synthetic` | 带参数 schema 的生成器列表；向 API 发送 **JSON** 生成请求（预填示例）。根据各生成器 schema 渲染的表单为 FUTURE。场景运行会自行生成其需求数据 |
-| Scenario Builder（场景构建器） | `/ui/scenarios` | 现有场景；表单由场景包的参数 JSON schema 渲染，预填默认值，最小 / 最大值取自 schema；仅保存修改过的值；展示 API 校验错误 |
+| Scenario Builder（场景构建器） | `/ui/scenarios` | 现有场景；表单由 `GET /api/scenarios/{id}` 提供的场景包参数 JSON schema 渲染（名称、默认值、最小 / 最大值——UI 代码中没有任何场景包专属内容，已用桩 API 测试）；仅保存修改过的值；展示 API 校验错误 |
 | Simulation（仿真） | `/ui/simulate` | 参考数据集 id、场景、预测模型、策略、预测期、种子 → 运行（HTMX 进度显示，完成后重定向至运行页面） |
-| Results（结果） | `/ui/runs`, `/ui/runs/{id}`, `/ui/compare` | 包含失败与错误信息的运行列表；运行页面含 KPI 表、图表、假设分析（修改一个参数，相同种子）及数据集链接；所选运行的对比，每个策略一张表，场景作为列（§3） |
+| Results（结果） | `/ui/runs`, `/ui/runs/{id}`, `/ui/compare` | 包含失败与错误信息的运行列表；运行页面含 KPI 表、图表、假设分析（修改一个参数；相同的参考数据 id、固定的场景版本、种子和选项）及数据集链接；所选运行的对比，每个策略一张表，场景作为列（§3） |
 
 标签存放在 `industrial_ai_ui/messages.py`（单一消息目录；可添加中文目录）。每个页面都显示
 "Prototype · Synthetic data"徽标及诚实说明（honesty note）。API 错误连同其错误码和消息一并展示；
