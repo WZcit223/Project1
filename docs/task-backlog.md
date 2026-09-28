@@ -26,7 +26,7 @@ Branch name suggestion in brackets.
 | M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ✅ approved 2026-09-28 |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ✅ approved 2026-09-28 |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ✅ approved 2026-09-28 |
-| M13 UI | 13 | G11 UI executes Golden Path | M12 | ⬜ |
+| M13 UI | 13 | G11 UI executes Golden Path | M12 | 🟡 awaiting owner review |
 | M14 Validation | 14 | G12 Validation passes | M11–M13 | ⬜ |
 | M15 Demo | 15 | G13 Demo stable | M14 | ⬜ |
 | M16 Docs & release | 16 | G14 v0.1.0 release candidate | M14 | ⬜ |
@@ -194,9 +194,9 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 
 ## Phase 13 — UI
 
-### TASK-UI-001 — Layout, Overview, Data pages  [`feature/ui-dashboard`]
-### TASK-UI-002 — Synthetic Data, Scenario Builder pages
-### TASK-UI-003 — Simulation, Results pages (+ what-if re-run)
+### TASK-UI-001 — Layout, Overview, Data pages  [`phase13`] ✅
+### TASK-UI-002 — Synthetic Data, Scenario Builder pages  [`phase13`] ✅
+### TASK-UI-003 — Simulation, Results pages (+ what-if re-run)  [`phase13`] ✅
 - Acceptance: Golden Path executable from browser; UI code imports no framework module.  **Gate 11.**
 
 ## Phase 14–16 — Validation, demo, release

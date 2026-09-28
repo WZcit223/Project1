@@ -28,7 +28,7 @@
 | M10 场景引擎 | 10 | （G8/G9 的一部分） | M4, M6 | ✅ 已批准 2026-09-28 |
 | M11 Golden Path | 11 | G9 Golden Path 可工作 | M5–M10 | ✅ 已批准 2026-09-28 |
 | M12 Application API | 12 | G10 API 可独立于 UI 工作 | M11 | ✅ 已批准 2026-09-28 |
-| M13 UI | 13 | G11 UI 可执行 Golden Path | M12 | ⬜ |
+| M13 UI | 13 | G11 UI 可执行 Golden Path | M12 | 🟡 待负责人审阅 |
 | M14 验证 | 14 | G12 验证通过 | M11–M13 | ⬜ |
 | M15 演示 | 15 | G13 演示稳定 | M14 | ⬜ |
 | M16 文档与发布 | 16 | G14 v0.1.0 发布候选版 | M14 | ⬜ |
@@ -191,9 +191,9 @@
 
 ## Phase 13 — UI
 
-### TASK-UI-001 — 布局、概览、数据页面  [`feature/ui-dashboard`]
-### TASK-UI-002 — 合成数据、场景构建器页面
-### TASK-UI-003 — 仿真、结果页面（+ what-if 重新运行）
+### TASK-UI-001 — 布局、概览、数据页面  [`phase13`] ✅
+### TASK-UI-002 — 合成数据、场景构建器页面  [`phase13`] ✅
+### TASK-UI-003 — 仿真、结果页面（+ what-if 重新运行）  [`phase13`] ✅
 - 验收：可从浏览器执行 Golden Path；UI 代码不导入任何框架模块。  **Gate 11。**
 
 ## Phase 14–16 — 验证、演示、发布
