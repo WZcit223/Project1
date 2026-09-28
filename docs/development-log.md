@@ -5,6 +5,70 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Phase 12: Application API (TASK-API-001, TASK-API-002)
+
+### Branch
+`phase12` — based on `phase11` @ `a9a94ae`
+
+### Objective
+The HTTP Application API as the only client interface, and the full Golden Path through HTTP only
+(Gate 10).
+
+### Changes
+- Refactor of the run layer for the API: generic `RunRequest.reference` (replaces the warehouse option
+  `reference_dir`), `ScenarioPack.requires_reference` and `components()`, `RunFailedError` with the run
+  id, scenarios provider in `WorkflowRunner`, `ScenarioSpec.source` (`pack` | `user`).
+- `ApplicationService` (application layer): packs, references, datasets (list / detail with provenance /
+  preview), generators and HTTP generation, scenarios incl. **user-defined scenarios** (SQLite, validated,
+  immutable), components (models / strategies), runs (start, list, record, results, time series,
+  compare). Read models in `application.views`; the API imports only `core` and `application`.
+- `industrial_ai.api`: routers `catalog.py` and `runs.py`, documented error shape and codes
+  (`errors.py`), lazily created service per app (`deps.py`).
+- Settings: `reference_dirs` (`IAI_REFERENCE_DIRS`, default `m5_subset`) — clients send reference ids,
+  never paths. `.env.example` updated.
+- Gate 10 test `tests/integration/test_api_golden_path.py`: discovery endpoints, all 4 scenarios over
+  HTTP, results / time series / compare / dataset provenance, user scenario lifecycle, HTTP generation,
+  error shape (422 / 404 / 409 / 500 `RUN_FAILED` with the failed run stored).
+- Specs: application-api (rewritten to the implemented contract), plugin-spec §3, scenario-spec §2
+  (EN + ZH).
+
+### Decisions / assumptions (for review)
+- HTTP run body differs from the Gate 0 draft: `reference_id` (configured id) instead of
+  `reference_dataset_id`; `horizon_days` instead of `horizon {start_date, days}` (start = day after the
+  last observation); pack choices (`forecast_model`, `strategies`, …) inside `options`;
+  `demand_source` / `synthetic` removed (reference replay NOT IMPLEMENTED).
+- Time series are generic: `variant` + result `table` + `column` + entity `filter` (sum over matching
+  entities) instead of the draft's `metric=inventory&strategy=&product=`.
+- `GET /api/references` added; dataset list has no `pack` filter and preview no `table` parameter
+  (datasets are single tables).
+- Run failure → HTTP 500 `RUN_FAILED` with `details.run_id` (the failed run is stored); invalid requests
+  → 422 and nothing stored.
+- Runs stay synchronous (a demo-subset run takes seconds); no authentication (non-goal, localhost).
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 360 passed in 93.28s (0:01:33).
+
+### Commits
+- fdc2a6a refactor(application): prepare the run layer for the HTTP API
+- 6940b47 feat(core): add configured reference data directories
+- 38258a9 feat(application): add the application service facade for the API
+- 65053d3 feat(api): add catalog, scenario, component and run endpoints
+- d919239 test(api): run the full Golden Path over HTTP only (Gate 10)
+- 918c458 docs(spec): document the implemented Application API
+- fcccffb docs(zh): mirror Application API spec updates
+- 3148ceb docs(plan): mark TASK-API-001/002 done, M12 awaiting review
+- docs(log): record Phase 12 Application API round (this entry)
+
+### Known issues
+- Every run re-reads the reference directory and re-registers identical tables by hash (reused).
+- The API process holds one service per app; concurrent runs are not coordinated (single-user demo).
+
+### Next
+Gate 10 / M12 review → Phase 13 (UI: Jinja2 + HTMX over the Application API) on branch `phase13`
+from `phase12`.
+
+---
+
 ## 2026-09-28 — Gate 9 / M11 approved
 
 ### Branch
