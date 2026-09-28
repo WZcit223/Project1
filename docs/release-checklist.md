@@ -7,8 +7,7 @@ Target: *a technically coherent, reproducible, clearly scoped Industrial AI Appl
 prototype that another technical person can clone, run, inspect and understand without being misled
 about the level of real-world validation.*
 
-Evidence was collected on 2026-09-28 against `phase16`. ✅ done with evidence · ⛔ blocking, owner
-action needed · ⏳ pending.
+Evidence was collected on 2026-09-28 against `phase16`. ✅ done with evidence · ⏳ pending.
 
 ## Engineering
 
@@ -72,10 +71,10 @@ action needed · ⏳ pending.
 |---|---|---|
 | No secrets, tokens, credentials or `.env` committed | ✅ | Pattern scan of tracked files: no matches; only `.env.example` tracked |
 | No raw external data except the approved subset | ✅ | Tracked data: `data/reference/m5_subset/` (~0.73 MB, CA_1 / FOODS_3 / top 50) and `.gitkeep` files only |
-| **Repository visibility matches the M5 approval** | ⛔ | CLAUDE.md §13 approved the committed subset on the basis that the repository is made private (Kaggle rules: do not redistribute). On 2026-09-28 GitHub reports `WZcit223/Project1` as **public**. Owner action: make the repository private (or remove the subset from the repository and its history) before any release. |
+| Repository visibility matches the M5 approval | ✅ resolved by owner decision | Owner decision (2026-09-28): the repository `WZcit223/Project1` is set to **private**; the approved M5 subset is retained; no history rewrite (CLAUDE.md §13). Not a release blocker. Visibility confirmation is recorded in the development log at release. |
 
 ## Owner decisions (not done by the agent)
 
-- [ ] Resolve the repository-visibility item above.
+- [x] Repository visibility: set to private (owner decision, 2026-09-28).
 - [ ] Approve a pull request `phase16` → `main`.
 - [ ] Approve the tag `v0.1.0` (and, if wanted, a GitHub release).

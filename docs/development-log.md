@@ -44,10 +44,9 @@ ruff format / check, mypy clean; pytest 379 passed; link check 0 broken. CI: run
 `ae8b89d` technical report, `a2fb39d` release checklist, this entry.
 
 ### Known Issues
-- **Blocking, owner action:** GitHub reports `WZcit223/Project1` as **public**; the committed M5 subset
-  was approved on the basis that the repository is private (CLAUDE.md §13; Kaggle: do not
-  redistribute). Make the repository private (or remove the subset from the repository and its history)
-  before release.
+- Repository visibility (found public on 2026-09-28 while the committed M5 subset was approved for a
+  private repository): **resolved by owner decision (2026-09-28)** — the repository is set to private,
+  the approved subset is retained, no history rewrite. Not a release blocker.
 - P2 (not blocking, by decision): TASK-P2-LEGEND, TASK-P2-GENFORMS.
 
 ### Next
