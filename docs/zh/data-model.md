@@ -186,7 +186,7 @@ uv run python scripts/make_m5_subset.py --input <存放 Kaggle CSV 的文件夹>
 # 默认值：--store CA_1 --department FOODS_3 --top-n 50 --output data/raw/m5_subset
 ```
 
-脚本分块流式读取大文件，保留所选门店 / 部门 / 品类以及总销量前 N 的商品（销量相同时按商品 id 排序），逐字复制原始值（日历文件逐字节复制），并写出 `SOURCE.json`（`source_type=reference`），记录过滤条件、每个原始文件的 SHA-256 以及下载日期。输出是真实的 M5 数据：保存在被 Git 忽略的 `data/raw/` 中。存在该目录时，`uv run pytest -m m5_local` 会对其进行转换和校验。
+脚本分块流式读取大文件，保留所选门店 / 部门 / 品类以及总销量前 N 的商品（销量相同时按商品 id 排序），逐字复制原始值（日历文件逐字节复制），并写出 `SOURCE.json`（`source_type=reference`），记录过滤条件、每个原始文件的 SHA-256 以及下载日期。输出是真实的 M5 数据，保存在被 Git 忽略的 `data/raw/` 中。唯一例外是经负责人批准、提交在 `data/reference/m5_subset/` 中的子集（CA_1 / FOODS_3 / 前 50，见 CLAUDE.md §13）；`uv run pytest -m m5_local` 会对该副本进行转换和校验（CI 中同样运行）。
 
 ## 6. 指标定义
 

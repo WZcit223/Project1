@@ -221,8 +221,9 @@ uv run python scripts/make_m5_subset.py --input <folder with the Kaggle CSVs> --
 It streams the large files in chunks, keeps the selected stores / departments / categories and the
 top-N items by total sales (ties by item id), copies values verbatim (calendar byte-for-byte) and
 writes a `SOURCE.json` (`source_type=reference`) with the filters, SHA-256 of each original file and the
-download date. The output is real M5 data: it stays in git-ignored `data/raw/`. With it present,
-`uv run pytest -m m5_local` converts and validates it.
+download date. The output is real M5 data and stays in git-ignored `data/raw/`. The one exception is
+the owner-approved subset (CA_1 / FOODS_3 / top 50) committed in `data/reference/m5_subset/`
+(CLAUDE.md §13); `uv run pytest -m m5_local` converts and validates that copy (also in CI).
 
 ## 6. Metrics definitions
 
