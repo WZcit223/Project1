@@ -5,6 +5,64 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Phase 14: Validation suite and report (TASK-VAL-001)
+
+### Branch
+`phase14` — based on `phase13` @ `c1a1fcc`
+
+### Objective
+A reproducible validation suite and `docs/validation-report.md`, keeping the owner's four categories
+explicit: V1 software/framework correctness, V2 framework integration / Golden Path, V3 scenario &
+reference-data validation, V4 future real operational validation (Gate 12).
+
+### Changes
+- `docs/validation.md` restated around V1–V4 (former levels mapped); explicit statement that M5 is
+  store-level retail **sales** used as the reference demand/sales environment, **not** warehouse
+  operational data (all operational data is synthetic; sales are censored by stockouts); new §4.1
+  reference-data checks; test data policy corrected (committed subset in `data/reference/m5_subset/`).
+- `scripts/validation_report.py`: runs the V1 / V2 / V3 pytest selections (JUnit counts per module),
+  computes V3 reference-data results (canonical + hybrid data checks, descriptive calibration
+  comparison, forecast backtest, Golden Path smoke run with a reproducibility re-run), records commit,
+  versions and seed, and writes the V4 "not validated" section. Nothing hand-entered; exit 1 on failure.
+- `docs/validation-report.md` generated from `81680d9`: V1 314, V2 49, V3 13 tests — all pass (the three
+  selections partition the full 376-test suite); reference-data checks 279 passed, 0 failed; baseline
+  re-run reproduces identical metrics.
+- The first report draft said item levels "carry over" although synthetic mean demand is +25% vs. the
+  reference; fixed to state the gap with computed numbers (selling-day means 17.5 vs. 18.7 units; zero
+  series-days 16.3% vs. 2.7% — unmodelled zero-sales runs, roadmap P1).
+- README links the report and the generator command; unit tests for the report helpers.
+
+### Decisions / assumptions (for review)
+- Category assignment by test location: `tests/unit` → V1; `tests/integration` (except `m5_local`),
+  `tests/scenario/test_golden_path.py`, `tests/ui` → V2; `tests/scenario/test_warehouse_scenarios.py` and
+  the `m5_local` tests → V3.
+- Reference-data comparisons (calibration, forecast accuracy, strategy KPIs) are **descriptive** with no
+  thresholds; only data checks and test assertions are pass/fail.
+- The report is generated, committed, and regenerated per release (not hand-edited); English only
+  (the spec `validation.md` is mirrored in Chinese).
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 376 passed (V1 314 + V2 49 + V3 13, per the generated report).
+
+### Commits
+- aa91797 feat(scripts): add the validation report generator
+- 4f67409 docs(spec): restate validation as four explicit categories V1–V4
+- 81680d9 fix(scripts): report the synthetic-vs-reference level gap honestly
+- 19276f4 docs(validation): add the generated v0.1 validation report
+- 498fc37 docs(readme): link the validation report and its generator command
+- c89e345 docs(plan): mark TASK-VAL-001 done, M14 awaiting review
+- 4786cdc docs(zh): mirror the V1–V4 validation categories
+- docs(log): record Phase 14 validation round (this entry)
+
+### Known issues
+- Synthetic demand level is +25% above reference sales overall (zero-run gap, documented).
+- The report's run time is ~3 minutes (runs the whole suite plus reference runs).
+
+### Next
+Gate 12 / M14 review → Phase 15 (demo script and guide, Gate 13) on branch `phase15` from `phase14`.
+
+---
+
 ## 2026-09-28 — Gate 11 / M13 approved
 
 ### Branch
