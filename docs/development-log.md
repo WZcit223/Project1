@@ -5,6 +5,47 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — Gate 11 conditions closed (Phase 13 follow-up)
+
+### Branch
+`phase13`
+
+### Changes
+Owner review: Gate 11 conditional PASS; no redesign. Items closed:
+1. CI green for `b834818` (GitHub Actions run 44, success).
+2. ADR-005 **Accepted**, with rationale and consequences.
+3. `reference_id` is a **reference dataset identifier** (identifier pattern, path-like values → 422);
+   run records returned by the API no longer include the server-side location (`request.reference`).
+   What-if re-runs now **pin the original scenario version** (before: "latest", so a newer version
+   could leak in) and keep reference id, seed, horizon, options and earlier overrides. New API tests for
+   path rejection / hiding and re-run semantics; UI test checks the what-if request.
+4. Scenario builder and what-if read the parameter schema of the actual scenario from the API (no
+   hard-coded `baseline`); a stub-API test renders and submits a made-up pack's schema.
+5. Browser smoke test (headless Chromium, M5 subset) found a real bug: UI route names
+   `create_scenario` / `generate` resolved to the same-named **API** routes (UI mounted inside the API
+   app), so those forms posted to `/api/...`. Fixed by `ui_` route names; regression tests added (they
+   fail without the fix). Re-run smoke test: run, what-if, scenario builder, comparison, overview all
+   work; strategy order reorder point → safety stock → dynamic; tile label "stockout-day rate"; no JS
+   errors, no 4xx/5xx in the server log.
+
+Chart-legend overlap stays in the backlog (P2, owner decision).
+
+### Tests / checks
+ruff format, ruff, mypy strict, pytest: 373 passed.
+
+### Commits
+- dcc8d64 fix(api): treat reference_id as a dataset identifier, never a path
+- 661a235 fix(ui): pin the scenario version on what-if and read schemas via the API
+- 0aa2089 docs(adr): accept ADR-005 (UI as a separate HTTP-only package)
+- cb3fac8 docs(spec): document reference ids and re-run semantics (EN + ZH)
+- 0cdf1dc fix(ui): prefix UI route names so forms never target API routes
+- docs(log): record Gate 11 conditions closed (this entry)
+
+### Next
+CI green → Gate 11 approved (per owner) → Phase 14 (validation) on `phase14`.
+
+---
+
 ## 2026-09-28 — Phase 13: UI (TASK-UI-001 … 003)
 
 ### Branch
