@@ -55,7 +55,9 @@ class RunCreate(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     pack: str
-    reference_id: str | None = None
+    reference_id: str | None = Field(default=None, pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
+    """Identifier of a configured reference dataset (e.g. ``m5_subset``) — never a file path; the
+    server resolves it via ``IAI_REFERENCE_DIRS``."""
     scenario_id: str
     scenario_version: str | None = None
     scenario_overrides: dict[str, JsonValue] = Field(default_factory=dict)

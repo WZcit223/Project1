@@ -24,10 +24,11 @@ class RunRequest(BaseModel):
     seed: int
     horizon_days: int = Field(ge=1)
     reference_id: str | None = None
-    """Configured id the reference was selected by (API runs); lets clients re-run a run."""
+    """Identifier of the reference dataset (e.g. ``m5_subset``) the run was started with; clients
+    re-run a run with it."""
     reference: str | None = None
-    """Location of the pack's reference data (e.g. an M5-format directory). The HTTP API never
-    accepts it from clients: it resolves a configured reference id to this value."""
+    """Server-side location of that reference data (e.g. an M5-format directory). Internal: the HTTP
+    API never accepts it from clients and never returns it."""
     options: dict[str, JsonValue] = Field(default_factory=dict)
     """Pack-specific options (e.g. reference data, forecast model, strategies)."""
 

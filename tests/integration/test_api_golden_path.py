@@ -215,3 +215,50 @@ def test_errors_use_the_documented_shape(client: TestClient) -> None:
     assert error_code(failed, 500) == "RUN_FAILED"
     run_id = failed.json()["error"]["details"]["run_id"]
     assert ok(client.get(f"/api/runs/{run_id}"))["status"] == "failed"
+
+
+def test_reference_id_is_an_identifier_never_a_path(client: TestClient) -> None:
+    for bad in ("/etc", "../fixture", "fixture/../broken", str(FIXTURE)):
+        response = client.post("/api/runs", json=run_body("baseline", reference_id=bad))
+        assert error_code(response, 422) == "VALIDATION_ERROR", bad
+    record = ok(client.post("/api/runs", json=run_body("baseline", horizon_days=28)), 201)
+    assert record["request"]["reference_id"] == "fixture"
+    assert "reference" not in record["request"]  # the server-side location is never returned
+    assert "reference" not in ok(client.get(f"/api/runs/{record['run_id']}"))["request"]
+
+
+def test_rerun_semantics_pinned_version_same_reference_and_seed(client: TestClient) -> None:
+    """A re-run built from a stored record reproduces it; a newer scenario version stays out."""
+    spec = {
+        "scenario_id": "pinned_demo",
+        "version": "1.0.0",
+        "pack": "warehouse",
+        "title": "Pinned demo",
+        "parameters": {"demand_multiplier": 1.1},
+    }
+    ok(client.post("/api/scenarios", json=spec), 201)
+    original = ok(client.post("/api/runs", json=run_body("pinned_demo", horizon_days=28)), 201)
+    newer = {**spec, "version": "1.1.0", "parameters": {"demand_multiplier": 1.5}}
+    ok(client.post("/api/scenarios", json=newer), 201)
+
+    request = original["request"]
+    rerun_body = {
+        key: request[key]
+        for key in ("pack", "reference_id", "scenario_id", "seed", "horizon_days", "options")
+    }
+    pinned = {**rerun_body, "scenario_version": original["scenario"]["version"]}
+    rerun = ok(client.post("/api/runs", json=pinned), 201)
+    assert rerun["scenario"]["version"] == "1.0.0"
+    assert rerun["request"]["reference_id"] == request["reference_id"] == "fixture"
+    assert rerun["variant_metrics"] == original["variant_metrics"]  # same reference, seed, version
+
+    latest = ok(client.post("/api/runs", json=rerun_body), 201)  # no version → latest
+    assert latest["scenario"]["version"] == "1.1.0"
+    assert latest["variant_metrics"] != original["variant_metrics"]
+
+    what_if = ok(
+        client.post("/api/runs", json={**pinned, "scenario_overrides": {"lead_time_delta": 4}}), 201
+    )
+    assert what_if["scenario"]["version"] == "1.0.0"
+    assert what_if["scenario"]["parameters"] == {"demand_multiplier": 1.1, "lead_time_delta": 4}
+    assert what_if["scenario_overrides"] == {"lead_time_delta": 4}

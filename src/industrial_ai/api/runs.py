@@ -16,9 +16,16 @@ from industrial_ai.application import (
 from industrial_ai.core.errors import ApplicationError
 
 router = APIRouter(prefix="/api/runs", tags=["runs"])
+PUBLIC_RECORD = {"request": {"reference"}}
+"""Server-side reference locations are internal; clients see only ``request.reference_id``."""
 
 
-@router.post("", response_model=RunRecord, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=RunRecord,
+    response_model_exclude=PUBLIC_RECORD,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_run(service: Service, body: RunCreate) -> RunRecord:
     """Execute an end-to-end scenario run (synchronous in v0.1)."""
     return service.start_run(body)
@@ -41,7 +48,7 @@ def compare_runs(
     return service.compare(ids)
 
 
-@router.get("/{run_id}", response_model=RunRecord)
+@router.get("/{run_id}", response_model=RunRecord, response_model_exclude=PUBLIC_RECORD)
 def get_run(service: Service, run_id: str) -> RunRecord:
     """Status, request, effective scenario, metrics and dataset links (provenance)."""
     return service.run(run_id)
