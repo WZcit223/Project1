@@ -23,10 +23,11 @@ build-backend = "uv_build"
 # uv workspace: scenario packs are separate packages (ADR-004). The framework has no runtime
 # dependency on them; the dev group installs the warehouse pack for tests and local runs only.
 [tool.uv.workspace]
-members = ["scenarios/warehouse"]
+members = ["scenarios/warehouse", "ui"]
 
 [tool.uv.sources]
 industrial-ai-warehouse = { workspace = true }
+industrial-ai-ui = { workspace = true }
 
 [tool.ruff]
 line-length = 100
@@ -38,13 +39,13 @@ extend-exclude = ["docs"]
 select = ["E", "F", "W", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["industrial_ai", "industrial_ai_warehouse"]
+known-first-party = ["industrial_ai", "industrial_ai_ui", "industrial_ai_warehouse"]
 
 [tool.mypy]
 python_version = "3.11"
 strict = true
-files = ["src", "scenarios/warehouse/src", "tests", "scripts"]
-mypy_path = ["src", "scenarios/warehouse/src"]
+files = ["src", "scenarios/warehouse/src", "ui/src", "tests", "scripts"]
+mypy_path = ["src", "scenarios/warehouse/src", "ui/src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -56,6 +57,7 @@ markers = [
 [dependency-groups]
 dev = [
     "httpx2>=2.13.1",
+    "industrial-ai-ui",
     "industrial-ai-warehouse",
     "mypy>=2.3.1",
     "pandas-stubs>=3.0.5.260914",
