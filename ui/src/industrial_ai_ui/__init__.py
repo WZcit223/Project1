@@ -4,4 +4,4 @@ This package never imports the framework (``industrial_ai``) or a scenario pack;
 the Application API through :class:`industrial_ai_ui.client.ApiClient` (enforced by a test).
 """
 
-__version__ = "0.1.0.dev0"
+__version__ = "0.1.0"

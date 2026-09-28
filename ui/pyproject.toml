@@ -1,6 +1,6 @@
 [project]
 name = "industrial-ai-ui"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Server-rendered demo UI (Jinja2 + HTMX) for the Industrial AI framework. Talks to the Application API over HTTP only."
 requires-python = ">=3.11"
 # Deliberately no dependency on industrial-ai: the UI knows the Application API, not the framework.

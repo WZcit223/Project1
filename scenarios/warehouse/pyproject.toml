@@ -1,6 +1,6 @@
 [project]
 name = "industrial-ai-warehouse"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Warehouse scenario pack for the Industrial AI framework: inventory demand forecasting and replenishment simulation."
 requires-python = ">=3.11"
 dependencies = ["industrial-ai"]

@@ -1,6 +1,6 @@
 [project]
 name = "industrial-ai"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Industrial AI Application Framework Prototype: synthetic data, simulation and scenario-based decision support."
 readme = "README.md"
 requires-python = ">=3.11"
