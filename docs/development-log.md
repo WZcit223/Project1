@@ -5,6 +5,21 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-28 — M10 approved
+
+### Branch
+`phase10` (CI green on `b92ca46`)
+
+### Changes
+- Owner approved M10 (scenario engine) together with the Gate 8 follow-ups and the Phase 10 decisions
+  (High Demand check on expected demand, lost-sales cost at full price, metric renames, user-defined
+  scenarios deferred). M10 ✅ in the backlog (EN + ZH).
+
+### Next
+Phase 11 (Golden Path) on branch `phase11` created from `phase10`.
+
+---
+
 ## 2026-09-27 — Phase 10: Gate 8 follow-ups (TASK-STR-004) + scenario engine (TASK-SCN-001/002)
 
 ### Branch

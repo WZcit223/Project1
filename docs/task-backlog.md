@@ -23,7 +23,7 @@ Branch name suggestion in brackets.
 | M7 Forecast plugins | 7 | (part of G6/G7) | M6 | ✅ approved 2026-09-27 |
 | M8 Inventory simulation | 8 | G7 Inventory simulation works | M6, M5 | ✅ approved 2026-09-27 |
 | M9 Strategies | 9 | G8 Strategies can be compared | M8, M7 | ✅ approved 2026-09-27 (with follow-ups TASK-STR-004) |
-| M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | 🟡 awaiting owner review |
+| M10 Scenario engine | 10 | (part of G8/G9) | M4, M6 | ✅ approved 2026-09-28 |
 | M11 Golden Path | 11 | G9 Golden Path works | M5–M10 | ⬜ |
 | M12 Application API | 12 | G10 API works independently of UI | M11 | ⬜ |
 | M13 UI | 13 | G11 UI executes Golden Path | M12 | ⬜ |
