@@ -27,7 +27,7 @@
 | M9 策略 | 9 | G8 策略可比较 | M8, M7 | ✅ 已批准 2026-09-27（附后续事项 TASK-STR-004） |
 | M10 场景引擎 | 10 | （G8/G9 的一部分） | M4, M6 | ✅ 已批准 2026-09-28 |
 | M11 Golden Path | 11 | G9 Golden Path 可工作 | M5–M10 | ✅ 已批准 2026-09-28 |
-| M12 Application API | 12 | G10 API 可独立于 UI 工作 | M11 | ⬜ |
+| M12 Application API | 12 | G10 API 可独立于 UI 工作 | M11 | 🟡 待负责人审阅 |
 | M13 UI | 13 | G11 UI 可执行 Golden Path | M12 | ⬜ |
 | M14 验证 | 14 | G12 验证通过 | M11–M13 | ⬜ |
 | M15 演示 | 15 | G13 演示稳定 | M14 | ⬜ |
@@ -185,8 +185,8 @@
 
 ## Phase 12 — Application API
 
-### TASK-API-001 — 目录、生成器、场景、模型、策略端点  [`feature/application-api`]
-### TASK-API-002 — 运行、结果、时间序列、比较端点
+### TASK-API-001 — 目录、生成器、场景、模型、策略端点  [`phase12`] ✅
+### TASK-API-002 — 运行、结果、时间序列、比较端点  [`phase12`] ✅
 - 验收：仅通过 HTTP（TestClient）完成完整 Golden Path。  **Gate 10。**
 
 ## Phase 13 — UI
