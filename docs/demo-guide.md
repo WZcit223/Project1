@@ -11,10 +11,28 @@ reproduce the result, and understand what has and has not been validated?*
 > controlled simulated conditions — they are **not** evidence of real-world performance
 > ([validation report](validation-report.md), category V4 not performed).
 
+## 0. What this is
+
+*This prototype demonstrates an **Industrial AI application framework** through an **inventory demand
+forecasting and replenishment** scenario, using M5 as reference demand data and synthetic operational
+data.* It is not a warehouse product, and it has not been shown to improve any real operation.
+
+| | Framework (`src/industrial_ai/`) | Scenario pack (`scenarios/warehouse/`) |
+|---|---|---|
+| Role | Reusable, domain-neutral building blocks | One validation case built only on the framework's public APIs |
+| Contains | Datasets + provenance, synthetic generators, forecast plugins, simulation engine, scenario registry, workflow runner, Application API | M5 adapter, retail / operations schemas, inventory simulation, replenishment strategies, four scenarios |
+| Rule | Never imports a scenario pack (enforced by tests) | Replaceable: another domain would be another pack |
+
+**Why inventory?** Demand forecasting and replenishment is a well-understood industrial decision
+problem with public real demand-like data (M5 sales). It exercises every framework layer — reference
+data, synthetic data, forecasting, simulation, strategies, scenarios, results — so it is a good test of
+the framework, not the goal of the project.
+
 ## 1. Quick start (≈ 5 minutes)
 
 Prerequisites: [uv](https://docs.astral.sh/uv/), Python 3.11+, a clone of this repository (it contains
 the small M5 reference subset in `data/reference/m5_subset/`; Kaggle rules apply — do not redistribute).
+Run all commands from the repository root; runs are stored in git-ignored `data/processed/`.
 
 ```bash
 uv sync                                  # locked environment (framework, warehouse pack, UI)
@@ -46,7 +64,7 @@ Start `uv run python scripts/serve.py` and open `http://127.0.0.1:8000/ui/`. Eve
 |---|---|---|---|
 | 1 | **Overview** | (empty on first start) | The UI only calls the Application API; the badge marks everything as prototype / synthetic |
 | 2 | **Scenario builder** | Look at `high_demand`, `demand_shock`, `supply_disruption`; optionally save a new scenario (e.g. shock ×1.8 for 7 days) | Scenarios are configuration, not code; values validated against the pack's parameter ranges; immutable versions |
-| 3 | **Simulation** | Reference `m5_subset`, scenario `baseline`, forecast `seasonal_naive`, all three strategies, 91 days, seed 20260927 → **Run** (~6 s) | Three strategies on identical demand and supply draws |
+| 3 | **Simulation** | Keep the defaults — reference `m5_subset`, scenario `baseline`, forecast `seasonal_naive`, all three strategies, 91 days, seed 20260927 — and **Run** (~6 s) | Three strategies on identical demand and supply draws; the defaults are the documented demo configuration |
 | 4 | **Results** (run page) | KPI table and charts | Fill rate vs. costs; ordering / holding / lost-sales cost shown separately |
 | 5 | **Simulation** | Same settings, scenario `high_demand` → Run | Same seed and demand stream; only the scenario differs |
 | 6 | **Results → Compare** | Tick both runs → Compare selected runs | *If the environment changes, what happens under each strategy?* |
@@ -62,7 +80,7 @@ validated at the prototype level.*
 
 ```
 UI form ─► POST /api/runs ─► ApplicationService ─► WorkflowRunner ─► WarehousePack.run
-  1 load reference   M5 files → canonical retail bundle (validated)            [reference]
+  1 load reference   M5 files → canonical retail bundle (schema checks)        [reference]
   2 operations       rule_based / statistical generators → warehouses, suppliers, lead times, costs [synthetic]
   3 scenario demand  time_series generator calibrated on reference sales, scenario applied        [synthetic]
   4 demand timeline  observed history + synthetic horizon (forecasts never see the future)
@@ -95,7 +113,9 @@ that the demo reproduces the report and that this table matches it):
 How to read them: all strategies face identical demand and supply draws, so differences come from the
 strategies. Lost-sales cost is valued at full selling price (an upper-bound proxy), so total cost
 favours strategies that hold more stock; ordering cost reflects the synthetic 20–60 USD per order.
-The UI run uses the same settings and shows the same values.
+The UI's default Simulation form uses the same configuration (seasonal naive, 91 days, seed
+20260927) and shows the same values; choosing another forecast model (e.g. LightGBM) gives different,
+equally reproducible numbers.
 
 ## 6. What has and has not been validated (V1–V4)
 

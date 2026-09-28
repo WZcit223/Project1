@@ -12,10 +12,26 @@
 > 受控的仿真条件下的比较 — 它们**不是**真实世界表现的证据
 > （[验证报告](../validation-report.md)，V4 类别未执行）。
 
+## 0. 这是什么
+
+*本原型通过一个**库存需求预测与补货**场景，展示一个**工业 AI 应用框架**，使用 M5 作为参考需求数据，并结合
+合成运营数据。* 它不是仓储产品，也没有被证明能改进任何真实运营。
+
+| | 框架（`src/industrial_ai/`） | 场景包（`scenarios/warehouse/`） |
+|---|---|---|
+| 角色 | 可复用、与领域无关的基础组件 | 一个仅基于框架公开 API 构建的验证案例 |
+| 包含 | 数据集 + 溯源、合成数据生成器、预测插件、仿真引擎、场景注册表、工作流运行器、Application API | M5 适配器、零售 / 运营 schema、库存仿真、补货策略、四个场景 |
+| 规则 | 从不导入场景包（由测试强制保证） | 可替换：其他领域就是另一个场景包 |
+
+**为什么选择库存？** 需求预测与补货是一个被充分理解的工业决策问题，并且有公开的、接近需求的真实数据
+（M5 销量）。它覆盖框架的每一层——参考数据、合成数据、预测、仿真、策略、场景、结果——因此是检验框架的
+好案例，而不是项目本身的目标。
+
 ## 1. 快速开始（约 5 分钟）
 
 前提条件：[uv](https://docs.astral.sh/uv/)、Python 3.11+、本仓库的一个克隆（其中包含
 位于 `data/reference/m5_subset/` 的小型 M5 参考子集；适用 Kaggle 规则 — 请勿再分发）。
+所有命令都在仓库根目录下运行；运行结果保存在被 Git 忽略的 `data/processed/` 中。
 
 ```bash
 uv sync                                  # locked environment (framework, warehouse pack, UI)
@@ -46,7 +62,7 @@ M5 不含库存信息：零观测销量可能是真实的零需求、缺货或�
 |---|---|---|---|
 | 1 | **Overview（概览）** | （首次启动时为空） | UI 只调用应用 API（Application API）；该标识将所有内容标记为原型 / 合成 |
 | 2 | **Scenario builder（场景构建器）** | 查看 `high_demand`、`demand_shock`、`supply_disruption`；可选：保存一个新场景（例如 7 天内冲击 ×1.8） | 场景是配置而非代码；取值依据场景包（pack）的参数范围进行校验；版本不可变 |
-| 3 | **Simulation（仿真）** | 参考数据 `m5_subset`、场景 `baseline`、预测 `seasonal_naive`、全部三种策略、91 天、seed 20260927 → **Run**（约 6 秒） | 三种策略面对相同的需求与供应抽样 |
+| 3 | **Simulation（仿真）** | 保持默认值——参考数据 `m5_subset`、场景 `baseline`、预测 `seasonal_naive`、全部三种策略、91 天、seed 20260927——然后 **Run**（约 6 秒） | 三种策略面对相同的需求与供应抽样；默认值即文档中的演示配置 |
 | 4 | **Results（结果）**（运行页面） | KPI 表格和图表 | 满足率与成本的对比；订货 / 持有 / 缺货损失成本分别列示 |
 | 5 | **Simulation（仿真）** | 相同设置，场景 `high_demand` → Run | 相同的 seed 与需求流；只有场景不同 |
 | 6 | **Results → Compare（结果 → 对比）** | 勾选两次运行 → Compare selected runs | *如果环境发生变化，每种策略下会发生什么？* |
@@ -61,7 +77,7 @@ M5 不含库存信息：零观测销量可能是真实的零需求、缺货或�
 
 ```
 UI form ─► POST /api/runs ─► ApplicationService ─► WorkflowRunner ─► WarehousePack.run
-  1 load reference   M5 files → canonical retail bundle (validated)            [reference]
+  1 load reference   M5 files → canonical retail bundle (schema checks)        [reference]
   2 operations       rule_based / statistical generators → warehouses, suppliers, lead times, costs [synthetic]
   3 scenario demand  time_series generator calibrated on reference sales, scenario applied        [synthetic]
   4 demand timeline  observed history + synthetic horizon (forecasts never see the future)
@@ -93,7 +109,7 @@ UI form ─► POST /api/runs ─► ApplicationService ─► WorkflowRunner �
 
 如何解读：所有策略面对相同的需求与供应抽样，因此差异来自策略本身。缺货损失成本按完整售价计价（一种上界代理），
 因此总成本会偏向持有更多库存的策略；订货成本反映合成设定的每单 20–60 USD。
-UI 中的运行使用相同设置，显示相同的数值。
+UI 仿真页面的默认表单使用相同配置（季节性朴素法、91 天、seed 20260927），显示相同的数值；选择其他预测模型（如 LightGBM）会得到不同但同样可复现的数值。
 
 ## 6. 已验证与未验证的内容（V1–V4）
 
