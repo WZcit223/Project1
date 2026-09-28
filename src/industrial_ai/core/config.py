@@ -42,6 +42,11 @@ class Settings(BaseSettings):
     log_level: LogLevel = LogLevel.INFO
     data_dir: Path = Path("./data")
     database_url: str = "sqlite:///./data/processed/industrial_ai.sqlite"
+    reference_dirs: dict[str, Path] = Field(
+        default_factory=lambda: {"m5_subset": Path("./data/reference/m5_subset")}
+    )
+    """Reference data the API may use, by id (``IAI_REFERENCE_DIRS`` as JSON). Clients send the id,
+    never a path."""
     api_host: str = "127.0.0.1"
     api_port: int = Field(default=8000, ge=1, le=65535)
 
