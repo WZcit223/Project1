@@ -4,7 +4,7 @@ All notable changes to this project. Format based on [Keep a Changelog](https://
 versions follow [Semantic Versioning](https://semver.org/). Detailed round-by-round history:
 [docs/development-log.md](docs/development-log.md).
 
-## [0.1.0] — unreleased (release candidate, pending owner approval)
+## [0.1.0] — 2026-09-29
 
 First prototype release of the **Industrial AI Application Framework**, demonstrated through an
 Inventory Demand Forecasting & Replenishment scenario (M5 reference sales + synthetic operational

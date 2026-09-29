@@ -29,7 +29,7 @@ Branch name suggestion in brackets.
 | M13 UI | 13 | G11 UI executes Golden Path | M12 | ✅ approved 2026-09-28 (conditions closed) |
 | M14 Validation | 14 | G12 Validation passes | M11–M13 | ✅ approved 2026-09-28 |
 | M15 Demo | 15 | G13 Demo stable | M14 | ✅ approved 2026-09-28 |
-| M16 Docs & release | 16 | G14 v0.1.0 release candidate | M14 | 🟡 release candidate ready for Gate 14 review (owner: merge, tag) |
+| M16 Docs & release | 16 | G14 v0.1.0 release candidate | M14 | ✅ approved 2026-09-29 (Gate 14; v0.1.0) |
 
 ## Phase 0 — Architecture
 
@@ -204,9 +204,9 @@ Acceptance: docs internally consistent; `uv run pytest`, `ruff`, `mypy` pass; ap
 ### TASK-VAL-001 — Validation suite & `docs/validation-report.md`  [`phase14`] ✅  **Gate 12**
 ### TASK-DEMO-001 — Demo script, seed data, demo guide (`docs/demo-guide.md`)  [`phase15`] ✅  **Gate 13**
 - Seed data = the committed M5 reference subset + seed 20260927 (no extra demo dataset).
-### TASK-DOC-001 — Technical report, doc refresh (EN + ZH), CHANGELOG, tag `v0.1.0`  [`phase16`] 🟡  **Gate 14**
+### TASK-DOC-001 — Technical report, doc refresh (EN + ZH), CHANGELOG, tag `v0.1.0`  [`phase16`] ✅  **Gate 14**
 - Done: technical report (EN + ZH), CHANGELOG, doc refresh, version 0.1.0, report regenerated,
-  [release checklist](release-checklist.md). Open, owner only: PR to `main`, merge, tag (repository set to private by owner decision).
+  [release checklist](release-checklist.md). Gate 14 approved 2026-09-29: merged to `main` and tagged `v0.1.0` (repository set to private by owner decision).
 
 ## P1 (after Golden Path, if time allows)
 

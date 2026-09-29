@@ -5,6 +5,33 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-29 — Gate 14 APPROVED (v0.1.0)
+
+### Branch
+`phase16` (release candidate) → `main` via PR `WZcit223/Project1#1`
+
+### Changes
+Gate 14 decision by the owner (2026-09-29), based on the release criteria in
+[release-checklist.md](release-checklist.md), all met: CI green on the PR head `953e97b` (push and
+pull_request runs); working tree clean; final diff reviewed (Phase 16 code changes are the version
+strings and lockfile only; no stray files in the PR); 379 tests, lint, format and mypy clean;
+fresh-clone `uv sync`, demo and browser Golden Path reproduce the documented numbers; semantic
+boundaries checked (observed sales ≠ synthetic demand ≠ fulfilled demand ≠ lost sales; zero observed
+sales ≠ confirmed stockout; scenario ≠ strategy; framework scenario-agnostic; UI via the Application
+API only; provenance / reproducibility; LLM orchestration future scope; V4 not performed); no new
+technical blockers. Repository visibility: owner decision — the repository will be private, the
+approved M5 subset is retained, no history rewrite; the visibility setting is an administrative action
+handled separately by the owner and does not block the release.
+
+Release record: README, CHANGELOG (0.1.0 — 2026-09-29), release checklist and backlog (M16 ✅,
+EN + ZH) updated before the merge, so the tagged commit carries the released status.
+
+### Next
+Merge PR #1, tag the merge commit `v0.1.0`, create the GitHub release; the merge commit, tag and CI
+evidence are recorded in the following entry.
+
+---
+
 ## 2026-09-28 — Phase 16: v0.1.0 release readiness (TASK-DOC-001)
 
 ### Branch

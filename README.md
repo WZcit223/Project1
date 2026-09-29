@@ -19,9 +19,8 @@ data. Keep three things apart:
 It is not a warehouse product and has not been shown to improve any real operation; results compare
 strategies under identical, controlled simulated conditions.
 
-> Status: **v0.1.0 release candidate** — all phases implemented (framework, warehouse pack, Golden
-> Path, Application API, demo UI, validation report, demo guide); merge to `main` and tag `v0.1.0`
-> await the project owner's approval. Start with the [technical report](docs/technical-report.md);
+> Status: **v0.1.0** (2026-09-29, Gate 14 approved) — a prototype: framework, warehouse pack, Golden
+> Path, Application API, demo UI, validation report, demo guide. Start with the [technical report](docs/technical-report.md);
 > changes: [CHANGELOG.md](CHANGELOG.md); what is and is not validated:
 > [docs/validation-report.md](docs/validation-report.md).
 

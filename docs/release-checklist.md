@@ -1,7 +1,8 @@
 # Release Checklist — v0.1.0
 
-Status: **Release candidate on `phase16`; not released.** Merge to `main`, tag `v0.1.0` and any release
-require the project owner's explicit approval (CLAUDE.md §7).
+Status: **Gate 14 APPROVED (2026-09-29) — v0.1.0.** Released by merging PR `WZcit223/Project1#1`
+(`phase16` → `main`) and tagging the merge commit `v0.1.0`, on the owner's explicit approval
+(CLAUDE.md §7). Final commit, tag and CI evidence: [development-log.md](development-log.md).
 
 Target: *a technically coherent, reproducible, clearly scoped Industrial AI Application Framework
 prototype that another technical person can clone, run, inspect and understand without being misled
@@ -76,5 +77,5 @@ Evidence was collected on 2026-09-28 against `phase16`. ✅ done with evidence �
 ## Owner decisions (not done by the agent)
 
 - [x] Repository visibility: set to private (owner decision, 2026-09-28).
-- [ ] Approve a pull request `phase16` → `main`.
-- [ ] Approve the tag `v0.1.0` (and, if wanted, a GitHub release).
+- [x] Approve a pull request `phase16` → `main` (Gate 14, 2026-09-29).
+- [x] Approve the tag `v0.1.0` and a GitHub release (Gate 14, 2026-09-29).
