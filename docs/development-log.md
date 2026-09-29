@@ -5,6 +5,37 @@ Fields: Date · Branch · Objective · Changes · Files / Modules · Tests · Co
 
 ---
 
+## 2026-09-29 — v0.1.0 merged to `main`; release record
+
+### Branch
+`docs/release-v0.1.0` · Based on: `main` at `99c5faa` (docs-only record; `phase16` stays the release
+snapshot)
+
+### Changes
+- **Gate 14 APPROVED** (owner, 2026-09-29) — see the previous entry.
+- **PR merged:** `WZcit223/Project1#1` (`phase16` → `main`), merge commit
+  `99c5faae081307a369e72a943b0658438a063dfd` (`99c5faa`; parents `c3a62bc` initial commit, `de1cf10`
+  approved head). The tree of `main` is identical to the approved head `de1cf10`.
+- **CI evidence:** PR head `de1cf10` — push and pull_request runs green; merged `main` at `99c5faa` —
+  GitHub Actions run 65 green (lint, format, mypy, 379 tests).
+- **Tag `v0.1.0`:** target `99c5faa`. The annotated tag was created locally but could not be pushed
+  from the agent environment (the git remote rejects tag pushes; branch pushes work), and the
+  available GitHub tools cannot create tags or releases. The owner creates tag and GitHub Release
+  together in the web UI (Releases → Draft a new release → tag `v0.1.0`, target `99c5faa`); release
+  notes were prepared. Status until then: **merged and validated; tag / GitHub Release pending (owner
+  action).**
+- Repository visibility: private by owner decision (M5 subset retained, no history rewrite);
+  administrative setting handled by the owner.
+
+### Known Issues
+None blocking. P2 (by decision): TASK-P2-LEGEND, TASK-P2-GENFORMS. Roadmap items stay out of v0.1.0.
+
+### Next
+Owner: publish the `v0.1.0` release (creates the tag at `99c5faa`) and set the repository to private.
+Any further work starts from `main` on a new branch.
+
+---
+
 ## 2026-09-29 — Gate 14 APPROVED (v0.1.0)
 
 ### Branch

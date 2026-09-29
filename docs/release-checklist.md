@@ -2,7 +2,8 @@
 
 Status: **Gate 14 APPROVED (2026-09-29) — v0.1.0.** Released by merging PR `WZcit223/Project1#1`
 (`phase16` → `main`) and tagging the merge commit `v0.1.0`, on the owner's explicit approval
-(CLAUDE.md §7). Final commit, tag and CI evidence: [development-log.md](development-log.md).
+(CLAUDE.md §7). Merge commit `99c5faa` (CI run 65 green); tag `v0.1.0` at `99c5faa` is created with the GitHub Release by
+the owner. Evidence: [development-log.md](development-log.md).
 
 Target: *a technically coherent, reproducible, clearly scoped Industrial AI Application Framework
 prototype that another technical person can clone, run, inspect and understand without being misled
