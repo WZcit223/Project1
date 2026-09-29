@@ -1,0 +1,12 @@
+<p>
+  Scenario <strong>{{ view.results.scenario.title }}</strong>
+  (<code>{{ view.results.scenario.scenario_id }}</code> {{ view.results.scenario.version }}{% if view.results.scenario.source == 'user' %}, user-defined{% endif %})
+  · reference <code>{{ view.record.request.reference_id or '–' }}</code>
+  · seed {{ view.record.request.seed }} · {{ view.record.request.horizon_days }} days
+  · forecast <code>{{ view.record.request.options.get('forecast_model', 'pack default') }}</code>
+  {% if view.record.scenario_overrides %}· overrides <code>{{ view.record.scenario_overrides }}</code>{% endif %}
+  {% for label in view.results.labels %}<span class="tag">{{ label }}</span>{% endfor %}
+</p>
+{% set results = view.results %}
+{% include "partials/kpis.html" with context %}
+<div class="charts">{% for chart in view.charts %}{{ chart | safe }}{% endfor %}</div>

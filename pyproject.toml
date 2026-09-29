@@ -1,0 +1,68 @@
+[project]
+name = "industrial-ai"
+version = "0.1.0"
+description = "Industrial AI Application Framework Prototype: synthetic data, simulation and scenario-based decision support."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "lightgbm>=4.3",
+    "pandas>=2.2",
+    "pyarrow>=16",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "pyyaml>=6.0",
+    "sqlmodel>=0.0.22",
+    "uvicorn>=0.30",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.17,<0.9.0"]
+build-backend = "uv_build"
+
+# uv workspace: scenario packs are separate packages (ADR-004). The framework has no runtime
+# dependency on them; the dev group installs the warehouse pack for tests and local runs only.
+[tool.uv.workspace]
+members = ["scenarios/warehouse", "ui"]
+
+[tool.uv.sources]
+industrial-ai-warehouse = { workspace = true }
+industrial-ai-ui = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+# docs/ contains illustrative interface sketches (pseudocode), not runnable code
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["industrial_ai", "industrial_ai_ui", "industrial_ai_warehouse"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src", "scenarios/warehouse/src", "ui/src", "tests", "scripts"]
+mypy_path = ["src", "scenarios/warehouse/src", "ui/src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "m5_local: uses the committed real M5 reference subset in data/reference/m5_subset (skipped if absent)",
+    "scenario_checks: V3 scenario behaviour checks (docs/validation.md section 4)",
+]
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "industrial-ai-ui",
+    "industrial-ai-warehouse",
+    "mypy>=2.3.1",
+    "pandas-stubs>=3.0.5.260914",
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+    "types-pyyaml>=6.0.12.20260906",
+]

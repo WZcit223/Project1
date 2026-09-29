@@ -1,0 +1,28 @@
+{
+  "created_at": "2026-09-27T09:29:14.447667Z",
+  "created_by": "industrial_ai_warehouse.adapters.m5.subset 1.0.0",
+  "dataset_id": "m5_subset_ca_1_foods_3_top50",
+  "dataset_name": "M5 Forecasting Accuracy subset (stores=CA_1; departments=FOODS_3; categories=all; top_n=50)",
+  "download_date": "2026-09-20",
+  "filters": {
+    "categories": [],
+    "departments": [
+      "FOODS_3"
+    ],
+    "stores": [
+      "CA_1"
+    ],
+    "top_n": 50
+  },
+  "license_notes": "Kaggle competition data: competition rules apply; do not redistribute.",
+  "notes": "50 series, 13227 price rows. Real M5 data: keep out of Git and do not redistribute.",
+  "source": "M5 Forecasting Accuracy",
+  "source_files": {
+    "calendar.csv": "sha256:d12b5914ef03e66649adf5dd9e996e6602251c22b7a6af8f1f7e3aa12f8860f5",
+    "sales_train_evaluation.csv": "sha256:4b4a47c44c38380d2a9168216fea8c9ff2f31b1ddb772f8a0995952a038b8aa0",
+    "sell_prices.csv": "sha256:9da3ad1f8b8ccacdbdc70612191dd375ec24a4ac6625c24b75b3bc60b0bed2ef"
+  },
+  "source_type": "reference",
+  "source_url": "https://www.kaggle.com/competitions/m5-forecasting-accuracy/data",
+  "version": "1"
+}

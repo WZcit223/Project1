@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Simulation{% endblock %}
+{% block content %}
+<h1>Simulation</h1>
+<p class="muted">Runs synthetic demand for the scenario, a rolling forecast and the inventory simulation for each selected strategy on identical demand and supply conditions.</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+<form method="post" action="{{ url_for('ui_start_run') }}" hx-post="{{ url_for('ui_start_run') }}" hx-target="main" hx-select="main" hx-indicator="#running" class="grid">
+  <label>Reference data
+    <select name="reference_id">{% for r in references %}<option value="{{ r.reference_id }}" {% if not r.available %}disabled{% endif %} {% if values.reference_id == r.reference_id %}selected{% endif %}>{{ r.reference_id }}{% if not r.available %} (not available){% endif %}</option>{% endfor %}</select>
+  </label>
+  <label>Scenario
+    <select name="scenario_id">{% for s in scenarios %}<option value="{{ s.scenario_id }}" {% if values.scenario_id == s.scenario_id %}selected{% endif %}>{{ s.title }} ({{ s.scenario_id }} {{ s.version }})</option>{% endfor %}</select>
+  </label>
+  <label>Forecast model
+    <select name="forecast_model">{% for m in models %}<option value="{{ m.component_id }}" {% if m.component_id == values.get('forecast_model', messages.DEFAULT_FORECAST_MODEL) %}selected{% endif %}>{{ m.component_id }}</option>{% endfor %}</select>
+  </label>
+  <fieldset><legend>Strategies</legend>
+    {% for s in strategies %}<label class="inline"><input type="checkbox" name="strategies" value="{{ s.component_id }}" checked> {{ messages.STRATEGY_LABELS.get(s.component_id, s.component_id) }}</label>{% endfor %}
+  </fieldset>
+  <label>Horizon (days) <input type="number" name="horizon_days" min="7" max="366" value="{{ values.horizon_days }}"></label>
+  <label>Seed <input type="number" name="seed" value="{{ values.seed }}"></label>
+  <button type="submit">Run</button>
+  <span id="running" class="htmx-indicator">Running… (a few seconds)</span>
+</form>
+{% endblock %}

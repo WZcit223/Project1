@@ -1,0 +1,16 @@
+[project]
+name = "industrial-ai-ui"
+version = "0.1.0"
+description = "Server-rendered demo UI (Jinja2 + HTMX) for the Industrial AI framework. Talks to the Application API over HTTP only."
+requires-python = ">=3.11"
+# Deliberately no dependency on industrial-ai: the UI knows the Application API, not the framework.
+dependencies = [
+    "fastapi>=0.115",
+    "httpx2>=2.13",
+    "jinja2>=3.1",
+    "uvicorn>=0.30",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.17,<0.9.0"]
+build-backend = "uv_build"

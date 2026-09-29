@@ -1,0 +1,13 @@
+scenario_id: supply_disruption
+version: 1.0.0
+pack: warehouse
+title: Supply Disruption
+description: >-
+  For six weeks from day 28, orders take 7 days longer to arrive and suppliers ship only half of
+  each order; planners are not told about the longer lead times.
+parameters:
+  lead_time_delta: 7
+  disruption_start_day: 28
+  disruption_duration_days: 42
+  supply_capacity_factor: 0.50
+tags: [supply]

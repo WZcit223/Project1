@@ -1,0 +1,10 @@
+scenario_id: demand_shock
+version: 1.0.0
+pack: warehouse
+title: Demand Shock
+description: Demand rises 2.5-fold for two weeks, starting four weeks into the horizon.
+parameters:
+  shock_multiplier: 2.50
+  shock_start_day: 28
+  shock_duration_days: 14
+tags: [demand]

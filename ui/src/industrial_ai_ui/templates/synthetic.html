@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Synthetic data{% endblock %}
+{% block content %}
+<h1>Synthetic data</h1>
+<p class="muted">Scenario runs generate their synthetic demand automatically. Here a generation request can be sent directly (JSON, validated by the API).</p>
+<h2>Generators</h2>
+{% for g in generators %}
+<details><summary><code>{{ g.generator_id }}</code> {{ g.generator_version }} — {{ g.description }}</summary>
+  <pre>{{ g.parameter_schema | tojson(indent=2) }}</pre>
+</details>
+{% endfor %}
+<h2>Generate</h2>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+{% if created %}<p class="ok">Registered <a href="{{ url_for('ui_dataset', dataset_id=created.dataset_id) }}"><code>{{ created.dataset_id }}</code></a> ({{ created.row_count }} rows, {{ created.source_type }}).</p>{% endif %}
+<form method="post" action="{{ url_for('ui_generate') }}">
+  <textarea name="request_json" rows="22">{{ request_json }}</textarea>
+  <button type="submit">Generate</button>
+</form>
+{% endblock %}

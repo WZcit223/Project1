@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ detail.summary.dataset_id }}{% endblock %}
+{% block content %}
+{% set s = detail.summary %}{% set p = detail.provenance %}
+<h1>{{ s.dataset_id }} <span class="source source-{{ s.source_type }}">{{ s.source_type }}</span></h1>
+<p>Version {{ s.version }} · <code>{{ s.schema_id }}</code> · {{ '{:,}'.format(s.row_count) }} rows · <code>{{ s.content_hash[:23] }}…</code></p>
+<h2>Provenance</h2>
+<ul>
+  <li>Produced by <code>{{ p.component.id if p.component else '–' }} {{ p.component.version if p.component else '' }}</code>{% if p.seed is not none %}, seed {{ p.seed }}{% endif %}</li>
+  {% if p.scenario %}<li>Scenario <code>{{ p.scenario.scenario_id }}</code> {{ p.scenario.version }}</li>{% endif %}
+  <li>Inputs: {% for i in p.inputs %}<a href="{{ url_for('ui_dataset', dataset_id=i.dataset_id) }}"><code>{{ i.dataset_id }}</code></a>{% if not loop.last %}, {% endif %}{% else %}none{% endfor %}</li>
+  {% for w in p.warnings %}<li class="warn">{{ w }}</li>{% endfor %}
+</ul>
+<details><summary>Fields</summary>
+  <table><thead><tr><th>Field</th><th>Type</th><th>Unit</th><th>Nullable</th></tr></thead><tbody>
+  {% for f in detail.table_schema.fields %}<tr><td><code>{{ f.name }}</code></td><td>{{ f.dtype }}</td><td>{{ f.unit or '' }}</td><td>{{ f.nullable }}</td></tr>{% endfor %}
+  </tbody></table>
+</details>
+<h2>Preview</h2>
+<div class="scroll"><table>
+  <thead><tr>{% for c in preview.columns %}<th>{{ c.name }}</th>{% endfor %}</tr></thead>
+  <tbody>{% for row in preview.rows %}<tr>{% for c in preview.columns %}<td>{{ row[c.name] }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+</table></div>
+{% endblock %}

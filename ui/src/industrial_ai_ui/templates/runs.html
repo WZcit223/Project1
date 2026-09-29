@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block content %}
+<h1>Results</h1>
+<form method="get" action="{{ url_for('ui_compare') }}">
+<table>
+  <thead><tr><th>Compare</th><th>Run</th><th>Scenario</th><th>Status</th><th>Seed</th><th>Created</th></tr></thead>
+  <tbody>
+  {% for r in runs %}
+    <tr>
+      <td>{% if r.status == 'succeeded' %}<input type="checkbox" name="run_ids" value="{{ r.run_id }}">{% endif %}</td>
+      <td><a href="{{ url_for('ui_run', run_id=r.run_id) }}"><code>{{ r.run_id }}</code></a></td>
+      <td>{{ r.scenario_id }} {{ r.scenario_version }}</td>
+      <td class="status-{{ r.status }}">{{ r.status }}{% if r.error %} — {{ r.error }}{% endif %}</td>
+      <td>{{ r.seed }}</td>
+      <td class="muted">{{ r.created_at[:19] }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="muted">No runs yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<button type="submit">Compare selected runs</button>
+</form>
+{% endblock %}

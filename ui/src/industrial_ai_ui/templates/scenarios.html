@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Scenario builder{% endblock %}
+{% block content %}
+<h1>Scenario builder</h1>
+<table>
+  <thead><tr><th>Scenario</th><th>Version</th><th>Source</th><th>Parameters (non-default)</th></tr></thead>
+  <tbody>{% for s in scenarios %}<tr><td>{{ s.title }} <code>{{ s.scenario_id }}</code></td><td>{{ s.version }}</td><td>{{ s.source }}</td><td><code>{{ s.parameters }}</code></td></tr>{% endfor %}</tbody>
+</table>
+<h2>New scenario</h2>
+<p class="muted">Start from the defaults (baseline) and change what should differ. Values are validated by the API against the pack's parameter ranges; scenarios are immutable, so a change needs a new version.</p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+{% if saved %}<p class="ok">Saved <code>{{ saved.scenario_id }}</code> {{ saved.version }}. It can now be selected on the <a href="{{ url_for('ui_simulate') }}">Simulation</a> page.</p>{% endif %}
+<form method="post" action="{{ url_for('ui_create_scenario') }}" class="grid">
+  <label>Scenario id <input name="scenario_id" required pattern="[a-z][a-z0-9_]*" placeholder="promo_week"></label>
+  <label>Version <input name="version" value="1.0.0" required></label>
+  <label>Title <input name="title" placeholder="Promotion week"></label>
+  <label>Description <input name="description"></label>
+  {% for name, prop in schema.properties.items() %}
+    <label title="{{ prop.get('description', '') }}">{{ name }}
+      {% if prop.type == 'boolean' %}
+        <input type="checkbox" name="param_{{ name }}" {% if defaults[name] %}checked{% endif %}>
+      {% else %}
+        <input type="number" name="param_{{ name }}" value="{{ defaults[name] }}"
+               step="{{ '1' if prop.type == 'integer' else 'any' }}"
+               {% if prop.minimum is defined %}min="{{ prop.minimum }}"{% endif %}
+               {% if prop.maximum is defined %}max="{{ prop.maximum }}"{% endif %}>
+      {% endif %}
+    </label>
+  {% endfor %}
+  <button type="submit">Save scenario</button>
+</form>
+{% endblock %}
